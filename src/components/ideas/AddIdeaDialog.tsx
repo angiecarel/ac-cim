@@ -122,7 +122,7 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
                   <SelectItem value="">None</SelectItem>
                   {platforms.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
-                      {p.emoji} {p.name}
+                      {p.name}
                     </SelectItem>
                   ))}
                 </SelectContent>

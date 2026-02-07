@@ -25,7 +25,6 @@ export interface Platform {
   id: string;
   user_id: string;
   name: string;
-  emoji: string;
   created_at: string;
   updated_at: string;
 }

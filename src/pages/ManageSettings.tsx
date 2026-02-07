@@ -64,7 +64,6 @@ export function ManageSettings() {
 
   // Platforms state
   const [newPlatformName, setNewPlatformName] = useState('');
-  const [newPlatformEmoji, setNewPlatformEmoji] = useState('📱');
   const [editingPlatform, setEditingPlatform] = useState<Platform | null>(null);
   const [deletingPlatform, setDeletingPlatform] = useState<Platform | null>(null);
   const [platformLoading, setPlatformLoading] = useState(false);
@@ -106,16 +105,15 @@ export function ManageSettings() {
   const handleAddPlatform = async () => {
     if (!newPlatformName.trim()) return;
     setPlatformLoading(true);
-    await createPlatform(newPlatformName.trim(), newPlatformEmoji);
+    await createPlatform(newPlatformName.trim());
     setNewPlatformName('');
-    setNewPlatformEmoji('📱');
     setPlatformLoading(false);
   };
 
   const handleUpdatePlatform = async () => {
     if (!editingPlatform) return;
     setPlatformLoading(true);
-    await updatePlatform(editingPlatform.id, editingPlatform.name, editingPlatform.emoji);
+    await updatePlatform(editingPlatform.id, editingPlatform.name);
     setEditingPlatform(null);
     setPlatformLoading(false);
   };
@@ -265,13 +263,6 @@ export function ManageSettings() {
             {/* Add new */}
             <div className="flex gap-2">
               <Input
-                placeholder="Emoji"
-                value={newPlatformEmoji}
-                onChange={(e) => setNewPlatformEmoji(e.target.value)}
-                className="w-16 text-center"
-                maxLength={2}
-              />
-              <Input
                 placeholder="Platform name..."
                 value={newPlatformName}
                 onChange={(e) => setNewPlatformName(e.target.value)}
@@ -287,7 +278,7 @@ export function ManageSettings() {
             <div className="space-y-2">
               {platforms.map((p) => (
                 <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
-                  <span>{p.emoji} {p.name}</span>
+                  <span>{p.name}</span>
                   <div className="flex gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -305,27 +296,14 @@ export function ManageSettings() {
                           <DialogTitle>Edit Platform</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
-                          <div className="grid grid-cols-[80px_1fr] gap-4">
-                            <div className="space-y-2">
-                              <Label>Emoji</Label>
-                              <Input
-                                value={editingPlatform?.emoji || ''}
-                                onChange={(e) => setEditingPlatform(prev => 
-                                  prev ? { ...prev, emoji: e.target.value } : null
-                                )}
-                                className="text-center"
-                                maxLength={2}
-                              />
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Name</Label>
-                              <Input
-                                value={editingPlatform?.name || ''}
-                                onChange={(e) => setEditingPlatform(prev => 
-                                  prev ? { ...prev, name: e.target.value } : null
-                                )}
-                              />
-                            </div>
+                          <div className="space-y-2">
+                            <Label>Name</Label>
+                            <Input
+                              value={editingPlatform?.name || ''}
+                              onChange={(e) => setEditingPlatform(prev => 
+                                prev ? { ...prev, name: e.target.value } : null
+                              )}
+                            />
                           </div>
                           <Button onClick={handleUpdatePlatform} disabled={platformLoading} className="w-full">
                             {platformLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}

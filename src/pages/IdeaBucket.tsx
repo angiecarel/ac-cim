@@ -312,7 +312,7 @@ export function IdeaBucket() {
                       onCheckedChange={() => togglePlatformFilter(p.id)}
                     />
                     <Label htmlFor={`platform-${p.id}`} className="text-sm">
-                      {p.emoji} {p.name}
+                      {p.name}
                     </Label>
                   </div>
                 ))}
