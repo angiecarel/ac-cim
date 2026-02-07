@@ -39,6 +39,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { ContentType, Platform, QuickLink } from '@/types';
+import { ChangePasswordCard } from '@/components/settings/ChangePasswordCard';
 
 export function ManageSettings() {
   const {
@@ -164,8 +165,13 @@ export function ManageSettings() {
       <div>
         <h1 className="text-3xl font-bold text-gradient">Manage Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Customize content types, platforms, and quicklinks
+          Customize your account, content types, platforms, and quicklinks
         </p>
+      </div>
+
+      {/* Account Section */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <ChangePasswordCard />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
