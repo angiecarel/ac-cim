@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 import { IdeaProvider } from "@/contexts/IdeaContext";
 import { AuthForm } from "@/components/auth/AuthForm";
+import { ResetPassword } from "@/pages/ResetPassword";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Dashboard } from "@/pages/Dashboard";
 import { IdeaBucket } from "@/pages/IdeaBucket";
@@ -57,7 +58,10 @@ const App = () => (
       <Sonner />
       <BrowserRouter>
         <AuthProvider>
-          <AppContent />
+          <Routes>
+            <Route path="/reset-password" element={<ResetPassword />} />
+            <Route path="/*" element={<AppContent />} />
+          </Routes>
         </AuthProvider>
       </BrowserRouter>
     </TooltipProvider>
