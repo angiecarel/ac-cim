@@ -97,12 +97,12 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
               <Label htmlFor="contentType">Content Type</Label>
-              <Select value={contentTypeId} onValueChange={setContentTypeId}>
+              <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
                 <SelectTrigger id="contentType">
                   <SelectValue placeholder="Select type" />
                 </SelectTrigger>
                 <SelectContent position="popper" side="bottom" className="bg-popover">
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="__none__">None</SelectItem>
                   {contentTypes.map((ct) => (
                     <SelectItem key={ct.id} value={ct.id}>
                       {ct.name}
@@ -114,12 +114,12 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
 
             <div className="space-y-2">
               <Label htmlFor="platform">Platform</Label>
-              <Select value={platformId} onValueChange={setPlatformId}>
+              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                 <SelectTrigger id="platform">
                   <SelectValue placeholder="Select platform" />
                 </SelectTrigger>
                 <SelectContent position="popper" side="bottom" className="bg-popover">
-                  <SelectItem value="">None</SelectItem>
+                  <SelectItem value="__none__">None</SelectItem>
                   {platforms.map((p) => (
                     <SelectItem key={p.id} value={p.id}>
                       {p.name}
