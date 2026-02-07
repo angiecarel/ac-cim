@@ -152,8 +152,8 @@ export function AuthForm() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-creative shadow-creative">
             <Lightbulb className="h-8 w-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gradient">Creative Idea Manager</CardTitle>
-          <CardDescription>Capture, organize, and schedule your creative ideas</CardDescription>
+          <CardTitle className="text-2xl font-bold text-gradient">CIM</CardTitle>
+          <CardDescription>Creative Idea Manager</CardDescription>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="signin" className="w-full">

@@ -84,7 +84,7 @@ export function ResetPassword() {
           <div className="mx-auto mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-creative shadow-creative">
             <Lightbulb className="h-8 w-8 text-primary-foreground" />
           </div>
-          <CardTitle className="text-2xl font-bold text-gradient">Set New Password</CardTitle>
+          <CardTitle className="text-2xl font-bold text-gradient">CIM - Set New Password</CardTitle>
           <CardDescription>Enter your new password below</CardDescription>
         </CardHeader>
         <CardContent>
