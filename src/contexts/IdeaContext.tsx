@@ -27,8 +27,8 @@ interface IdeaContextType {
   // Platforms
   platforms: Platform[];
   platformsLoading: boolean;
-  createPlatform: (name: string, emoji: string) => Promise<void>;
-  updatePlatform: (id: string, name: string, emoji: string) => Promise<void>;
+  createPlatform: (name: string) => Promise<void>;
+  updatePlatform: (id: string, name: string) => Promise<void>;
   deletePlatform: (id: string) => Promise<void>;
   
   // QuickLinks

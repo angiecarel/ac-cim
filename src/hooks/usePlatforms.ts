@@ -35,7 +35,7 @@ export function usePlatforms(userId: string | undefined) {
     fetchPlatforms();
   }, [fetchPlatforms]);
 
-  const createPlatform = useCallback(async (name: string, emoji: string) => {
+  const createPlatform = useCallback(async (name: string) => {
     if (!userId) return;
 
     try {
@@ -44,7 +44,6 @@ export function usePlatforms(userId: string | undefined) {
         .insert({
           user_id: userId,
           name,
-          emoji,
         })
         .select()
         .single();
@@ -58,15 +57,15 @@ export function usePlatforms(userId: string | undefined) {
     }
   }, [userId]);
 
-  const updatePlatform = useCallback(async (id: string, name: string, emoji: string) => {
+  const updatePlatform = useCallback(async (id: string, name: string) => {
     try {
       const { error } = await supabase
         .from('platforms')
-        .update({ name, emoji })
+        .update({ name })
         .eq('id', id);
 
       if (error) throw error;
-      setPlatforms(prev => prev.map(p => p.id === id ? { ...p, name, emoji } : p).sort((a, b) => a.name.localeCompare(b.name)));
+      setPlatforms(prev => prev.map(p => p.id === id ? { ...p, name } : p).sort((a, b) => a.name.localeCompare(b.name)));
       toast.success('Platform updated!');
     } catch (error) {
       console.error('Error updating platform:', error);
