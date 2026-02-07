@@ -356,12 +356,15 @@ export function ManageSettings() {
                 onChange={(e) => setNewQuickLinkUrl(e.target.value)}
                 className="flex-1 min-w-[200px]"
               />
-              <Select value={newQuickLinkType} onValueChange={setNewQuickLinkType}>
+              <Select
+                value={newQuickLinkType || "__all__"}
+                onValueChange={(v) => setNewQuickLinkType(v === "__all__" ? "" : v)}
+              >
                 <SelectTrigger className="w-40">
                   <SelectValue placeholder="All types" />
                 </SelectTrigger>
                 <SelectContent position="popper" side="bottom" className="bg-popover">
-                  <SelectItem value="">All types</SelectItem>
+                  <SelectItem value="__all__">All types</SelectItem>
                   {contentTypes.map((ct) => (
                     <SelectItem key={ct.id} value={ct.id}>
                       {ct.name}
@@ -428,16 +431,16 @@ export function ManageSettings() {
                           <div className="space-y-2">
                             <Label>Content Type Filter</Label>
                             <Select 
-                              value={editingQuickLink?.content_type_id || ''} 
+                              value={editingQuickLink?.content_type_id || "__all__"} 
                               onValueChange={(v) => setEditingQuickLink(prev => 
-                                prev ? { ...prev, content_type_id: v || null } : null
+                                prev ? { ...prev, content_type_id: v === "__all__" ? null : v } : null
                               )}
                             >
                               <SelectTrigger>
                                 <SelectValue placeholder="All types" />
                               </SelectTrigger>
                               <SelectContent position="popper" side="bottom" className="bg-popover">
-                                <SelectItem value="">All types</SelectItem>
+                                <SelectItem value="__all__">All types</SelectItem>
                                 {contentTypes.map((ct) => (
                                   <SelectItem key={ct.id} value={ct.id}>
                                     {ct.name}
