@@ -173,12 +173,12 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label>Content Type</Label>
-                <Select value={contentTypeId} onValueChange={setContentTypeId}>
+                <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />
                   </SelectTrigger>
                   <SelectContent position="popper" side="bottom" className="bg-popover">
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {contentTypes.map((ct) => (
                       <SelectItem key={ct.id} value={ct.id}>
                         {ct.name}
@@ -190,12 +190,12 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
 
               <div className="space-y-2">
                 <Label>Platform</Label>
-                <Select value={platformId} onValueChange={setPlatformId}>
+                <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select platform" />
                   </SelectTrigger>
                   <SelectContent position="popper" side="bottom" className="bg-popover">
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {platforms.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.name}
