@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   PenTool,
+  Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -24,6 +25,7 @@ const navItems = [
   { path: '/ideas', label: 'Idea Bucket', icon: Lightbulb },
   { path: '/calendar', label: 'Calendar', icon: Calendar },
   { path: '/systems', label: 'Log', icon: PenTool },
+  { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
   { path: '/archive', label: 'Archive', icon: Archive },
   { path: '/settings', label: 'Manage', icon: Settings },
