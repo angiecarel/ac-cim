@@ -288,12 +288,53 @@ export type Database = {
           },
         ]
       }
+      system_tags: {
+        Row: {
+          created_at: string
+          id: string
+          system_id: string
+          tag_id: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          system_id: string
+          tag_id: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          system_id?: string
+          tag_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "system_tags_system_id_fkey"
+            columns: ["system_id"]
+            isOneToOne: false
+            referencedRelation: "systems"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "system_tags_tag_id_fkey"
+            columns: ["tag_id"]
+            isOneToOne: false
+            referencedRelation: "tags"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       systems: {
         Row: {
           content: string | null
           created_at: string
+          entry_date: string | null
           id: string
           idea_id: string | null
+          mood: string | null
           note_type: Database["public"]["Enums"]["system_note_type"]
           platform_id: string | null
           title: string
@@ -303,8 +344,10 @@ export type Database = {
         Insert: {
           content?: string | null
           created_at?: string
+          entry_date?: string | null
           id?: string
           idea_id?: string | null
+          mood?: string | null
           note_type?: Database["public"]["Enums"]["system_note_type"]
           platform_id?: string | null
           title: string
@@ -314,8 +357,10 @@ export type Database = {
         Update: {
           content?: string | null
           created_at?: string
+          entry_date?: string | null
           id?: string
           idea_id?: string | null
+          mood?: string | null
           note_type?: Database["public"]["Enums"]["system_note_type"]
           platform_id?: string | null
           title?: string

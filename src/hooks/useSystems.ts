@@ -12,6 +12,8 @@ export interface SystemNote {
   note_type: SystemNoteType;
   platform_id: string | null;
   idea_id: string | null;
+  entry_date: string | null;
+  mood: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -66,6 +68,8 @@ export function useSystems(userId: string | undefined) {
             note_type: system.note_type || 'quick_thought',
             platform_id: system.platform_id || null,
             idea_id: system.idea_id || null,
+            entry_date: system.entry_date || null,
+            mood: system.mood || null,
           })
           .select()
           .single();
