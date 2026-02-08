@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useIdea } from '@/contexts/IdeaContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { QuickLinksManager } from '@/components/dashboard/QuickLinksManager';
 import { 
   Lightbulb, 
   Pause, 
@@ -11,13 +12,12 @@ import {
   Archive,
   Clock,
   Settings,
-  ExternalLink,
   ArrowRight,
   Recycle
 } from 'lucide-react';
 
 export function Dashboard() {
-  const { stats, quickLinks, setFilters } = useIdea();
+  const { stats, setFilters } = useIdea();
 
   const statCards = [
     { label: 'Total Ideas', value: stats.total, icon: Lightbulb, color: 'text-primary' },
@@ -89,41 +89,7 @@ export function Dashboard() {
 
       {/* QuickLinks Section */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <Card>
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2">
-              <ExternalLink className="h-5 w-5 text-primary" />
-              QuickLinks
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            {quickLinks.length === 0 ? (
-              <div className="text-center py-6">
-                <p className="text-muted-foreground mb-3">No quicklinks yet</p>
-                <Link to="/settings">
-                  <Button variant="outline" size="sm">
-                    Add QuickLinks
-                  </Button>
-                </Link>
-              </div>
-            ) : (
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {quickLinks.map((link) => (
-                  <a
-                    key={link.id}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors text-sm font-medium"
-                  >
-                    <ExternalLink className="h-4 w-4 text-primary flex-shrink-0" />
-                    <span className="truncate">{link.name}</span>
-                  </a>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
+        <QuickLinksManager />
 
         {/* Recent Activity placeholder */}
         <Card>
