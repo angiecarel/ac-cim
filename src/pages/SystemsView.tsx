@@ -2,17 +2,13 @@ import { useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSystems, SystemNote, SystemNoteType } from '@/hooks/useSystems';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
-import { Label } from '@/components/ui/label';
-import { Plus, StickyNote, BookOpen, Trash2, Edit, Link2 } from 'lucide-react';
-import { format } from 'date-fns';
-import { cn } from '@/lib/utils';
+import { Plus, StickyNote, BookOpen } from 'lucide-react';
+import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
+import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
+import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
 
 export function SystemsView() {
   const { user } = useAuth();
@@ -22,127 +18,85 @@ export function SystemsView() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<SystemNote | null>(null);
   const [noteType, setNoteType] = useState<SystemNoteType>('quick_thought');
-  const [title, setTitle] = useState('');
-  const [content, setContent] = useState('');
-  const [platformId, setPlatformId] = useState<string>('');
-  const [ideaId, setIdeaId] = useState<string>('');
+  const [focusModeOpen, setFocusModeOpen] = useState(false);
+  const [focusModeTitle, setFocusModeTitle] = useState('');
+  const [focusModeContent, setFocusModeContent] = useState('');
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
 
-  const resetForm = () => {
-    setTitle('');
-    setContent('');
-    setPlatformId('');
-    setIdeaId('');
-    setNoteType('quick_thought');
-    setEditingNote(null);
-  };
-
-  const handleCreate = async () => {
-    if (!title.trim()) return;
-    await createSystem({
-      title: title.trim(),
-      content: content.trim() || null,
-      note_type: noteType,
-      platform_id: platformId || null,
-      idea_id: ideaId || null,
-    });
-    resetForm();
-    setIsAddOpen(false);
-  };
-
-  const handleUpdate = async () => {
-    if (!editingNote || !title.trim()) return;
-    await updateSystem(editingNote.id, {
-      title: title.trim(),
-      content: content.trim() || null,
-      platform_id: platformId || null,
-      idea_id: ideaId || null,
-    });
-    resetForm();
-  };
-
-  const openEdit = (note: SystemNote) => {
-    setEditingNote(note);
-    setTitle(note.title);
-    setContent(note.content || '');
-    setPlatformId(note.platform_id || '');
-    setIdeaId(note.idea_id || '');
-    setNoteType(note.note_type);
-  };
-
-  const openAdd = (type: SystemNoteType) => {
-    resetForm();
-    setNoteType(type);
-    setIsAddOpen(true);
-  };
-
   const getLinkedPlatform = (platformId: string | null) => {
     if (!platformId) return null;
-    return platforms.find((p) => p.id === platformId);
+    return platforms.find((p) => p.id === platformId) || null;
   };
 
   const getLinkedIdea = (ideaId: string | null) => {
     if (!ideaId) return null;
-    return ideas.find((i) => i.id === ideaId);
+    return ideas.find((i) => i.id === ideaId) || null;
   };
 
-  // Filter out archived/recycled ideas for linking
-  const linkableIdeas = ideas.filter((i) => !['archived', 'recycled'].includes(i.status));
+  const handleSave = async (data: {
+    title: string;
+    content: string;
+    platform_id: string | null;
+    idea_id: string | null;
+    entry_date: string | null;
+    mood: string | null;
+  }) => {
+    if (editingNote) {
+      await updateSystem(editingNote.id, {
+        title: data.title,
+        content: data.content || null,
+        platform_id: data.platform_id,
+        idea_id: data.idea_id,
+        entry_date: data.entry_date,
+        mood: data.mood,
+      });
+    } else {
+      await createSystem({
+        title: data.title,
+        content: data.content || null,
+        note_type: noteType,
+        platform_id: data.platform_id,
+        idea_id: data.idea_id,
+        entry_date: data.entry_date,
+        mood: data.mood,
+      });
+    }
+    setEditingNote(null);
+    setIsAddOpen(false);
+  };
 
-  const NoteCard = ({ note, isSticky = false }: { note: SystemNote; isSticky?: boolean }) => {
-    const platform = getLinkedPlatform(note.platform_id);
-    const idea = getLinkedIdea(note.idea_id);
+  const openAdd = (type: SystemNoteType) => {
+    setEditingNote(null);
+    setNoteType(type);
+    setIsAddOpen(true);
+  };
 
-    return (
-      <Card
-        className={cn(
-          'group relative card-hover',
-          isSticky && 'bg-accent/50 border-accent'
-        )}
-      >
-        <CardHeader className="pb-2">
-          <div className="flex items-start justify-between gap-2">
-            <CardTitle className="text-base font-medium leading-tight">{note.title}</CardTitle>
-            <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => openEdit(note)}>
-                <Edit className="h-3.5 w-3.5" />
-              </Button>
-              <Button
-                variant="ghost"
-                size="icon"
-                className="h-7 w-7 text-destructive hover:text-destructive"
-                onClick={() => deleteSystem(note.id)}
-              >
-                <Trash2 className="h-3.5 w-3.5" />
-              </Button>
-            </div>
-          </div>
-        </CardHeader>
-        <CardContent className="space-y-3">
-          {note.content && (
-            <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-4">{note.content}</p>
-          )}
-          {(platform || idea) && (
-            <div className="flex flex-wrap gap-2">
-              {platform && (
-                <span className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-1 rounded-full">
-                  {platform.name}
-                </span>
-              )}
-              {idea && (
-                <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                  <Link2 className="h-3 w-3" />
-                  {idea.title}
-                </span>
-              )}
-            </div>
-          )}
-          <p className="text-xs text-muted-foreground">{format(new Date(note.updated_at), 'MMM d, yyyy')}</p>
-        </CardContent>
-      </Card>
-    );
+  const openEdit = (note: SystemNote) => {
+    setEditingNote(note);
+    setNoteType(note.note_type);
+    setIsAddOpen(true);
+  };
+
+  const handleOpenFocusMode = () => {
+    setFocusModeTitle('');
+    setFocusModeContent('');
+    setIsAddOpen(false);
+    setFocusModeOpen(true);
+  };
+
+  const handleFocusModeSave = async (title: string, content: string) => {
+    await createSystem({
+      title,
+      content: content || null,
+      note_type: 'journal_entry',
+      platform_id: null,
+      idea_id: null,
+      entry_date: new Date().toISOString().split('T')[0],
+      mood: null,
+    });
+    setFocusModeOpen(false);
   };
 
   if (loading) {
@@ -164,17 +118,48 @@ export function SystemsView() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="quick" className="space-y-6">
+      <Tabs defaultValue="journal" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="quick" className="gap-2">
-            <StickyNote className="h-4 w-4" />
-            Quick Thoughts
-          </TabsTrigger>
           <TabsTrigger value="journal" className="gap-2">
             <BookOpen className="h-4 w-4" />
             Journal Entries
           </TabsTrigger>
+          <TabsTrigger value="quick" className="gap-2">
+            <StickyNote className="h-4 w-4" />
+            Quick Thoughts
+          </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="journal" className="space-y-4">
+          <div className="flex justify-end gap-2">
+            <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
+              Focus Mode
+            </Button>
+            <Button onClick={() => openAdd('journal_entry')} className="gap-2">
+              <Plus className="h-4 w-4" />
+              New Entry
+            </Button>
+          </div>
+          {journalEntries.length === 0 ? (
+            <Card className="p-8 text-center">
+              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No journal entries yet. Start documenting your journey!</p>
+            </Card>
+          ) : (
+            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {journalEntries.map((note) => (
+                <JournalNoteCard
+                  key={note.id}
+                  note={note}
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
         <TabsContent value="quick" className="space-y-4">
           <div className="flex justify-end">
@@ -191,186 +176,44 @@ export function SystemsView() {
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {quickThoughts.map((note) => (
-                <NoteCard key={note.id} note={note} isSticky />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        <TabsContent value="journal" className="space-y-4">
-          <div className="flex justify-end">
-            <Button onClick={() => openAdd('journal_entry')} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Journal Entry
-            </Button>
-          </div>
-          {journalEntries.length === 0 ? (
-            <Card className="p-8 text-center">
-              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No journal entries yet. Document your systems!</p>
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {journalEntries.map((note) => (
-                <NoteCard key={note.id} note={note} />
+                <JournalNoteCard
+                  key={note.id}
+                  note={note}
+                  isSticky
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
               ))}
             </div>
           )}
         </TabsContent>
       </Tabs>
 
-      {/* Add Dialog */}
-      <Dialog open={isAddOpen} onOpenChange={setIsAddOpen}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              {noteType === 'quick_thought' ? (
-                <>
-                  <StickyNote className="h-5 w-5 text-accent-foreground" />
-                  New Quick Thought
-                </>
-              ) : (
-                <>
-                  <BookOpen className="h-5 w-5 text-primary" />
-                  New Journal Entry
-                </>
-              )}
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="title">Title</Label>
-              <Input
-                id="title"
-                value={title}
-                onChange={(e) => setTitle(e.target.value)}
-                placeholder={noteType === 'quick_thought' ? 'Quick thought...' : 'Entry title...'}
-              />
-            </div>
-            <div>
-              <Label htmlFor="content">Content</Label>
-              <Textarea
-                id="content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                placeholder="Write your thoughts..."
-                rows={noteType === 'journal_entry' ? 8 : 4}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Link to Context</Label>
-              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select context" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">None</SelectItem>
-                    {platforms.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Link to Idea</Label>
-              <Select value={ideaId || "__none__"} onValueChange={(v) => setIdeaId(v === "__none__" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select idea" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">None</SelectItem>
-                    {linkableIdeas.map((i) => (
-                      <SelectItem key={i.id} value={i.id}>
-                        {i.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setIsAddOpen(false)}>
-              Cancel
-            </Button>
-            <Button onClick={handleCreate} disabled={!title.trim()}>
-              Create
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Add/Edit Dialog */}
+      <JournalEntryDialog
+        open={isAddOpen}
+        onOpenChange={(open) => {
+          setIsAddOpen(open);
+          if (!open) setEditingNote(null);
+        }}
+        noteType={noteType}
+        editingNote={editingNote}
+        platforms={platforms}
+        ideas={ideas}
+        onSave={handleSave}
+        onOpenFocusMode={noteType === 'journal_entry' ? handleOpenFocusMode : undefined}
+      />
 
-      {/* Edit Dialog */}
-      <Dialog open={!!editingNote} onOpenChange={(open) => !open && resetForm()}>
-        <DialogContent className="max-w-lg">
-          <DialogHeader>
-            <DialogTitle className="flex items-center gap-2">
-              <Edit className="h-5 w-5" />
-              Edit Note
-            </DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="edit-title">Title</Label>
-              <Input id="edit-title" value={title} onChange={(e) => setTitle(e.target.value)} />
-            </div>
-            <div>
-              <Label htmlFor="edit-content">Content</Label>
-              <Textarea
-                id="edit-content"
-                value={content}
-                onChange={(e) => setContent(e.target.value)}
-                rows={editingNote?.note_type === 'journal_entry' ? 8 : 4}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-4">
-              <div>
-                <Label>Link to Context</Label>
-              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select context" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">None</SelectItem>
-                    {platforms.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-              <div>
-                <Label>Link to Idea</Label>
-              <Select value={ideaId || "__none__"} onValueChange={(v) => setIdeaId(v === "__none__" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select idea" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="__none__">None</SelectItem>
-                    {linkableIdeas.map((i) => (
-                      <SelectItem key={i.id} value={i.id}>
-                        {i.title}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={resetForm}>
-              Cancel
-            </Button>
-            <Button onClick={handleUpdate} disabled={!title.trim()}>
-              Save
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      {/* Focus Mode Dialog */}
+      <FocusModeDialog
+        open={focusModeOpen}
+        onOpenChange={setFocusModeOpen}
+        initialTitle={focusModeTitle}
+        initialContent={focusModeContent}
+        onSave={handleFocusModeSave}
+      />
     </div>
   );
 }
