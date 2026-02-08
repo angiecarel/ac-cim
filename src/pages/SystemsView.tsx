@@ -128,7 +128,6 @@ export function SystemsView() {
             <div className="flex flex-wrap gap-2">
               {platform && (
                 <span className="inline-flex items-center gap-1 text-xs bg-muted px-2 py-1 rounded-full">
-                  <span>{platform.emoji}</span>
                   {platform.name}
                 </span>
               )}
@@ -269,7 +268,7 @@ export function SystemsView() {
                     <SelectItem value="__none__">None</SelectItem>
                     {platforms.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.emoji} {p.name}
+                        {p.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -338,7 +337,7 @@ export function SystemsView() {
                     <SelectItem value="__none__">None</SelectItem>
                     {platforms.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
-                        {p.emoji} {p.name}
+                        {p.name}
                       </SelectItem>
                     ))}
                   </SelectContent>
