@@ -62,7 +62,7 @@ export function QuickNoteCard({
             !note.color && 'bg-accent'
           )}
         />
-        <span className="flex-1 font-handwritten text-sm truncate">{note.title}</span>
+        <span className="flex-1 font-handwritten text-lg truncate">{note.title}</span>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -95,23 +95,21 @@ export function QuickNoteCard({
       )}
     >
       <CardHeader className="pb-2">
-        <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-xl font-handwritten leading-snug line-clamp-2">
-            {note.title}
-          </CardTitle>
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
-            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
-              <Edit className="h-3.5 w-3.5" />
-            </Button>
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7 text-destructive hover:text-destructive"
-              onClick={() => onDelete(note.id)}
-            >
-              <Trash2 className="h-3.5 w-3.5" />
-            </Button>
-          </div>
+        <CardTitle className="text-2xl font-handwritten leading-snug pr-16">
+          {note.title}
+        </CardTitle>
+        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
+            <Edit className="h-3.5 w-3.5" />
+          </Button>
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7 text-destructive hover:text-destructive"
+            onClick={() => onDelete(note.id)}
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </Button>
         </div>
       </CardHeader>
       <CardContent className="space-y-3">
