@@ -90,9 +90,11 @@ export type Database = {
           description: string | null
           id: string
           is_timely: boolean
+          next_action: string | null
           platform_id: string | null
           priority: Database["public"]["Enums"]["idea_priority"]
           scheduled_date: string | null
+          source: string | null
           status: Database["public"]["Enums"]["idea_status"]
           title: string
           updated_at: string
@@ -105,9 +107,11 @@ export type Database = {
           description?: string | null
           id?: string
           is_timely?: boolean
+          next_action?: string | null
           platform_id?: string | null
           priority?: Database["public"]["Enums"]["idea_priority"]
           scheduled_date?: string | null
+          source?: string | null
           status?: Database["public"]["Enums"]["idea_status"]
           title: string
           updated_at?: string
@@ -120,9 +124,11 @@ export type Database = {
           description?: string | null
           id?: string
           is_timely?: boolean
+          next_action?: string | null
           platform_id?: string | null
           priority?: Database["public"]["Enums"]["idea_priority"]
           scheduled_date?: string | null
+          source?: string | null
           status?: Database["public"]["Enums"]["idea_status"]
           title?: string
           updated_at?: string
