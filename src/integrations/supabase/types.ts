@@ -196,6 +196,36 @@ export type Database = {
           },
         ]
       }
+      note_colors: {
+        Row: {
+          created_at: string
+          hex_color: string
+          id: string
+          name: string
+          sort_order: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          hex_color: string
+          id?: string
+          name: string
+          sort_order?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          hex_color?: string
+          id?: string
+          name?: string
+          sort_order?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       platforms: {
         Row: {
           created_at: string
