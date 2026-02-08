@@ -83,7 +83,7 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
           <div className="grid grid-cols-2 gap-4 text-sm">
             {idea.content_type && (
               <div>
-                <span className="text-muted-foreground">Content Type:</span>
+                <span className="text-muted-foreground">Idea Type:</span>
                 <span className="ml-2 font-medium">{idea.content_type.name}</span>
               </div>
             )}
