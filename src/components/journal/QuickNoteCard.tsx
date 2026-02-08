@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Edit, Trash2, Link2 } from 'lucide-react';
+import { Edit, Trash2, Link2, Pin, PinOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
@@ -24,6 +24,7 @@ interface QuickNoteCardProps {
   noteColors: NoteColor[];
   onEdit: (note: SystemNote) => void;
   onDelete: (id: string) => void;
+  onTogglePin?: (id: string, isPinned: boolean) => void;
   compact?: boolean;
 }
 
@@ -34,6 +35,7 @@ export function QuickNoteCard({
   noteColors,
   onEdit,
   onDelete,
+  onTogglePin,
   compact = false,
 }: QuickNoteCardProps) {
   const colorStyle = getColorStyle(note.color, noteColors);
@@ -52,6 +54,9 @@ export function QuickNoteCard({
           borderColor: colorStyle.border,
         }}
       >
+        {note.is_pinned && (
+          <Pin className="h-3 w-3 text-primary flex-shrink-0" />
+        )}
         <div
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: colorStyle.border }}
@@ -64,6 +69,16 @@ export function QuickNoteCard({
           {format(new Date(note.updated_at), 'MMM d')}
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onTogglePin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-6 w-6"
+              onClick={() => onTogglePin(note.id, !note.is_pinned)}
+            >
+              {note.is_pinned ? <PinOff className="h-3 w-3" /> : <Pin className="h-3 w-3" />}
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-6 w-6" onClick={() => onEdit(note)}>
             <Edit className="h-3 w-3" />
           </Button>
@@ -82,17 +97,35 @@ export function QuickNoteCard({
 
   return (
     <Card
-      className="group relative transition-all hover:shadow-md"
+      className={cn(
+        "group relative transition-all hover:shadow-md",
+        note.is_pinned && "ring-2 ring-primary/30"
+      )}
       style={{
         backgroundColor: colorStyle.bg,
         borderColor: colorStyle.border,
       }}
     >
       <CardHeader className="pb-2">
-        <CardTitle className="text-2xl font-handwritten leading-snug pr-16">
-          {note.title}
-        </CardTitle>
+        <div className="flex items-start gap-2">
+          {note.is_pinned && (
+            <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
+          )}
+          <CardTitle className="text-2xl font-handwritten leading-snug pr-16 flex-1">
+            {note.title}
+          </CardTitle>
+        </div>
         <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onTogglePin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => onTogglePin(note.id, !note.is_pinned)}
+            >
+              {note.is_pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
             <Edit className="h-3.5 w-3.5" />
           </Button>

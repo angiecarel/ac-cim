@@ -16,6 +16,7 @@ export interface SystemNote {
   entry_date: string | null;
   mood: string | null;
   color: string | null;
+  is_pinned: boolean;
   created_at: string;
   updated_at: string;
 }

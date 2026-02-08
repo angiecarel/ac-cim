@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
-import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles } from 'lucide-react';
+import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles, Pin, PinOff } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -29,6 +29,7 @@ interface JournalNoteCardProps {
   idea?: Idea | null;
   onEdit: (note: SystemNote) => void;
   onDelete: (id: string) => void;
+  onTogglePin?: (id: string, isPinned: boolean) => void;
   compact?: boolean;
 }
 
@@ -38,6 +39,7 @@ export function JournalNoteCard({
   idea,
   onEdit,
   onDelete,
+  onTogglePin,
   compact = false,
 }: JournalNoteCardProps) {
   const MoodIcon = note.mood && MOOD_ICONS[note.mood]?.icon;
@@ -51,6 +53,9 @@ export function JournalNoteCard({
   if (compact) {
     return (
       <div className="group flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-muted/30 transition-colors">
+        {note.is_pinned && (
+          <Pin className="h-3.5 w-3.5 text-primary flex-shrink-0" />
+        )}
         {MoodIcon && (
           <MoodIcon className={cn('h-4 w-4 flex-shrink-0', moodColor)} />
         )}
@@ -65,6 +70,16 @@ export function JournalNoteCard({
           }
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+          {onTogglePin && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={() => onTogglePin(note.id, !note.is_pinned)}
+            >
+              {note.is_pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+            </Button>
+          )}
           <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
             <Edit className="h-3.5 w-3.5" />
           </Button>
@@ -82,12 +97,18 @@ export function JournalNoteCard({
   }
 
   return (
-    <Card className="group w-full transition-all hover:shadow-md">
+    <Card className={cn(
+      "group w-full transition-all hover:shadow-md",
+      note.is_pinned && "ring-2 ring-primary/30"
+    )}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             {/* Header row with date and mood */}
             <div className="flex items-center gap-3 mb-2 text-sm text-muted-foreground">
+              {note.is_pinned && (
+                <Pin className="h-4 w-4 text-primary" />
+              )}
               <span>
                 {note.entry_date 
                   ? format(new Date(note.entry_date), 'EEEE, MMMM d, yyyy')
@@ -131,6 +152,16 @@ export function JournalNoteCard({
 
           {/* Actions */}
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+            {onTogglePin && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="h-8 w-8"
+                onClick={() => onTogglePin(note.id, !note.is_pinned)}
+              >
+                {note.is_pinned ? <PinOff className="h-4 w-4" /> : <Pin className="h-4 w-4" />}
+              </Button>
+            )}
             <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(note)}>
               <Edit className="h-4 w-4" />
             </Button>

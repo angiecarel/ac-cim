@@ -5,15 +5,18 @@ import { useNoteColors } from '@/hooks/useNoteColors';
 import { useIdea } from '@/contexts/IdeaContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette } from 'lucide-react';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X } from 'lucide-react';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
 import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
 import { QuickNoteDialog } from '@/components/journal/QuickNoteDialog';
 import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
+import { LogFAB } from '@/components/journal/LogFAB';
+import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
@@ -35,44 +38,95 @@ export function SystemsView() {
   const [journalViewMode, setJournalViewMode] = useState<ViewMode>('expanded');
   const [quickNoteSortBy, setQuickNoteSortBy] = useState<SortOption>('date_desc');
   const [colorFilter, setColorFilter] = useState<ColorFilter>('__all__');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
 
-  // Filter quick thoughts by color
+  // Filter quick thoughts by color and search
   const filteredQuickThoughts = useMemo(() => {
-    if (colorFilter === '__all__') return quickThoughts;
-    if (colorFilter === '__none__') return quickThoughts.filter(n => !n.color);
-    return quickThoughts.filter(n => n.color === colorFilter);
-  }, [quickThoughts, colorFilter]);
+    let filtered = quickThoughts;
+    
+    // Apply color filter
+    if (colorFilter === '__none__') {
+      filtered = filtered.filter(n => !n.color);
+    } else if (colorFilter !== '__all__') {
+      filtered = filtered.filter(n => n.color === colorFilter);
+    }
+    
+    // Apply search filter
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(n => 
+        n.title.toLowerCase().includes(query) || 
+        (n.content && n.content.toLowerCase().includes(query))
+      );
+    }
+    
+    return filtered;
+  }, [quickThoughts, colorFilter, searchQuery]);
 
-  // Sort quick thoughts based on selected option
+  // Sort quick thoughts based on selected option (pinned always first)
   const sortedQuickThoughts = useMemo(() => {
     const sorted = [...filteredQuickThoughts];
     
+    // First sort by the selected option
     switch (quickNoteSortBy) {
       case 'date_desc':
-        return sorted.sort((a, b) => 
+        sorted.sort((a, b) => 
           new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime()
         );
+        break;
       case 'date_asc':
-        return sorted.sort((a, b) => 
+        sorted.sort((a, b) => 
           new Date(a.entry_date || a.created_at).getTime() - new Date(b.entry_date || b.created_at).getTime()
         );
+        break;
       case 'alpha_asc':
-        return sorted.sort((a, b) => a.title.localeCompare(b.title));
+        sorted.sort((a, b) => a.title.localeCompare(b.title));
+        break;
       case 'alpha_desc':
-        return sorted.sort((a, b) => b.title.localeCompare(a.title));
+        sorted.sort((a, b) => b.title.localeCompare(a.title));
+        break;
       case 'color':
-        return sorted.sort((a, b) => {
+        sorted.sort((a, b) => {
           const colorA = a.color || '';
           const colorB = b.color || '';
           return colorA.localeCompare(colorB);
         });
-      default:
-        return sorted;
+        break;
     }
+    
+    // Then stable-sort pinned items to the top
+    return sorted.sort((a, b) => {
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      return 0;
+    });
   }, [filteredQuickThoughts, quickNoteSortBy]);
+
+  // Filter and sort journal entries (search + pinned first)
+  const filteredJournalEntries = useMemo(() => {
+    let filtered = journalEntries;
+    
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(n => 
+        n.title.toLowerCase().includes(query) || 
+        (n.content && n.content.toLowerCase().includes(query))
+      );
+    }
+    
+    // Sort by date descending, then pinned first
+    return filtered.sort((a, b) => {
+      // Pinned first
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      // Then by date
+      return new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime();
+    });
+  }, [journalEntries, searchQuery]);
 
   const getLinkedPlatform = (platformId: string | null) => {
     if (!platformId) return null;
@@ -147,6 +201,25 @@ export function SystemsView() {
     setIsAddOpen(false);
   };
 
+  // Toggle pin handler
+  const handleTogglePin = async (id: string, isPinned: boolean) => {
+    await updateSystem(id, { is_pinned: isPinned });
+  };
+
+  // Quick capture save handler
+  const handleQuickCaptureSave = async (data: { title: string; content: string; type: SystemNoteType }) => {
+    await createSystem({
+      title: data.title,
+      content: data.content || null,
+      note_type: data.type,
+      platform_id: null,
+      idea_id: null,
+      entry_date: data.type === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
+      mood: null,
+      color: null,
+    });
+  };
+
   const openAdd = (type: SystemNoteType) => {
     setEditingNote(null);
     setNoteType(type);
@@ -194,6 +267,27 @@ export function SystemsView() {
         <div>
           <h1 className="text-3xl font-bold text-gradient">Log</h1>
           <p className="text-muted-foreground mt-1">Quick notes and journal entries</p>
+        </div>
+        
+        {/* Global Search */}
+        <div className="relative w-full sm:w-64">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search notes..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="pl-9 pr-9"
+          />
+          {searchQuery && (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+              onClick={() => setSearchQuery('')}
+            >
+              <X className="h-3.5 w-3.5" />
+            </Button>
+          )}
         </div>
       </div>
 
@@ -280,6 +374,11 @@ export function SystemsView() {
               <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No quick notes yet. Capture a fleeting idea!</p>
             </Card>
+          ) : sortedQuickThoughts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No notes match your search.</p>
+            </Card>
           ) : quickNoteViewMode === 'compact' ? (
             <div className="space-y-1">
               {sortedQuickThoughts.map((note) => (
@@ -292,6 +391,7 @@ export function SystemsView() {
                   noteColors={noteColors}
                   onEdit={openEdit}
                   onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
                 />
               ))}
             </div>
@@ -306,6 +406,7 @@ export function SystemsView() {
                   noteColors={noteColors}
                   onEdit={openEdit}
                   onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
                 />
               ))}
             </div>
@@ -346,9 +447,14 @@ export function SystemsView() {
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No journal entries yet. Start documenting your journey!</p>
             </Card>
+          ) : filteredJournalEntries.length === 0 ? (
+            <Card className="p-8 text-center">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No entries match your search.</p>
+            </Card>
           ) : journalViewMode === 'compact' ? (
             <Card className="divide-y divide-border overflow-hidden">
-              {journalEntries.map((note) => (
+              {filteredJournalEntries.map((note) => (
                 <JournalNoteCard
                   key={note.id}
                   note={note}
@@ -357,12 +463,13 @@ export function SystemsView() {
                   idea={getLinkedIdea(note.idea_id)}
                   onEdit={openEdit}
                   onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
                 />
               ))}
             </Card>
           ) : (
             <div className="space-y-4">
-              {journalEntries.map((note) => (
+              {filteredJournalEntries.map((note) => (
                 <JournalNoteCard
                   key={note.id}
                   note={note}
@@ -370,6 +477,7 @@ export function SystemsView() {
                   idea={getLinkedIdea(note.idea_id)}
                   onEdit={openEdit}
                   onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
                 />
               ))}
             </div>
@@ -421,6 +529,16 @@ export function SystemsView() {
         initialContent={focusModeContent}
         onSave={handleFocusModeSave}
       />
+
+      {/* Quick Capture Dialog */}
+      <QuickCaptureDialog
+        open={quickCaptureOpen}
+        onOpenChange={setQuickCaptureOpen}
+        onSave={handleQuickCaptureSave}
+      />
+
+      {/* Floating Action Button */}
+      <LogFAB onClick={() => setQuickCaptureOpen(true)} />
     </div>
   );
 }
