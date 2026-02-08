@@ -38,6 +38,7 @@ import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate } from '@/typ
 import { Loader2, CalendarIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { TagMultiSelect } from './TagMultiSelect';
 
 interface EditIdeaDialogProps {
   idea: Idea | null;
@@ -46,7 +47,7 @@ interface EditIdeaDialogProps {
 }
 
 export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps) {
-  const { updateIdea, deleteIdea, contentTypes, platforms } = useIdea();
+  const { updateIdea, deleteIdea, contentTypes, tags, createTag, getIdeaTags, setIdeaTags } = useIdea();
   const [loading, setLoading] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [showStatusConfirm, setShowStatusConfirm] = useState(false);
@@ -56,7 +57,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
   const [description, setDescription] = useState('');
   const [content, setContent] = useState('');
   const [contentTypeId, setContentTypeId] = useState<string>('');
-  const [platformId, setPlatformId] = useState<string>('');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [priority, setPriority] = useState<IdeaPriority>('none');
   const [status, setStatus] = useState<IdeaStatus>('developing');
   const [isTimely, setIsTimely] = useState(false);
@@ -72,7 +73,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       setDescription(idea.description || '');
       setContent(idea.content || '');
       setContentTypeId(idea.content_type_id || '');
-      setPlatformId(idea.platform_id || '');
+      // Load idea tags
+      getIdeaTags(idea.id).then(tagIds => setSelectedTagIds(tagIds));
       setPriority(idea.priority);
       setStatus(idea.status);
       setIsTimely(idea.is_timely);
@@ -118,7 +120,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       description: description.trim() || null,
       content: content.trim() || null,
       content_type_id: contentTypeId || null,
-      platform_id: platformId || null,
+      platform_id: null,
       priority,
       status,
       is_timely: isTimely,
@@ -128,6 +130,9 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       energy_level: energyLevel,
       time_estimate: timeEstimate,
     });
+    
+    // Update idea tags
+    await setIdeaTags(idea.id, selectedTagIds);
     setLoading(false);
     onOpenChange(false);
   };
@@ -201,20 +206,13 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
               </div>
 
               <div className="space-y-2">
-                <Label>Context</Label>
-                <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Select context" />
-                  </SelectTrigger>
-                  <SelectContent position="popper" side="bottom" className="bg-popover">
-                    <SelectItem value="__none__">None</SelectItem>
-                    {platforms.map((p) => (
-                      <SelectItem key={p.id} value={p.id}>
-                        {p.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <Label>Tags</Label>
+                <TagMultiSelect
+                  tags={tags}
+                  selectedTagIds={selectedTagIds}
+                  onTagsChange={setSelectedTagIds}
+                  onCreateTag={createTag}
+                />
               </div>
             </div>
 

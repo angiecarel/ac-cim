@@ -20,6 +20,7 @@ import {
 import { useIdea } from '@/contexts/IdeaContext';
 import { IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
 import { Loader2 } from 'lucide-react';
+import { TagMultiSelect } from './TagMultiSelect';
 
 interface AddIdeaDialogProps {
   open: boolean;
@@ -27,13 +28,13 @@ interface AddIdeaDialogProps {
 }
 
 export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
-  const { createIdea, contentTypes, platforms } = useIdea();
+  const { createIdea, contentTypes, tags, createTag, setIdeaTags } = useIdea();
   const [loading, setLoading] = useState(false);
   
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [contentTypeId, setContentTypeId] = useState<string>('');
-  const [platformId, setPlatformId] = useState<string>('');
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [priority, setPriority] = useState<IdeaPriority>('none');
   const [isTimely, setIsTimely] = useState(false);
   const [source, setSource] = useState('');
@@ -46,7 +47,7 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       setTitle('');
       setDescription('');
       setContentTypeId('');
-      setPlatformId('');
+      setSelectedTagIds([]);
       setPriority('none');
       setIsTimely(false);
       setSource('');
@@ -61,11 +62,11 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
     if (!title.trim()) return;
 
     setLoading(true);
-    await createIdea({
+    const newIdea = await createIdea({
       title: title.trim(),
       description: description.trim() || null,
       content_type_id: contentTypeId || null,
-      platform_id: platformId || null,
+      platform_id: null,
       priority,
       is_timely: isTimely,
       source: source.trim() || null,
@@ -73,13 +74,19 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       energy_level: energyLevel || null,
       time_estimate: timeEstimate || null,
     });
+    
+    // Set tags for the new idea
+    if (newIdea && selectedTagIds.length > 0) {
+      await setIdeaTags(newIdea.id, selectedTagIds);
+    }
+    
     setLoading(false);
     onOpenChange(false);
   };
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="sm:max-w-md">
+      <DialogContent className="sm:max-w-md max-h-[90vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle className="text-gradient">Add New Idea</DialogTitle>
         </DialogHeader>
@@ -106,40 +113,31 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
             />
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-2">
-              <Label htmlFor="contentType">Idea Type</Label>
-              <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
-                <SelectTrigger id="contentType">
-                  <SelectValue placeholder="Select type" />
-                </SelectTrigger>
-                <SelectContent position="popper" side="bottom" className="bg-popover">
-                  <SelectItem value="__none__">None</SelectItem>
-                  {contentTypes.map((ct) => (
-                    <SelectItem key={ct.id} value={ct.id}>
-                      {ct.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label htmlFor="contentType">Idea Type</Label>
+            <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
+              <SelectTrigger id="contentType">
+                <SelectValue placeholder="Select type" />
+              </SelectTrigger>
+              <SelectContent position="popper" side="bottom" className="bg-popover">
+                <SelectItem value="__none__">None</SelectItem>
+                {contentTypes.map((ct) => (
+                  <SelectItem key={ct.id} value={ct.id}>
+                    {ct.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="platform">Context</Label>
-              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
-                <SelectTrigger id="platform">
-                  <SelectValue placeholder="Select context" />
-                </SelectTrigger>
-                <SelectContent position="popper" side="bottom" className="bg-popover">
-                  <SelectItem value="__none__">None</SelectItem>
-                  {platforms.map((p) => (
-                    <SelectItem key={p.id} value={p.id}>
-                      {p.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
+          <div className="space-y-2">
+            <Label>Tags</Label>
+            <TagMultiSelect
+              tags={tags}
+              selectedTagIds={selectedTagIds}
+              onTagsChange={setSelectedTagIds}
+              onCreateTag={createTag}
+            />
           </div>
 
           <div className="space-y-2">
@@ -180,48 +178,48 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
             />
           </div>
 
-           <div className="space-y-2">
-             <Label htmlFor="nextAction">Next Action</Label>
-             <Textarea
-               id="nextAction"
-               placeholder="What's the very next step to move this forward?"
-               value={nextAction}
-               onChange={(e) => setNextAction(e.target.value)}
-               rows={2}
-               maxLength={500}
-             />
-           </div>
+          <div className="space-y-2">
+            <Label htmlFor="nextAction">Next Action</Label>
+            <Textarea
+              id="nextAction"
+              placeholder="What's the very next step to move this forward?"
+              value={nextAction}
+              onChange={(e) => setNextAction(e.target.value)}
+              rows={2}
+              maxLength={500}
+            />
+          </div>
 
-           <div className="grid grid-cols-2 gap-4">
-             <div className="space-y-2">
-               <Label htmlFor="energyLevel">Energy Level</Label>
-               <Select value={energyLevel} onValueChange={(v) => setEnergyLevel(v as EnergyLevel)}>
-                 <SelectTrigger id="energyLevel">
-                   <SelectValue placeholder="Select level" />
-                 </SelectTrigger>
-                 <SelectContent position="popper" side="bottom" className="bg-popover">
-                   <SelectItem value="low">Low</SelectItem>
-                   <SelectItem value="medium">Medium</SelectItem>
-                   <SelectItem value="high">High</SelectItem>
-                 </SelectContent>
-               </Select>
-             </div>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="energyLevel">Energy Level</Label>
+              <Select value={energyLevel} onValueChange={(v) => setEnergyLevel(v as EnergyLevel)}>
+                <SelectTrigger id="energyLevel">
+                  <SelectValue placeholder="Select level" />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="low">Low</SelectItem>
+                  <SelectItem value="medium">Medium</SelectItem>
+                  <SelectItem value="high">High</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-             <div className="space-y-2">
-               <Label htmlFor="timeEstimate">Time Estimate</Label>
-               <Select value={timeEstimate} onValueChange={(v) => setTimeEstimate(v as TimeEstimate)}>
-                 <SelectTrigger id="timeEstimate">
-                   <SelectValue placeholder="Select time" />
-                 </SelectTrigger>
-                 <SelectContent position="popper" side="bottom" className="bg-popover">
-                   <SelectItem value="quick">Quick (minutes)</SelectItem>
-                   <SelectItem value="hour">Hour</SelectItem>
-                   <SelectItem value="day">Day</SelectItem>
-                   <SelectItem value="week_plus">Week+</SelectItem>
-                 </SelectContent>
-               </Select>
-             </div>
-           </div>
+            <div className="space-y-2">
+              <Label htmlFor="timeEstimate">Time Estimate</Label>
+              <Select value={timeEstimate} onValueChange={(v) => setTimeEstimate(v as TimeEstimate)}>
+                <SelectTrigger id="timeEstimate">
+                  <SelectValue placeholder="Select time" />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="quick">Quick (minutes)</SelectItem>
+                  <SelectItem value="hour">Hour</SelectItem>
+                  <SelectItem value="day">Day</SelectItem>
+                  <SelectItem value="week_plus">Week+</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

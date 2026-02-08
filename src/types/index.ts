@@ -27,8 +27,27 @@ export interface Platform {
   id: string;
   user_id: string;
   name: string;
+  emoji: string;
   created_at: string;
   updated_at: string;
+}
+
+export interface Tag {
+  id: string;
+  user_id: string;
+  name: string;
+  color: string;
+  is_system: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface IdeaTag {
+  id: string;
+  idea_id: string;
+  tag_id: string;
+  user_id: string;
+  created_at: string;
 }
 
 export interface Idea {
@@ -53,6 +72,7 @@ export interface Idea {
   content_type?: ContentType | null;
   platform?: Platform | null;
   files?: IdeaFile[];
+  tags?: Tag[];
 }
 
 export interface IdeaFile {

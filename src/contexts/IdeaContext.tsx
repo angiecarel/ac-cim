@@ -1,9 +1,10 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
-import { Idea, ContentType, Platform, QuickLink, IdeaFilters, IdeaStats, ViewMode } from '@/types';
+import { Idea, ContentType, Platform, QuickLink, Tag, IdeaFilters, IdeaStats, ViewMode } from '@/types';
 import { useIdeas } from '@/hooks/useIdeas';
 import { useContentTypes } from '@/hooks/useContentTypes';
 import { usePlatforms } from '@/hooks/usePlatforms';
 import { useQuickLinks } from '@/hooks/useQuickLinks';
+import { useTags, useIdeaTags } from '@/hooks/useTags';
 import { useAuth } from './AuthContext';
 
 interface IdeaContextType {
@@ -37,6 +38,14 @@ interface IdeaContextType {
   createQuickLink: (name: string, url: string, contentTypeId?: string | null) => Promise<void>;
   updateQuickLink: (id: string, name: string, url: string, contentTypeId?: string | null) => Promise<void>;
   deleteQuickLink: (id: string) => Promise<void>;
+  
+  // Tags
+  tags: Tag[];
+  tagsLoading: boolean;
+  createTag: (name: string, color?: string) => Promise<Tag | null>;
+  deleteTag: (id: string) => Promise<void>;
+  getIdeaTags: (ideaId: string) => Promise<string[]>;
+  setIdeaTags: (ideaId: string, tagIds: string[]) => Promise<void>;
   
   // View state
   viewMode: ViewMode;
@@ -93,6 +102,15 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
     updateQuickLink,
     deleteQuickLink,
   } = useQuickLinks(user?.id);
+
+  const {
+    tags,
+    loading: tagsLoading,
+    createTag,
+    deleteTag,
+  } = useTags(user?.id);
+
+  const { getIdeaTags, setIdeaTags } = useIdeaTags(user?.id);
   
   // Archive/Restore/Recycle helpers
   const archiveIdea = useCallback(async (id: string) => {
@@ -195,6 +213,12 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
         createQuickLink,
         updateQuickLink,
         deleteQuickLink,
+        tags,
+        tagsLoading,
+        createTag,
+        deleteTag,
+        getIdeaTags,
+        setIdeaTags,
         viewMode,
         setViewMode,
         filters,
