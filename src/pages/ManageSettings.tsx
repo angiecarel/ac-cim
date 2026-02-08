@@ -40,6 +40,7 @@ import {
 } from 'lucide-react';
 import { ContentType, Platform, QuickLink } from '@/types';
 import { ChangePasswordCard } from '@/components/settings/ChangePasswordCard';
+import { ZapierSettings } from '@/components/settings/ZapierSettings';
 
 export function ManageSettings() {
   const {
@@ -172,6 +173,11 @@ export function ManageSettings() {
       {/* Account Section */}
       <div className="grid lg:grid-cols-2 gap-6">
         <ChangePasswordCard />
+      </div>
+
+      {/* Zapier Integration */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        <ZapierSettings />
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
