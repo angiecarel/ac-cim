@@ -14,6 +14,7 @@ interface IdeaContextType {
   createIdea: (idea: Partial<Idea>) => Promise<Idea | null>;
   updateIdea: (id: string, updates: Partial<Idea>) => Promise<void>;
   deleteIdea: (id: string) => Promise<void>;
+  duplicateIdea: (idea: Idea) => Promise<Idea | null>;
   archiveIdea: (id: string) => Promise<void>;
   restoreIdea: (id: string) => Promise<void>;
   recycleIdea: (id: string) => Promise<void>;
@@ -112,7 +113,7 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
 
   const { getIdeaTags, setIdeaTags } = useIdeaTags(user?.id);
   
-  // Archive/Restore/Recycle helpers
+  // Archive/Restore/Recycle/Duplicate helpers
   const archiveIdea = useCallback(async (id: string) => {
     await updateIdea(id, { status: 'archived', scheduled_date: null });
   }, [updateIdea]);
@@ -124,6 +125,33 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
   const recycleIdea = useCallback(async (id: string) => {
     await updateIdea(id, { status: 'recycled', scheduled_date: null });
   }, [updateIdea]);
+
+  const duplicateIdea = useCallback(async (idea: Idea): Promise<Idea | null> => {
+    const newIdea = await createIdea({
+      title: `${idea.title} (Copy)`,
+      description: idea.description,
+      content: idea.content,
+      content_type_id: idea.content_type_id,
+      platform_id: idea.platform_id,
+      priority: idea.priority,
+      status: 'developing',
+      is_timely: false,
+      source: idea.source,
+      next_action: idea.next_action,
+      energy_level: idea.energy_level,
+      time_estimate: idea.time_estimate,
+    });
+    
+    // Copy tags if new idea was created
+    if (newIdea) {
+      const tagIds = await getIdeaTags(idea.id);
+      if (tagIds.length > 0) {
+        await setIdeaTags(newIdea.id, tagIds);
+      }
+    }
+    
+    return newIdea;
+  }, [createIdea, getIdeaTags, setIdeaTags]);
   
   // Clear filters
   const clearFilters = useCallback(() => {
@@ -195,6 +223,7 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
         createIdea,
         updateIdea,
         deleteIdea,
+        duplicateIdea,
         archiveIdea,
         restoreIdea,
         recycleIdea,

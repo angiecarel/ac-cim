@@ -14,6 +14,50 @@ export type Database = {
   }
   public: {
     Tables: {
+      content_templates: {
+        Row: {
+          content_type_id: string | null
+          created_at: string
+          id: string
+          is_default: boolean
+          name: string
+          sort_order: number
+          template_content: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content_type_id?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name: string
+          sort_order?: number
+          template_content: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content_type_id?: string | null
+          created_at?: string
+          id?: string
+          is_default?: boolean
+          name?: string
+          sort_order?: number
+          template_content?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "content_templates_content_type_id_fkey"
+            columns: ["content_type_id"]
+            isOneToOne: false
+            referencedRelation: "content_types"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       content_types: {
         Row: {
           created_at: string

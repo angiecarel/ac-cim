@@ -44,6 +44,7 @@ export function IdeaBucket() {
     contentTypes,
     platforms,
     quickLinks,
+    duplicateIdea,
   } = useIdea();
 
   const [showAddDialog, setShowAddDialog] = useState(false);
@@ -428,6 +429,7 @@ export function IdeaBucket() {
           setViewingIdea(null);
           setEditingIdea(idea);
         }}
+        onDuplicate={duplicateIdea}
       />
       <EditIdeaDialog
         idea={editingIdea}

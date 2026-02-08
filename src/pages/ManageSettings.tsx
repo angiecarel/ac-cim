@@ -40,6 +40,7 @@ import {
 import { ContentType, Platform } from '@/types';
 import { ChangePasswordCard } from '@/components/settings/ChangePasswordCard';
 import { ZapierSettings } from '@/components/settings/ZapierSettings';
+import { TemplateManager } from '@/components/settings/TemplateManager';
 
 export function ManageSettings() {
   const {
@@ -135,6 +136,9 @@ export function ManageSettings() {
       <div className="grid lg:grid-cols-2 gap-6">
         <ZapierSettings />
       </div>
+
+      {/* Content Templates */}
+      <TemplateManager />
 
       <div className="grid lg:grid-cols-2 gap-6">
         {/* Idea Types */}
