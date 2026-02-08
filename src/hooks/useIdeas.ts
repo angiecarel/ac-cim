@@ -64,6 +64,8 @@ export function useIdeas(userId: string | undefined) {
           status: idea.status || 'developing',
           is_timely: idea.is_timely || false,
           scheduled_date: idea.scheduled_date,
+          source: idea.source || null,
+          next_action: idea.next_action || null,
         })
         .select(`
           *,
@@ -104,6 +106,8 @@ export function useIdeas(userId: string | undefined) {
           status: updates.status,
           is_timely: updates.is_timely,
           scheduled_date: updates.scheduled_date,
+          source: updates.source,
+          next_action: updates.next_action,
         })
         .eq('id', id);
 

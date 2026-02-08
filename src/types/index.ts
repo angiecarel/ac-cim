@@ -41,6 +41,8 @@ export interface Idea {
   status: IdeaStatus;
   is_timely: boolean;
   scheduled_date: string | null;
+  source: string | null;
+  next_action: string | null;
   created_at: string;
   updated_at: string;
   // Joined data

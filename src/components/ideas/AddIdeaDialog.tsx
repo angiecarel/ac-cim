@@ -36,6 +36,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
   const [platformId, setPlatformId] = useState<string>('');
   const [priority, setPriority] = useState<IdeaPriority>('none');
   const [isTimely, setIsTimely] = useState(false);
+  const [source, setSource] = useState('');
+  const [nextAction, setNextAction] = useState('');
 
   useEffect(() => {
     if (open) {
@@ -45,6 +47,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       setPlatformId('');
       setPriority('none');
       setIsTimely(false);
+      setSource('');
+      setNextAction('');
     }
   }, [open]);
 
@@ -60,6 +64,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       platform_id: platformId || null,
       priority,
       is_timely: isTimely,
+      source: source.trim() || null,
+      next_action: nextAction.trim() || null,
     });
     setLoading(false);
     onOpenChange(false);
@@ -154,6 +160,29 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
               id="timely"
               checked={isTimely}
               onCheckedChange={setIsTimely}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="source">Source</Label>
+            <Input
+              id="source"
+              placeholder="Where did this come from? (podcast, conversation, etc.)"
+              value={source}
+              onChange={(e) => setSource(e.target.value)}
+              maxLength={255}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="nextAction">Next Action</Label>
+            <Textarea
+              id="nextAction"
+              placeholder="What's the very next step to move this forward?"
+              value={nextAction}
+              onChange={(e) => setNextAction(e.target.value)}
+              rows={2}
+              maxLength={500}
             />
           </div>
 

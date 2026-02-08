@@ -61,6 +61,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
   const [status, setStatus] = useState<IdeaStatus>('developing');
   const [isTimely, setIsTimely] = useState(false);
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
+  const [source, setSource] = useState('');
+  const [nextAction, setNextAction] = useState('');
 
   useEffect(() => {
     if (idea && open) {
@@ -73,6 +75,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       setStatus(idea.status);
       setIsTimely(idea.is_timely);
       setScheduledDate(idea.scheduled_date ? new Date(idea.scheduled_date) : undefined);
+      setSource(idea.source || '');
+      setNextAction(idea.next_action || '');
     }
   }, [idea, open]);
 
@@ -115,6 +119,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       status,
       is_timely: isTimely,
       scheduled_date: scheduledDate ? format(scheduledDate, 'yyyy-MM-dd') : null,
+      source: source.trim() || null,
+      next_action: nextAction.trim() || null,
     });
     setLoading(false);
     onOpenChange(false);
@@ -277,6 +283,29 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
                 id="edit-timely"
                 checked={isTimely}
                 onCheckedChange={setIsTimely}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-source">Source</Label>
+              <Input
+                id="edit-source"
+                placeholder="Where did this come from? (podcast, conversation, etc.)"
+                value={source}
+                onChange={(e) => setSource(e.target.value)}
+                maxLength={255}
+              />
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="edit-nextAction">Next Action</Label>
+              <Textarea
+                id="edit-nextAction"
+                placeholder="What's the very next step to move this forward?"
+                value={nextAction}
+                onChange={(e) => setNextAction(e.target.value)}
+                rows={2}
+                maxLength={500}
               />
             </div>
 

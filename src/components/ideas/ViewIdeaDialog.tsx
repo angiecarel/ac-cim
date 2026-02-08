@@ -110,9 +110,25 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
                 {idea.content}
               </div>
             </div>
+           )}
+
+          {/* Source */}
+          {idea.source && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-1">Source</h4>
+              <p className="text-sm">{idea.source}</p>
+            </div>
           )}
 
-          {/* Actions */}
+          {/* Next Action */}
+          {idea.next_action && (
+            <div>
+              <h4 className="text-sm font-medium text-muted-foreground mb-1">Next Action</h4>
+              <p className="text-sm preserve-whitespace">{idea.next_action}</p>
+            </div>
+          )}
+
+           {/* Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
               Close
