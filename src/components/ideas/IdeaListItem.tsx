@@ -1,4 +1,5 @@
-import { Idea, QuickLink } from '@/types';
+import { useEffect, useState } from 'react';
+import { Idea, QuickLink, Tag } from '@/types';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -35,9 +36,16 @@ interface IdeaListItemProps {
 }
 
 export function IdeaListItem({ idea, onView, onEdit, onSchedule, compact = false, quickLinks = [] }: IdeaListItemProps) {
-  const { updateIdea, archiveIdea } = useIdea();
+  const { updateIdea, archiveIdea, tags, getIdeaTags } = useIdea();
+  const [ideaTags, setIdeaTags] = useState<Tag[]>([]);
   const statusInfo = statusConfig[idea.status];
   const StatusIcon = statusInfo.icon;
+
+  useEffect(() => {
+    getIdeaTags(idea.id).then(tagIds => {
+      setIdeaTags(tags.filter(t => tagIds.includes(t.id)));
+    });
+  }, [idea.id, tags, getIdeaTags]);
 
   const relevantQuickLinks = quickLinks.filter(
     ql => !ql.content_type_id || ql.content_type_id === idea.content_type_id
@@ -89,9 +97,15 @@ export function IdeaListItem({ idea, onView, onEdit, onSchedule, compact = false
             {idea.content_type.name}
           </span>
         )}
-        {idea.platform && (
-          <span className="text-xs">{idea.platform.name}</span>
-        )}
+        {ideaTags.slice(0, 2).map(tag => (
+          <span 
+            key={tag.id} 
+            className="px-2 py-0.5 rounded text-xs"
+            style={{ backgroundColor: `${tag.color}20`, color: tag.color }}
+          >
+            {tag.name}
+          </span>
+        ))}
         {idea.scheduled_date && (
           <span className="flex items-center gap-1 text-xs">
             <CalendarIcon className="h-3 w-3" />

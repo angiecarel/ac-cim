@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogContent,
@@ -6,11 +7,12 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Idea } from '@/types';
+import { Idea, Tag } from '@/types';
 import { Clock, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { statusConfig } from '@/lib/statusLabels';
+import { useIdea } from '@/contexts/IdeaContext';
 
 interface ViewIdeaDialogProps {
   idea: Idea | null;
@@ -27,6 +29,17 @@ const priorityLabels = {
 };
 
 export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDialogProps) {
+  const { tags, getIdeaTags } = useIdea();
+  const [ideaTags, setIdeaTags] = useState<Tag[]>([]);
+
+  useEffect(() => {
+    if (idea && open) {
+      getIdeaTags(idea.id).then(tagIds => {
+        setIdeaTags(tags.filter(t => tagIds.includes(t.id)));
+      });
+    }
+  }, [idea, open, tags, getIdeaTags]);
+
   if (!idea) return null;
 
   const statusInfo = statusConfig[idea.status];
@@ -72,10 +85,20 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
                 <span className="ml-2 font-medium">{idea.content_type.name}</span>
               </div>
             )}
-            {idea.platform && (
-              <div>
-                <span className="text-muted-foreground">Context:</span>
-                <span className="ml-2 font-medium">{idea.platform.name}</span>
+            {ideaTags.length > 0 && (
+              <div className="col-span-2">
+                <span className="text-muted-foreground">Tags:</span>
+                <div className="flex flex-wrap gap-1 mt-1">
+                  {ideaTags.map(tag => (
+                    <Badge
+                      key={tag.id}
+                      variant="secondary"
+                      style={{ backgroundColor: `${tag.color}20`, borderColor: tag.color, color: tag.color }}
+                    >
+                      {tag.name}
+                    </Badge>
+                  ))}
+                </div>
               </div>
             )}
             {idea.scheduled_date && (
