@@ -161,18 +161,22 @@ export default {
   				'Times',
   				'serif'
   			],
-  			mono: [
-  				'Space Mono',
-  				'ui-monospace',
-  				'SFMono-Regular',
-  				'Menlo',
-  				'Monaco',
-  				'Consolas',
-  				'Liberation Mono',
-  				'Courier New',
-  				'monospace'
-  			]
-  		}
+			mono: [
+				'Space Mono',
+				'ui-monospace',
+				'SFMono-Regular',
+				'Menlo',
+				'Monaco',
+				'Consolas',
+				'Liberation Mono',
+				'Courier New',
+				'monospace'
+			],
+			handwritten: [
+				'Caveat',
+				'cursive'
+			]
+		}
   	}
   },
   plugins: [require("tailwindcss-animate")],

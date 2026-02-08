@@ -13,7 +13,7 @@ import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
 import { QuickNoteDialog } from '@/components/journal/QuickNoteDialog';
 import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
 
-type QuickNoteViewMode = 'expanded' | 'compact';
+type ViewMode = 'expanded' | 'compact';
 
 export function SystemsView() {
   const { user } = useAuth();
@@ -26,7 +26,8 @@ export function SystemsView() {
   const [focusModeOpen, setFocusModeOpen] = useState(false);
   const [focusModeTitle, setFocusModeTitle] = useState('');
   const [focusModeContent, setFocusModeContent] = useState('');
-  const [quickNoteViewMode, setQuickNoteViewMode] = useState<QuickNoteViewMode>('expanded');
+  const [quickNoteViewMode, setQuickNoteViewMode] = useState<ViewMode>('expanded');
+  const [journalViewMode, setJournalViewMode] = useState<ViewMode>('expanded');
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
@@ -167,23 +168,56 @@ export function SystemsView() {
           </TabsTrigger>
         </TabsList>
 
+        {/* Journal Entries Tab */}
         <TabsContent value="journal" className="space-y-4">
-          <div className="flex justify-end gap-2">
-            <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
-              Focus Mode
-            </Button>
-            <Button onClick={() => openAdd('journal_entry')} className="gap-2">
-              <Plus className="h-4 w-4" />
-              New Entry
-            </Button>
+          <div className="flex items-center justify-between gap-4">
+            <ToggleGroup
+              type="single"
+              value={journalViewMode}
+              onValueChange={(v) => v && setJournalViewMode(v as ViewMode)}
+              className="border rounded-md"
+            >
+              <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
+                <LayoutGrid className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Expanded</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
+                <List className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Titles</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
+                Focus Mode
+              </Button>
+              <Button onClick={() => openAdd('journal_entry')} className="gap-2">
+                <Plus className="h-4 w-4" />
+                New Entry
+              </Button>
+            </div>
           </div>
+
           {journalEntries.length === 0 ? (
             <Card className="p-8 text-center">
               <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No journal entries yet. Start documenting your journey!</p>
             </Card>
+          ) : journalViewMode === 'compact' ? (
+            <Card className="divide-y divide-border overflow-hidden">
+              {journalEntries.map((note) => (
+                <JournalNoteCard
+                  key={note.id}
+                  note={note}
+                  compact
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
+              ))}
+            </Card>
           ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div className="space-y-4">
               {journalEntries.map((note) => (
                 <JournalNoteCard
                   key={note.id}
@@ -198,12 +232,13 @@ export function SystemsView() {
           )}
         </TabsContent>
 
+        {/* Quick Notes Tab */}
         <TabsContent value="quick" className="space-y-4">
           <div className="flex items-center justify-between gap-4">
             <ToggleGroup
               type="single"
               value={quickNoteViewMode}
-              onValueChange={(v) => v && setQuickNoteViewMode(v as QuickNoteViewMode)}
+              onValueChange={(v) => v && setQuickNoteViewMode(v as ViewMode)}
               className="border rounded-md"
             >
               <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
