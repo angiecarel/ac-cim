@@ -8,17 +8,19 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Idea, Tag } from '@/types';
-import { Clock, Pencil } from 'lucide-react';
+import { Clock, Pencil, Sparkles, Copy } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { statusConfig } from '@/lib/statusLabels';
 import { useIdea } from '@/contexts/IdeaContext';
+import { SparkDialog } from './SparkDialog';
 
 interface ViewIdeaDialogProps {
   idea: Idea | null;
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onEdit: (idea: Idea) => void;
+  onDuplicate?: (idea: Idea) => void;
 }
 
 const priorityLabels = {
@@ -28,9 +30,10 @@ const priorityLabels = {
   best: 'Best',
 };
 
-export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDialogProps) {
+export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit, onDuplicate }: ViewIdeaDialogProps) {
   const { tags, getIdeaTags } = useIdea();
   const [ideaTags, setIdeaTags] = useState<Tag[]>([]);
+  const [sparkOpen, setSparkOpen] = useState(false);
 
   useEffect(() => {
     if (idea && open) {
@@ -168,22 +171,54 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
           </div>
 
            {/* Actions */}
-          <div className="flex justify-end gap-2 pt-4 border-t">
-            <Button variant="outline" onClick={() => onOpenChange(false)}>
-              Close
-            </Button>
-            <Button 
-              className="bg-gradient-creative hover:opacity-90"
-              onClick={() => {
-                onOpenChange(false);
-                onEdit(idea);
-              }}
-            >
-              <Pencil className="h-4 w-4 mr-2" />
-              Edit
-            </Button>
+          <div className="flex flex-wrap justify-between gap-2 pt-4 border-t">
+            <div className="flex gap-2">
+              <Button 
+                variant="outline"
+                onClick={() => setSparkOpen(true)}
+                className="gap-2"
+              >
+                <Sparkles className="h-4 w-4" />
+                Spark
+              </Button>
+              {onDuplicate && (
+                <Button 
+                  variant="outline"
+                  onClick={() => {
+                    onDuplicate(idea);
+                    onOpenChange(false);
+                  }}
+                  className="gap-2"
+                >
+                  <Copy className="h-4 w-4" />
+                  Duplicate
+                </Button>
+              )}
+            </div>
+            <div className="flex gap-2">
+              <Button variant="outline" onClick={() => onOpenChange(false)}>
+                Close
+              </Button>
+              <Button 
+                className="bg-gradient-creative hover:opacity-90"
+                onClick={() => {
+                  onOpenChange(false);
+                  onEdit(idea);
+                }}
+              >
+                <Pencil className="h-4 w-4 mr-2" />
+                Edit
+              </Button>
+            </div>
           </div>
         </div>
+
+        {/* Spark Dialog */}
+        <SparkDialog
+          idea={idea}
+          open={sparkOpen}
+          onOpenChange={setSparkOpen}
+        />
       </DialogContent>
     </Dialog>
   );
