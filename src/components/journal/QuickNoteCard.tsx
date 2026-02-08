@@ -1,10 +1,11 @@
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
+import { NoteColor } from '@/hooks/useNoteColors';
 import { Edit, Trash2, Link2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { getColorClasses } from './QuickNoteDialog';
+import { getColorStyle } from './QuickNoteDialog';
 
 interface Platform {
   id: string;
@@ -20,6 +21,7 @@ interface QuickNoteCardProps {
   note: SystemNote;
   platform?: Platform | null;
   idea?: Idea | null;
+  noteColors: NoteColor[];
   onEdit: (note: SystemNote) => void;
   onDelete: (id: string) => void;
   compact?: boolean;
@@ -29,11 +31,12 @@ export function QuickNoteCard({
   note,
   platform,
   idea,
+  noteColors,
   onEdit,
   onDelete,
   compact = false,
 }: QuickNoteCardProps) {
-  const colorClasses = getColorClasses(note.color);
+  const colorStyle = getColorStyle(note.color, noteColors);
 
   // Strip HTML for preview
   const contentPreview = note.content
@@ -43,24 +46,15 @@ export function QuickNoteCard({
   if (compact) {
     return (
       <div
-        className={cn(
-          'group flex items-center gap-3 px-3 py-2 rounded-md border transition-all hover:shadow-sm',
-          colorClasses.bg,
-          colorClasses.border
-        )}
+        className="group flex items-center gap-3 px-3 py-2 rounded-md border transition-all hover:shadow-sm"
+        style={{
+          backgroundColor: colorStyle.bg,
+          borderColor: colorStyle.border,
+        }}
       >
         <div
-          className={cn(
-            'w-2 h-2 rounded-full flex-shrink-0',
-            note.color === 'yellow' && 'bg-yellow-500',
-            note.color === 'green' && 'bg-green-500',
-            note.color === 'blue' && 'bg-blue-500',
-            note.color === 'purple' && 'bg-purple-500',
-            note.color === 'pink' && 'bg-pink-500',
-            note.color === 'orange' && 'bg-orange-500',
-            note.color === 'gray' && 'bg-gray-500',
-            !note.color && 'bg-accent'
-          )}
+          className="w-2 h-2 rounded-full flex-shrink-0"
+          style={{ backgroundColor: colorStyle.border }}
         />
         <span className="flex-1 font-handwritten text-lg truncate">{note.title}</span>
         {platform && (
@@ -88,11 +82,11 @@ export function QuickNoteCard({
 
   return (
     <Card
-      className={cn(
-        'group relative transition-all hover:shadow-md',
-        colorClasses.bg,
-        colorClasses.border
-      )}
+      className="group relative transition-all hover:shadow-md"
+      style={{
+        backgroundColor: colorStyle.bg,
+        borderColor: colorStyle.border,
+      }}
     >
       <CardHeader className="pb-2">
         <CardTitle className="text-2xl font-handwritten leading-snug pr-16">
