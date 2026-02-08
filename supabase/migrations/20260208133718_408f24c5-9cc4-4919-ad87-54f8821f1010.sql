@@ -1,0 +1,1 @@
+ALTER TABLE public.profiles ADD COLUMN zapier_webhook_url TEXT;

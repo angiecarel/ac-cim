@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
+import { triggerZapierWebhook, ZAPIER_EVENTS } from '@/lib/zapier';
 
 export type SystemNoteType = 'quick_thought' | 'journal_entry';
 
@@ -22,6 +23,25 @@ export interface SystemNote {
 export function useSystems(userId: string | undefined) {
   const [systems, setSystems] = useState<SystemNote[]>([]);
   const [loading, setLoading] = useState(true);
+  const [webhookUrl, setWebhookUrl] = useState<string | null>(null);
+
+  // Load webhook URL on mount
+  useEffect(() => {
+    const loadWebhook = async () => {
+      if (!userId) return;
+      try {
+        const { data } = await supabase
+          .from('profiles')
+          .select('zapier_webhook_url')
+          .eq('user_id', userId)
+          .single();
+        setWebhookUrl(data?.zapier_webhook_url || null);
+      } catch (error) {
+        console.error('Error loading webhook URL:', error);
+      }
+    };
+    loadWebhook();
+  }, [userId]);
 
   const fetchSystems = useCallback(async () => {
     if (!userId) {
@@ -79,6 +99,21 @@ export function useSystems(userId: string | undefined) {
         if (error) throw error;
         setSystems((prev) => [data as SystemNote, ...prev]);
         toast({ title: 'Note created' });
+        
+        // Trigger Zapier webhook
+        if (webhookUrl) {
+          const eventType = system.note_type === 'journal_entry' 
+            ? ZAPIER_EVENTS.JOURNAL_ENTRY_CREATED 
+            : ZAPIER_EVENTS.QUICK_NOTE_CREATED;
+          await triggerZapierWebhook(webhookUrl, eventType, {
+            id: (data as SystemNote).id,
+            title: (data as SystemNote).title,
+            type: system.note_type,
+            platform_id: system.platform_id,
+            idea_id: system.idea_id,
+          });
+        }
+        
         return data as SystemNote;
       } catch (error) {
         console.error('Error creating system:', error);
@@ -90,7 +125,7 @@ export function useSystems(userId: string | undefined) {
         return null;
       }
     },
-    [userId]
+    [userId, webhookUrl]
   );
 
   const updateSystem = useCallback(
@@ -106,6 +141,23 @@ export function useSystems(userId: string | undefined) {
           prev.map((s) => (s.id === id ? { ...s, ...updates, updated_at: new Date().toISOString() } : s))
         );
         toast({ title: 'Note updated' });
+        
+        // Trigger Zapier webhook
+        if (webhookUrl) {
+          const note = systems.find((s) => s.id === id);
+          if (note) {
+            const eventType = note.note_type === 'journal_entry' 
+              ? ZAPIER_EVENTS.JOURNAL_ENTRY_UPDATED 
+              : ZAPIER_EVENTS.QUICK_NOTE_UPDATED;
+            await triggerZapierWebhook(webhookUrl, eventType, {
+              id,
+              title: updates.title || note.title,
+              type: note.note_type,
+              platform_id: updates.platform_id ?? note.platform_id,
+              idea_id: updates.idea_id ?? note.idea_id,
+            });
+          }
+        }
       } catch (error) {
         console.error('Error updating system:', error);
         toast({
@@ -115,7 +167,7 @@ export function useSystems(userId: string | undefined) {
         });
       }
     },
-    []
+    [webhookUrl, systems]
   );
 
   const deleteSystem = useCallback(async (id: string) => {
