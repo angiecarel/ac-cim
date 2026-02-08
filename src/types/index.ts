@@ -1,6 +1,8 @@
 // Idea status and priority types
 export type IdeaStatus = 'hold' | 'developing' | 'ready' | 'scheduled' | 'archived' | 'recycled';
 export type IdeaPriority = 'none' | 'good' | 'better' | 'best';
+export type EnergyLevel = 'low' | 'medium' | 'high';
+export type TimeEstimate = 'quick' | 'hour' | 'day' | 'week_plus';
 
 // Database types
 export interface Profile {
@@ -43,6 +45,8 @@ export interface Idea {
   scheduled_date: string | null;
   source: string | null;
   next_action: string | null;
+  energy_level: EnergyLevel | null;
+  time_estimate: TimeEstimate | null;
   created_at: string;
   updated_at: string;
   // Joined data

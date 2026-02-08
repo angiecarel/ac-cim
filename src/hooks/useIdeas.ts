@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Idea, IdeaStatus, IdeaPriority } from '@/types';
+import { Idea, IdeaStatus, IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
 import { toast } from 'sonner';
 
 export function useIdeas(userId: string | undefined) {
@@ -66,6 +66,8 @@ export function useIdeas(userId: string | undefined) {
           scheduled_date: idea.scheduled_date,
           source: idea.source || null,
           next_action: idea.next_action || null,
+          energy_level: idea.energy_level || null,
+          time_estimate: idea.time_estimate || null,
         })
         .select(`
           *,
@@ -108,6 +110,8 @@ export function useIdeas(userId: string | undefined) {
           scheduled_date: updates.scheduled_date,
           source: updates.source,
           next_action: updates.next_action,
+          energy_level: updates.energy_level,
+          time_estimate: updates.time_estimate,
         })
         .eq('id', id);
 

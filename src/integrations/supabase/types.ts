@@ -88,6 +88,7 @@ export type Database = {
           content_type_id: string | null
           created_at: string
           description: string | null
+          energy_level: Database["public"]["Enums"]["energy_level"] | null
           id: string
           is_timely: boolean
           next_action: string | null
@@ -96,6 +97,7 @@ export type Database = {
           scheduled_date: string | null
           source: string | null
           status: Database["public"]["Enums"]["idea_status"]
+          time_estimate: Database["public"]["Enums"]["time_estimate"] | null
           title: string
           updated_at: string
           user_id: string
@@ -105,6 +107,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           description?: string | null
+          energy_level?: Database["public"]["Enums"]["energy_level"] | null
           id?: string
           is_timely?: boolean
           next_action?: string | null
@@ -113,6 +116,7 @@ export type Database = {
           scheduled_date?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["idea_status"]
+          time_estimate?: Database["public"]["Enums"]["time_estimate"] | null
           title: string
           updated_at?: string
           user_id: string
@@ -122,6 +126,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           description?: string | null
+          energy_level?: Database["public"]["Enums"]["energy_level"] | null
           id?: string
           is_timely?: boolean
           next_action?: string | null
@@ -130,6 +135,7 @@ export type Database = {
           scheduled_date?: string | null
           source?: string | null
           status?: Database["public"]["Enums"]["idea_status"]
+          time_estimate?: Database["public"]["Enums"]["time_estimate"] | null
           title?: string
           updated_at?: string
           user_id?: string
@@ -251,6 +257,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
+      energy_level: "low" | "medium" | "high"
       idea_priority: "none" | "good" | "better" | "best"
       idea_status:
         | "hold"
@@ -259,6 +266,7 @@ export type Database = {
         | "scheduled"
         | "archived"
         | "recycled"
+      time_estimate: "quick" | "hour" | "day" | "week_plus"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -386,6 +394,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
+      energy_level: ["low", "medium", "high"],
       idea_priority: ["none", "good", "better", "best"],
       idea_status: [
         "hold",
@@ -395,6 +404,7 @@ export const Constants = {
         "archived",
         "recycled",
       ],
+      time_estimate: ["quick", "hour", "day", "week_plus"],
     },
   },
 } as const

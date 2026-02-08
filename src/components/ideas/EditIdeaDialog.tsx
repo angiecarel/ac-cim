@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Idea, IdeaPriority, IdeaStatus } from '@/types';
+import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate } from '@/types';
 import { Loader2, CalendarIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -63,6 +63,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
   const [scheduledDate, setScheduledDate] = useState<Date | undefined>();
   const [source, setSource] = useState('');
   const [nextAction, setNextAction] = useState('');
+  const [energyLevel, setEnergyLevel] = useState<EnergyLevel | null>(null);
+  const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | null>(null);
 
   useEffect(() => {
     if (idea && open) {
@@ -77,6 +79,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       setScheduledDate(idea.scheduled_date ? new Date(idea.scheduled_date) : undefined);
       setSource(idea.source || '');
       setNextAction(idea.next_action || '');
+      setEnergyLevel(idea.energy_level || null);
+      setTimeEstimate(idea.time_estimate || null);
     }
   }, [idea, open]);
 
@@ -121,6 +125,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       scheduled_date: scheduledDate ? format(scheduledDate, 'yyyy-MM-dd') : null,
       source: source.trim() || null,
       next_action: nextAction.trim() || null,
+      energy_level: energyLevel,
+      time_estimate: timeEstimate,
     });
     setLoading(false);
     onOpenChange(false);
@@ -298,16 +304,49 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="edit-nextAction">Next Action</Label>
-              <Textarea
-                id="edit-nextAction"
-                placeholder="What's the very next step to move this forward?"
-                value={nextAction}
-                onChange={(e) => setNextAction(e.target.value)}
-                rows={2}
-                maxLength={500}
-              />
-            </div>
+               <Label htmlFor="edit-nextAction">Next Action</Label>
+               <Textarea
+                 id="edit-nextAction"
+                 placeholder="What's the very next step to move this forward?"
+                 value={nextAction}
+                 onChange={(e) => setNextAction(e.target.value)}
+                 rows={2}
+                 maxLength={500}
+               />
+             </div>
+
+             <div className="grid grid-cols-2 gap-4">
+               <div className="space-y-2">
+                 <Label htmlFor="edit-energyLevel">Energy Level</Label>
+                 <Select value={energyLevel || "__none__"} onValueChange={(v) => setEnergyLevel(v === "__none__" ? null : v as EnergyLevel)}>
+                   <SelectTrigger id="edit-energyLevel">
+                     <SelectValue placeholder="Select level" />
+                   </SelectTrigger>
+                   <SelectContent position="popper" side="bottom" className="bg-popover">
+                     <SelectItem value="__none__">None</SelectItem>
+                     <SelectItem value="low">Low</SelectItem>
+                     <SelectItem value="medium">Medium</SelectItem>
+                     <SelectItem value="high">High</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+
+               <div className="space-y-2">
+                 <Label htmlFor="edit-timeEstimate">Time Estimate</Label>
+                 <Select value={timeEstimate || "__none__"} onValueChange={(v) => setTimeEstimate(v === "__none__" ? null : v as TimeEstimate)}>
+                   <SelectTrigger id="edit-timeEstimate">
+                     <SelectValue placeholder="Select time" />
+                   </SelectTrigger>
+                   <SelectContent position="popper" side="bottom" className="bg-popover">
+                     <SelectItem value="__none__">None</SelectItem>
+                     <SelectItem value="quick">Quick (minutes)</SelectItem>
+                     <SelectItem value="hour">Hour</SelectItem>
+                     <SelectItem value="day">Day</SelectItem>
+                     <SelectItem value="week_plus">Week+</SelectItem>
+                   </SelectContent>
+                 </Select>
+               </div>
+             </div>
 
             <div className="flex justify-between gap-2 pt-4 border-t">
               <Button 
