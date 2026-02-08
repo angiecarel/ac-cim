@@ -18,7 +18,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useIdea } from '@/contexts/IdeaContext';
-import { IdeaPriority } from '@/types';
+import { IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
 import { Loader2 } from 'lucide-react';
 
 interface AddIdeaDialogProps {
@@ -38,6 +38,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
   const [isTimely, setIsTimely] = useState(false);
   const [source, setSource] = useState('');
   const [nextAction, setNextAction] = useState('');
+  const [energyLevel, setEnergyLevel] = useState<EnergyLevel | ''>('');
+  const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | ''>('');
 
   useEffect(() => {
     if (open) {
@@ -49,6 +51,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       setIsTimely(false);
       setSource('');
       setNextAction('');
+      setEnergyLevel('');
+      setTimeEstimate('');
     }
   }, [open]);
 
@@ -66,6 +70,8 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
       is_timely: isTimely,
       source: source.trim() || null,
       next_action: nextAction.trim() || null,
+      energy_level: energyLevel || null,
+      time_estimate: timeEstimate || null,
     });
     setLoading(false);
     onOpenChange(false);
@@ -174,17 +180,48 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="nextAction">Next Action</Label>
-            <Textarea
-              id="nextAction"
-              placeholder="What's the very next step to move this forward?"
-              value={nextAction}
-              onChange={(e) => setNextAction(e.target.value)}
-              rows={2}
-              maxLength={500}
-            />
-          </div>
+           <div className="space-y-2">
+             <Label htmlFor="nextAction">Next Action</Label>
+             <Textarea
+               id="nextAction"
+               placeholder="What's the very next step to move this forward?"
+               value={nextAction}
+               onChange={(e) => setNextAction(e.target.value)}
+               rows={2}
+               maxLength={500}
+             />
+           </div>
+
+           <div className="grid grid-cols-2 gap-4">
+             <div className="space-y-2">
+               <Label htmlFor="energyLevel">Energy Level</Label>
+               <Select value={energyLevel} onValueChange={(v) => setEnergyLevel(v as EnergyLevel)}>
+                 <SelectTrigger id="energyLevel">
+                   <SelectValue placeholder="Select level" />
+                 </SelectTrigger>
+                 <SelectContent position="popper" side="bottom" className="bg-popover">
+                   <SelectItem value="low">Low</SelectItem>
+                   <SelectItem value="medium">Medium</SelectItem>
+                   <SelectItem value="high">High</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+
+             <div className="space-y-2">
+               <Label htmlFor="timeEstimate">Time Estimate</Label>
+               <Select value={timeEstimate} onValueChange={(v) => setTimeEstimate(v as TimeEstimate)}>
+                 <SelectTrigger id="timeEstimate">
+                   <SelectValue placeholder="Select time" />
+                 </SelectTrigger>
+                 <SelectContent position="popper" side="bottom" className="bg-popover">
+                   <SelectItem value="quick">Quick (minutes)</SelectItem>
+                   <SelectItem value="hour">Hour</SelectItem>
+                   <SelectItem value="day">Day</SelectItem>
+                   <SelectItem value="week_plus">Week+</SelectItem>
+                 </SelectContent>
+               </Select>
+             </div>
+           </div>
 
           <div className="flex justify-end gap-2 pt-4">
             <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>

@@ -128,6 +128,22 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
             </div>
           )}
 
+          {/* Energy Level & Time Estimate */}
+          <div className="grid grid-cols-2 gap-4">
+            {idea.energy_level && (
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-1">Energy Level</h4>
+                <p className="text-sm capitalize">{idea.energy_level}</p>
+              </div>
+            )}
+            {idea.time_estimate && (
+              <div>
+                <h4 className="text-sm font-medium text-muted-foreground mb-1">Time Estimate</h4>
+                <p className="text-sm capitalize">{idea.time_estimate === 'week_plus' ? 'Week+' : idea.time_estimate}</p>
+              </div>
+            )}
+          </div>
+
            {/* Actions */}
           <div className="flex justify-end gap-2 pt-4 border-t">
             <Button variant="outline" onClick={() => onOpenChange(false)}>
