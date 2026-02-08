@@ -96,7 +96,7 @@ export function QuickNoteCard({
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base font-handwritten leading-tight truncate">
+          <CardTitle className="text-xl font-handwritten leading-snug line-clamp-2">
             {note.title}
           </CardTitle>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
