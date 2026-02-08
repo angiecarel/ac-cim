@@ -165,7 +165,7 @@ export function ManageSettings() {
       <div>
         <h1 className="text-3xl font-bold text-gradient">Manage Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Customize your account, content types, platforms, and quicklinks
+          Customize your account, idea types, platforms, and quicklinks
         </p>
       </div>
 
@@ -175,19 +175,19 @@ export function ManageSettings() {
       </div>
 
       <div className="grid lg:grid-cols-2 gap-6">
-        {/* Content Types */}
+        {/* Idea Types */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <FileType className="h-5 w-5 text-primary" />
-              Content Types
+              Idea Types
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Add new */}
             <div className="flex gap-2">
               <Input
-                placeholder="New content type..."
+                placeholder="New idea type..."
                 value={newContentTypeName}
                 onChange={(e) => setNewContentTypeName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddContentType()}
@@ -221,7 +221,7 @@ export function ManageSettings() {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Edit Content Type</DialogTitle>
+                          <DialogTitle>Edit Idea Type</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
                           <div className="space-y-2">
@@ -429,7 +429,7 @@ export function ManageSettings() {
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Content Type Filter</Label>
+                            <Label>Idea Type Filter</Label>
                             <Select 
                               value={editingQuickLink?.content_type_id || "__all__"} 
                               onValueChange={(v) => setEditingQuickLink(prev => 

@@ -172,7 +172,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
 
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
-                <Label>Content Type</Label>
+                <Label>Idea Type</Label>
                 <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select type" />

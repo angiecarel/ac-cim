@@ -96,7 +96,7 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
 
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2">
-              <Label htmlFor="contentType">Content Type</Label>
+              <Label htmlFor="contentType">Idea Type</Label>
               <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
                 <SelectTrigger id="contentType">
                   <SelectValue placeholder="Select type" />
