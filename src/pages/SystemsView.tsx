@@ -261,12 +261,12 @@ export function SystemsView() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Link to Context</Label>
-                <Select value={platformId} onValueChange={setPlatformId}>
+              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select context" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {platforms.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.emoji} {p.name}
@@ -277,12 +277,12 @@ export function SystemsView() {
               </div>
               <div>
                 <Label>Link to Idea</Label>
-                <Select value={ideaId} onValueChange={setIdeaId}>
+              <Select value={ideaId || "__none__"} onValueChange={(v) => setIdeaId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select idea" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {linkableIdeas.map((i) => (
                       <SelectItem key={i.id} value={i.id}>
                         {i.title}
@@ -330,12 +330,12 @@ export function SystemsView() {
             <div className="grid grid-cols-2 gap-4">
               <div>
                 <Label>Link to Context</Label>
-                <Select value={platformId} onValueChange={setPlatformId}>
+              <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select context" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {platforms.map((p) => (
                       <SelectItem key={p.id} value={p.id}>
                         {p.emoji} {p.name}
@@ -346,12 +346,12 @@ export function SystemsView() {
               </div>
               <div>
                 <Label>Link to Idea</Label>
-                <Select value={ideaId} onValueChange={setIdeaId}>
+              <Select value={ideaId || "__none__"} onValueChange={(v) => setIdeaId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
                     <SelectValue placeholder="Select idea" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="">None</SelectItem>
+                    <SelectItem value="__none__">None</SelectItem>
                     {linkableIdeas.map((i) => (
                       <SelectItem key={i.id} value={i.id}>
                         {i.title}
