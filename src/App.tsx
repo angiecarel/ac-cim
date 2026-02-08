@@ -12,6 +12,7 @@ import { Dashboard } from "@/pages/Dashboard";
 import { IdeaBucket } from "@/pages/IdeaBucket";
 import { CalendarView } from "@/pages/CalendarView";
 import { SystemsView } from "@/pages/SystemsView";
+import { QuickLinksPage } from "@/pages/QuickLinksPage";
 import { PastIdeas } from "@/pages/PastIdeas";
 import { ArchiveView } from "@/pages/ArchiveView";
 import { ManageSettings } from "@/pages/ManageSettings";
@@ -43,6 +44,7 @@ function AppContent() {
           <Route path="/ideas" element={<IdeaBucket />} />
           <Route path="/calendar" element={<CalendarView />} />
           <Route path="/systems" element={<SystemsView />} />
+          <Route path="/quicklinks" element={<QuickLinksPage />} />
           <Route path="/history" element={<PastIdeas />} />
           <Route path="/archive" element={<ArchiveView />} />
           <Route path="/settings" element={<ManageSettings />} />
