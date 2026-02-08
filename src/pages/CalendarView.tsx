@@ -43,7 +43,7 @@ export function CalendarView() {
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gradient">Calendar</h1>
-        <p className="text-muted-foreground mt-1">View your scheduled ideas</p>
+        <p className="text-muted-foreground mt-1">View your planned ideas</p>
       </div>
 
       <div className="grid lg:grid-cols-[1fr_350px] gap-6">
@@ -76,7 +76,7 @@ export function CalendarView() {
           <CardContent>
             {selectedDateIdeas.length === 0 ? (
               <p className="text-center text-muted-foreground py-8">
-                No ideas scheduled for this date
+                No ideas planned for this date
               </p>
             ) : (
               <div className="space-y-3">

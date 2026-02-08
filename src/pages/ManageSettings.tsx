@@ -165,7 +165,7 @@ export function ManageSettings() {
       <div>
         <h1 className="text-3xl font-bold text-gradient">Manage Settings</h1>
         <p className="text-muted-foreground mt-1">
-          Customize your account, idea types, platforms, and quicklinks
+          Customize your account, idea types, contexts, and quicklinks
         </p>
       </div>
 
@@ -257,19 +257,19 @@ export function ManageSettings() {
           </CardContent>
         </Card>
 
-        {/* Platforms */}
+        {/* Contexts */}
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Layers className="h-5 w-5 text-primary" />
-              Platforms
+              Contexts
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
             {/* Add new */}
             <div className="flex gap-2">
               <Input
-                placeholder="Platform name..."
+                placeholder="Context name..."
                 value={newPlatformName}
                 onChange={(e) => setNewPlatformName(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && handleAddPlatform()}
@@ -299,7 +299,7 @@ export function ManageSettings() {
                       </DialogTrigger>
                       <DialogContent>
                         <DialogHeader>
-                          <DialogTitle>Edit Platform</DialogTitle>
+                          <DialogTitle>Edit Context</DialogTitle>
                         </DialogHeader>
                         <div className="space-y-4 pt-4">
                           <div className="space-y-2">

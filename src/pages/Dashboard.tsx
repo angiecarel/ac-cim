@@ -21,10 +21,10 @@ export function Dashboard() {
 
   const statCards = [
     { label: 'Total Ideas', value: stats.total, icon: Lightbulb, color: 'text-primary' },
-    { label: 'Hold', value: stats.byStatus.hold, icon: Pause, color: 'text-status-hold', status: 'hold' as const },
-    { label: 'Developing', value: stats.byStatus.developing, icon: Pencil, color: 'text-status-developing', status: 'developing' as const },
-    { label: 'Ready', value: stats.byStatus.ready, icon: Rocket, color: 'text-status-ready', status: 'ready' as const },
-    { label: 'Scheduled', value: stats.byStatus.scheduled, icon: CalendarIcon, color: 'text-status-scheduled', status: 'scheduled' as const },
+    { label: 'Captured', value: stats.byStatus.hold, icon: Pause, color: 'text-status-hold', status: 'hold' as const },
+    { label: 'Exploring', value: stats.byStatus.developing, icon: Pencil, color: 'text-status-developing', status: 'developing' as const },
+    { label: 'Actionable', value: stats.byStatus.ready, icon: Rocket, color: 'text-status-ready', status: 'ready' as const },
+    { label: 'Planned', value: stats.byStatus.scheduled, icon: CalendarIcon, color: 'text-status-scheduled', status: 'scheduled' as const },
     { label: 'Archived', value: stats.byStatus.archived, icon: Archive, color: 'text-status-archived', status: 'archived' as const },
   ];
 

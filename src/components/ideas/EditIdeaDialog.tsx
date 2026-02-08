@@ -189,10 +189,10 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
               </div>
 
               <div className="space-y-2">
-                <Label>Platform</Label>
+                <Label>Context</Label>
                 <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                   <SelectTrigger>
-                    <SelectValue placeholder="Select platform" />
+                    <SelectValue placeholder="Select context" />
                   </SelectTrigger>
                   <SelectContent position="popper" side="bottom" className="bg-popover">
                     <SelectItem value="__none__">None</SelectItem>
@@ -229,10 +229,10 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent position="popper" side="bottom" className="bg-popover">
-                    <SelectItem value="hold">Hold</SelectItem>
-                    <SelectItem value="developing">Developing</SelectItem>
-                    <SelectItem value="ready">Ready</SelectItem>
-                    <SelectItem value="scheduled">Scheduled</SelectItem>
+                    <SelectItem value="hold">Captured</SelectItem>
+                    <SelectItem value="developing">Exploring</SelectItem>
+                    <SelectItem value="ready">Actionable</SelectItem>
+                    <SelectItem value="scheduled">Planned</SelectItem>
                     <SelectItem value="archived">Archived</SelectItem>
                     <SelectItem value="recycled">Recycled</SelectItem>
                   </SelectContent>
@@ -242,7 +242,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
 
             {status === 'scheduled' && (
               <div className="space-y-2">
-                <Label>Scheduled Date</Label>
+                <Label>Planned Date</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -325,9 +325,9 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       <AlertDialog open={showStatusConfirm} onOpenChange={setShowStatusConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear Scheduled Date?</AlertDialogTitle>
+            <AlertDialogTitle>Clear Planned Date?</AlertDialogTitle>
             <AlertDialogDescription>
-              Changing the status will remove the scheduled date. Continue?
+              Changing the status will remove the planned date. Continue?
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>

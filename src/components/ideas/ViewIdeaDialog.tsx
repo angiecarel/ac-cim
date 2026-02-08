@@ -7,16 +7,10 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Idea } from '@/types';
-import { 
-  Clock, 
-  Pause, 
-  Pencil, 
-  Rocket, 
-  CalendarIcon,
-  Archive,
-} from 'lucide-react';
+import { Clock, Pencil } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { statusConfig } from '@/lib/statusLabels';
 
 interface ViewIdeaDialogProps {
   idea: Idea | null;
@@ -24,15 +18,6 @@ interface ViewIdeaDialogProps {
   onOpenChange: (open: boolean) => void;
   onEdit: (idea: Idea) => void;
 }
-
-const statusConfig = {
-  hold: { label: 'Hold', icon: Pause, className: 'status-badge-hold' },
-  developing: { label: 'Developing', icon: Pencil, className: 'status-badge-developing' },
-  ready: { label: 'Ready', icon: Rocket, className: 'status-badge-ready' },
-  scheduled: { label: 'Scheduled', icon: CalendarIcon, className: 'status-badge-scheduled' },
-  archived: { label: 'Archived', icon: Archive, className: 'status-badge-archived' },
-  recycled: { label: 'Recycled', icon: Clock, className: 'status-badge-recycled' },
-};
 
 const priorityLabels = {
   none: 'No Priority',
@@ -89,13 +74,13 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit }: ViewIdeaDia
             )}
             {idea.platform && (
               <div>
-                <span className="text-muted-foreground">Platform:</span>
+                <span className="text-muted-foreground">Context:</span>
                 <span className="ml-2 font-medium">{idea.platform.name}</span>
               </div>
             )}
             {idea.scheduled_date && (
               <div>
-                <span className="text-muted-foreground">Scheduled:</span>
+                <span className="text-muted-foreground">Planned:</span>
                 <span className="ml-2 font-medium">
                   {format(new Date(idea.scheduled_date), 'MMMM d, yyyy')}
                 </span>

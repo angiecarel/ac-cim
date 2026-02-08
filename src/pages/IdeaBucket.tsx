@@ -29,20 +29,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-
-const statusOptions: { value: IdeaStatus; label: string }[] = [
-  { value: 'hold', label: 'Hold' },
-  { value: 'developing', label: 'Developing' },
-  { value: 'ready', label: 'Ready' },
-  { value: 'scheduled', label: 'Scheduled' },
-];
-
-const priorityOptions: { value: IdeaPriority; label: string }[] = [
-  { value: 'none', label: 'No Priority' },
-  { value: 'good', label: 'Good' },
-  { value: 'better', label: 'Better' },
-  { value: 'best', label: 'Best' },
-];
+import { statusOptions, priorityOptions } from '@/lib/statusLabels';
 
 export function IdeaBucket() {
   const {
@@ -294,7 +281,7 @@ export function IdeaBucket() {
           <Popover>
             <PopoverTrigger asChild>
               <Button variant="outline" size="sm" className="gap-2">
-                Platform
+                Context
                 {filters.platform?.length ? (
                   <Badge variant="secondary" className="ml-1 h-5 px-1.5">
                     {filters.platform.length}

@@ -113,10 +113,10 @@ export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="platform">Platform</Label>
+              <Label htmlFor="platform">Context</Label>
               <Select value={platformId || "__none__"} onValueChange={(v) => setPlatformId(v === "__none__" ? "" : v)}>
                 <SelectTrigger id="platform">
-                  <SelectValue placeholder="Select platform" />
+                  <SelectValue placeholder="Select context" />
                 </SelectTrigger>
                 <SelectContent position="popper" side="bottom" className="bg-popover">
                   <SelectItem value="__none__">None</SelectItem>
