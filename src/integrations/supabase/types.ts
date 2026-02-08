@@ -368,6 +368,7 @@ export type Database = {
           entry_date: string | null
           id: string
           idea_id: string | null
+          is_pinned: boolean
           mood: string | null
           note_type: Database["public"]["Enums"]["system_note_type"]
           platform_id: string | null
@@ -382,6 +383,7 @@ export type Database = {
           entry_date?: string | null
           id?: string
           idea_id?: string | null
+          is_pinned?: boolean
           mood?: string | null
           note_type?: Database["public"]["Enums"]["system_note_type"]
           platform_id?: string | null
@@ -396,6 +398,7 @@ export type Database = {
           entry_date?: string | null
           id?: string
           idea_id?: string | null
+          is_pinned?: boolean
           mood?: string | null
           note_type?: Database["public"]["Enums"]["system_note_type"]
           platform_id?: string | null
