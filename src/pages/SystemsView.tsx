@@ -8,7 +8,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown } from 'lucide-react';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette } from 'lucide-react';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
 import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
@@ -17,6 +17,7 @@ import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
+type ColorFilter = '__all__' | '__none__' | string;
 
 export function SystemsView() {
   const { user } = useAuth();
@@ -33,13 +34,21 @@ export function SystemsView() {
   const [quickNoteViewMode, setQuickNoteViewMode] = useState<ViewMode>('expanded');
   const [journalViewMode, setJournalViewMode] = useState<ViewMode>('expanded');
   const [quickNoteSortBy, setQuickNoteSortBy] = useState<SortOption>('date_desc');
+  const [colorFilter, setColorFilter] = useState<ColorFilter>('__all__');
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
 
+  // Filter quick thoughts by color
+  const filteredQuickThoughts = useMemo(() => {
+    if (colorFilter === '__all__') return quickThoughts;
+    if (colorFilter === '__none__') return quickThoughts.filter(n => !n.color);
+    return quickThoughts.filter(n => n.color === colorFilter);
+  }, [quickThoughts, colorFilter]);
+
   // Sort quick thoughts based on selected option
   const sortedQuickThoughts = useMemo(() => {
-    const sorted = [...quickThoughts];
+    const sorted = [...filteredQuickThoughts];
     
     switch (quickNoteSortBy) {
       case 'date_desc':
@@ -63,7 +72,7 @@ export function SystemsView() {
       default:
         return sorted;
     }
-  }, [quickThoughts, quickNoteSortBy]);
+  }, [filteredQuickThoughts, quickNoteSortBy]);
 
   const getLinkedPlatform = (platformId: string | null) => {
     if (!platformId) return null;
@@ -223,7 +232,7 @@ export function SystemsView() {
               
               {/* Sort dropdown */}
               <Select value={quickNoteSortBy} onValueChange={(v) => setQuickNoteSortBy(v as SortOption)}>
-                <SelectTrigger className="w-[160px]">
+                <SelectTrigger className="w-[140px]">
                   <ArrowUpDown className="h-4 w-4 mr-2" />
                   <SelectValue placeholder="Sort by" />
                 </SelectTrigger>
@@ -233,6 +242,29 @@ export function SystemsView() {
                   <SelectItem value="alpha_asc">A → Z</SelectItem>
                   <SelectItem value="alpha_desc">Z → A</SelectItem>
                   <SelectItem value="color">By Color</SelectItem>
+                </SelectContent>
+              </Select>
+
+              {/* Color filter dropdown */}
+              <Select value={colorFilter} onValueChange={(v) => setColorFilter(v as ColorFilter)}>
+                <SelectTrigger className="w-[160px]">
+                  <Palette className="h-4 w-4 mr-2" />
+                  <SelectValue placeholder="Filter by color" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="__all__">All Colors</SelectItem>
+                  <SelectItem value="__none__">No Color</SelectItem>
+                  {noteColors.map((color) => (
+                    <SelectItem key={color.id} value={color.id}>
+                      <div className="flex items-center gap-2">
+                        <span
+                          className="w-3 h-3 rounded-full border border-border"
+                          style={{ backgroundColor: color.hex_color }}
+                        />
+                        {color.name}
+                      </div>
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
