@@ -86,7 +86,10 @@ export function AppSidebar() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-creative">
               <Lightbulb className="h-5 w-5 text-primary-foreground" />
             </div>
-            <span className="font-bold text-lg text-gradient">CIM</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-lg text-gradient leading-tight">CIM</span>
+              <span className="text-xs text-muted-foreground leading-tight">Creative Idea Manager</span>
+            </div>
           </Link>
 
           {/* Navigation */}
