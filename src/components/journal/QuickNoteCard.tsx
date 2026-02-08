@@ -62,7 +62,7 @@ export function QuickNoteCard({
             !note.color && 'bg-accent'
           )}
         />
-        <span className="flex-1 font-medium text-sm truncate">{note.title}</span>
+        <span className="flex-1 font-handwritten text-sm truncate">{note.title}</span>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -96,7 +96,7 @@ export function QuickNoteCard({
     >
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
-          <CardTitle className="text-base font-medium leading-tight truncate">
+          <CardTitle className="text-base font-handwritten leading-tight truncate">
             {note.title}
           </CardTitle>
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
