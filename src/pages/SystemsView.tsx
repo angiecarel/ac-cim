@@ -4,7 +4,6 @@ import { useSystems, SystemNote, SystemNoteType } from '@/hooks/useSystems';
 import { useIdea } from '@/contexts/IdeaContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Plus, StickyNote, BookOpen, LayoutGrid, List } from 'lucide-react';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
@@ -150,49 +149,103 @@ export function SystemsView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Journal</h1>
-          <p className="text-muted-foreground mt-1">Best practices, notes, and journal entries</p>
+          <h1 className="text-3xl font-bold text-gradient">Log</h1>
+          <p className="text-muted-foreground mt-1">Quick notes and journal entries</p>
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="journal" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="journal" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Journal Entries
-          </TabsTrigger>
-          <TabsTrigger value="quick" className="gap-2">
-            <StickyNote className="h-4 w-4" />
-            Quick Notes
-          </TabsTrigger>
-        </TabsList>
-
-        {/* Journal Entries Tab */}
-        <TabsContent value="journal" className="space-y-4">
+      {/* Two-column layout */}
+      <div className="grid lg:grid-cols-2 gap-6">
+        {/* Quick Notes - Left Column */}
+        <div className="space-y-4">
           <div className="flex items-center justify-between gap-4">
-            <ToggleGroup
-              type="single"
-              value={journalViewMode}
-              onValueChange={(v) => v && setJournalViewMode(v as ViewMode)}
-              className="border rounded-md"
-            >
-              <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Expanded</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
-                <List className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Titles</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
-                Focus Mode
-              </Button>
-              <Button onClick={() => openAdd('journal_entry')} className="gap-2">
+            <div className="flex items-center gap-2">
+              <StickyNote className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold">Quick Notes</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <ToggleGroup
+                type="single"
+                value={quickNoteViewMode}
+                onValueChange={(v) => v && setQuickNoteViewMode(v as ViewMode)}
+                className="border rounded-md"
+              >
+                <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-2">
+                  <LayoutGrid className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-2">
+                  <List className="h-4 w-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
+              <Button onClick={() => openAdd('quick_thought')} size="sm" className="gap-1.5">
                 <Plus className="h-4 w-4" />
-                New Entry
+                <span className="hidden sm:inline">Add Note</span>
+              </Button>
+            </div>
+          </div>
+
+          {quickThoughts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No quick notes yet. Capture a fleeting idea!</p>
+            </Card>
+          ) : quickNoteViewMode === 'compact' ? (
+            <div className="space-y-1">
+              {quickThoughts.map((note) => (
+                <QuickNoteCard
+                  key={note.id}
+                  note={note}
+                  compact
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="grid sm:grid-cols-2 gap-4">
+              {quickThoughts.map((note) => (
+                <QuickNoteCard
+                  key={note.id}
+                  note={note}
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Journal Entries - Right Column */}
+        <div className="space-y-4">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-2">
+              <BookOpen className="h-5 w-5 text-muted-foreground" />
+              <h2 className="text-lg font-semibold">Journal Entries</h2>
+            </div>
+            <div className="flex items-center gap-2">
+              <ToggleGroup
+                type="single"
+                value={journalViewMode}
+                onValueChange={(v) => v && setJournalViewMode(v as ViewMode)}
+                className="border rounded-md"
+              >
+                <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-2">
+                  <LayoutGrid className="h-4 w-4" />
+                </ToggleGroupItem>
+                <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-2">
+                  <List className="h-4 w-4" />
+                </ToggleGroupItem>
+              </ToggleGroup>
+              <Button variant="outline" onClick={handleOpenFocusMode} size="sm">
+                Focus
+              </Button>
+              <Button onClick={() => openAdd('journal_entry')} size="sm" className="gap-1.5">
+                <Plus className="h-4 w-4" />
+                <span className="hidden sm:inline">New Entry</span>
               </Button>
             </div>
           </div>
@@ -230,67 +283,8 @@ export function SystemsView() {
               ))}
             </div>
           )}
-        </TabsContent>
-
-        {/* Quick Notes Tab */}
-        <TabsContent value="quick" className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <ToggleGroup
-              type="single"
-              value={quickNoteViewMode}
-              onValueChange={(v) => v && setQuickNoteViewMode(v as ViewMode)}
-              className="border rounded-md"
-            >
-              <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Cards</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
-                <List className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">List</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <Button onClick={() => openAdd('quick_thought')} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Note
-            </Button>
-          </div>
-
-          {quickThoughts.length === 0 ? (
-            <Card className="p-8 text-center">
-              <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No quick notes yet. Capture a fleeting idea!</p>
-            </Card>
-          ) : quickNoteViewMode === 'compact' ? (
-            <div className="space-y-1">
-              {quickThoughts.map((note) => (
-                <QuickNoteCard
-                  key={note.id}
-                  note={note}
-                  compact
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {quickThoughts.map((note) => (
-                <QuickNoteCard
-                  key={note.id}
-                  note={note}
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                />
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
 
       {/* Journal Entry Dialog */}
       {noteType === 'journal_entry' && (
