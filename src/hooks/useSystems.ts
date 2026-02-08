@@ -14,6 +14,7 @@ export interface SystemNote {
   idea_id: string | null;
   entry_date: string | null;
   mood: string | null;
+  color: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -70,6 +71,7 @@ export function useSystems(userId: string | undefined) {
             idea_id: system.idea_id || null,
             entry_date: system.entry_date || null,
             mood: system.mood || null,
+            color: system.color || null,
           })
           .select()
           .single();

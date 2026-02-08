@@ -329,6 +329,7 @@ export type Database = {
       }
       systems: {
         Row: {
+          color: string | null
           content: string | null
           created_at: string
           entry_date: string | null
@@ -342,6 +343,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          color?: string | null
           content?: string | null
           created_at?: string
           entry_date?: string | null
@@ -355,6 +357,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          color?: string | null
           content?: string | null
           created_at?: string
           entry_date?: string | null

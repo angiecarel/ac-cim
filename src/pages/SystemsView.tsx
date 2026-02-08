@@ -5,10 +5,15 @@ import { useIdea } from '@/contexts/IdeaContext';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Plus, StickyNote, BookOpen } from 'lucide-react';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List } from 'lucide-react';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
 import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
+import { QuickNoteDialog } from '@/components/journal/QuickNoteDialog';
+import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
+
+type QuickNoteViewMode = 'expanded' | 'compact';
 
 export function SystemsView() {
   const { user } = useAuth();
@@ -21,6 +26,7 @@ export function SystemsView() {
   const [focusModeOpen, setFocusModeOpen] = useState(false);
   const [focusModeTitle, setFocusModeTitle] = useState('');
   const [focusModeContent, setFocusModeContent] = useState('');
+  const [quickNoteViewMode, setQuickNoteViewMode] = useState<QuickNoteViewMode>('expanded');
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
@@ -35,7 +41,8 @@ export function SystemsView() {
     return ideas.find((i) => i.id === ideaId) || null;
   };
 
-  const handleSave = async (data: {
+  // Journal entry save handler
+  const handleJournalSave = async (data: {
     title: string;
     content: string;
     platform_id: string | null;
@@ -56,11 +63,41 @@ export function SystemsView() {
       await createSystem({
         title: data.title,
         content: data.content || null,
-        note_type: noteType,
+        note_type: 'journal_entry',
         platform_id: data.platform_id,
         idea_id: data.idea_id,
         entry_date: data.entry_date,
         mood: data.mood,
+      });
+    }
+    setEditingNote(null);
+    setIsAddOpen(false);
+  };
+
+  // Quick note save handler
+  const handleQuickNoteSave = async (data: {
+    title: string;
+    content: string;
+    platform_id: string | null;
+    idea_id: string | null;
+    color: string | null;
+  }) => {
+    if (editingNote) {
+      await updateSystem(editingNote.id, {
+        title: data.title,
+        content: data.content || null,
+        platform_id: data.platform_id,
+        idea_id: data.idea_id,
+        color: data.color,
+      });
+    } else {
+      await createSystem({
+        title: data.title,
+        content: data.content || null,
+        note_type: 'quick_thought',
+        platform_id: data.platform_id,
+        idea_id: data.idea_id,
+        color: data.color,
       });
     }
     setEditingNote(null);
@@ -126,7 +163,7 @@ export function SystemsView() {
           </TabsTrigger>
           <TabsTrigger value="quick" className="gap-2">
             <StickyNote className="h-4 w-4" />
-            Quick Thoughts
+            Quick Notes
           </TabsTrigger>
         </TabsList>
 
@@ -162,24 +199,53 @@ export function SystemsView() {
         </TabsContent>
 
         <TabsContent value="quick" className="space-y-4">
-          <div className="flex justify-end">
+          <div className="flex items-center justify-between gap-4">
+            <ToggleGroup
+              type="single"
+              value={quickNoteViewMode}
+              onValueChange={(v) => v && setQuickNoteViewMode(v as QuickNoteViewMode)}
+              className="border rounded-md"
+            >
+              <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
+                <LayoutGrid className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">Cards</span>
+              </ToggleGroupItem>
+              <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
+                <List className="h-4 w-4" />
+                <span className="hidden sm:inline text-sm">List</span>
+              </ToggleGroupItem>
+            </ToggleGroup>
             <Button onClick={() => openAdd('quick_thought')} className="gap-2">
               <Plus className="h-4 w-4" />
-              Add Quick Thought
+              Add Note
             </Button>
           </div>
+
           {quickThoughts.length === 0 ? (
             <Card className="p-8 text-center">
               <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No quick thoughts yet. Capture a fleeting idea!</p>
+              <p className="text-muted-foreground">No quick notes yet. Capture a fleeting idea!</p>
             </Card>
+          ) : quickNoteViewMode === 'compact' ? (
+            <div className="space-y-1">
+              {quickThoughts.map((note) => (
+                <QuickNoteCard
+                  key={note.id}
+                  note={note}
+                  compact
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                />
+              ))}
+            </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {quickThoughts.map((note) => (
-                <JournalNoteCard
+                <QuickNoteCard
                   key={note.id}
                   note={note}
-                  isSticky
                   platform={getLinkedPlatform(note.platform_id)}
                   idea={getLinkedIdea(note.idea_id)}
                   onEdit={openEdit}
@@ -191,20 +257,37 @@ export function SystemsView() {
         </TabsContent>
       </Tabs>
 
-      {/* Add/Edit Dialog */}
-      <JournalEntryDialog
-        open={isAddOpen}
-        onOpenChange={(open) => {
-          setIsAddOpen(open);
-          if (!open) setEditingNote(null);
-        }}
-        noteType={noteType}
-        editingNote={editingNote}
-        platforms={platforms}
-        ideas={ideas}
-        onSave={handleSave}
-        onOpenFocusMode={noteType === 'journal_entry' ? handleOpenFocusMode : undefined}
-      />
+      {/* Journal Entry Dialog */}
+      {noteType === 'journal_entry' && (
+        <JournalEntryDialog
+          open={isAddOpen}
+          onOpenChange={(open) => {
+            setIsAddOpen(open);
+            if (!open) setEditingNote(null);
+          }}
+          noteType={noteType}
+          editingNote={editingNote}
+          platforms={platforms}
+          ideas={ideas}
+          onSave={handleJournalSave}
+          onOpenFocusMode={handleOpenFocusMode}
+        />
+      )}
+
+      {/* Quick Note Dialog */}
+      {noteType === 'quick_thought' && (
+        <QuickNoteDialog
+          open={isAddOpen}
+          onOpenChange={(open) => {
+            setIsAddOpen(open);
+            if (!open) setEditingNote(null);
+          }}
+          editingNote={editingNote}
+          platforms={platforms}
+          ideas={ideas}
+          onSave={handleQuickNoteSave}
+        />
+      )}
 
       {/* Focus Mode Dialog */}
       <FocusModeDialog
