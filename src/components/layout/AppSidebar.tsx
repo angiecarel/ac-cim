@@ -23,7 +23,7 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/ideas', label: 'Idea Bucket', icon: Lightbulb },
   { path: '/calendar', label: 'Calendar', icon: Calendar },
-  { path: '/systems', label: 'Systems', icon: Cog },
+  { path: '/systems', label: 'Journal', icon: Cog },
   { path: '/history', label: 'Past Ideas', icon: History },
   { path: '/archive', label: 'Archive', icon: Archive },
   { path: '/settings', label: 'Manage', icon: Settings },
