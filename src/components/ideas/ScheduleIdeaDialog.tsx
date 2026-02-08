@@ -43,7 +43,7 @@ export function ScheduleIdeaDialog({ idea, open, onOpenChange }: ScheduleIdeaDia
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle className="text-gradient">Schedule Idea</DialogTitle>
+          <DialogTitle className="text-gradient">Plan Idea</DialogTitle>
         </DialogHeader>
         <div className="space-y-4">
           <p className="text-sm text-muted-foreground">
@@ -67,9 +67,10 @@ export function ScheduleIdeaDialog({ idea, open, onOpenChange }: ScheduleIdeaDia
               onClick={handleSchedule} 
               className="bg-gradient-creative hover:opacity-90" 
               disabled={loading || !selectedDate}
+              title="Plan this idea for the selected date"
             >
               {loading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
-              Schedule for {selectedDate ? format(selectedDate, 'MMM d') : '...'}
+              Plan for {selectedDate ? format(selectedDate, 'MMM d') : '...'}
             </Button>
           </div>
         </div>

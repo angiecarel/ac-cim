@@ -6,11 +6,13 @@ import {
   Clock, 
   Pause, 
   Pencil, 
-  Rocket, 
   CalendarIcon,
   MoreHorizontal,
   Archive,
-  Eye
+  Eye,
+  Compass,
+  Target,
+  CalendarCheck
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -21,6 +23,7 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { format } from 'date-fns';
 import { useIdea } from '@/contexts/IdeaContext';
+import { statusConfig, priorityLabels } from '@/lib/statusLabels';
 
 interface IdeaListItemProps {
   idea: Idea;
@@ -30,22 +33,6 @@ interface IdeaListItemProps {
   compact?: boolean;
   quickLinks?: QuickLink[];
 }
-
-const statusConfig = {
-  hold: { label: 'Hold', icon: Pause, className: 'status-badge-hold' },
-  developing: { label: 'Developing', icon: Pencil, className: 'status-badge-developing' },
-  ready: { label: 'Ready', icon: Rocket, className: 'status-badge-ready' },
-  scheduled: { label: 'Scheduled', icon: CalendarIcon, className: 'status-badge-scheduled' },
-  archived: { label: 'Archived', icon: Archive, className: 'status-badge-archived' },
-  recycled: { label: 'Recycled', icon: Clock, className: 'status-badge-recycled' },
-};
-
-const priorityLabels = {
-  none: '',
-  good: 'Good',
-  better: 'Better',
-  best: 'Best',
-};
 
 export function IdeaListItem({ idea, onView, onEdit, onSchedule, compact = false, quickLinks = [] }: IdeaListItemProps) {
   const { updateIdea, archiveIdea } = useIdea();
@@ -156,19 +143,19 @@ export function IdeaListItem({ idea, onView, onEdit, onSchedule, compact = false
           <DropdownMenuSeparator />
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleStatusChange('hold'); }}>
             <Pause className="h-4 w-4 mr-2" />
-            Hold
+            Captured
           </DropdownMenuItem>
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleStatusChange('developing'); }}>
-            <Pencil className="h-4 w-4 mr-2" />
-            Developing
+            <Compass className="h-4 w-4 mr-2" />
+            Exploring
           </DropdownMenuItem>
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); handleStatusChange('ready'); }}>
-            <Rocket className="h-4 w-4 mr-2" />
-            Ready
+            <Target className="h-4 w-4 mr-2" />
+            Actionable
           </DropdownMenuItem>
           <DropdownMenuItem onClick={(e) => { e.stopPropagation(); onSchedule(idea); }}>
-            <CalendarIcon className="h-4 w-4 mr-2" />
-            Schedule
+            <CalendarCheck className="h-4 w-4 mr-2" />
+            Plan
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem 
