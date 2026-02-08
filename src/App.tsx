@@ -11,6 +11,7 @@ import { AppLayout } from "@/components/layout/AppLayout";
 import { Dashboard } from "@/pages/Dashboard";
 import { IdeaBucket } from "@/pages/IdeaBucket";
 import { CalendarView } from "@/pages/CalendarView";
+import { SystemsView } from "@/pages/SystemsView";
 import { PastIdeas } from "@/pages/PastIdeas";
 import { ArchiveView } from "@/pages/ArchiveView";
 import { ManageSettings } from "@/pages/ManageSettings";
@@ -41,6 +42,7 @@ function AppContent() {
           <Route path="/" element={<Dashboard />} />
           <Route path="/ideas" element={<IdeaBucket />} />
           <Route path="/calendar" element={<CalendarView />} />
+          <Route path="/systems" element={<SystemsView />} />
           <Route path="/history" element={<PastIdeas />} />
           <Route path="/archive" element={<ArchiveView />} />
           <Route path="/settings" element={<ManageSettings />} />

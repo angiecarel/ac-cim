@@ -288,6 +288,57 @@ export type Database = {
           },
         ]
       }
+      systems: {
+        Row: {
+          content: string | null
+          created_at: string
+          id: string
+          idea_id: string | null
+          note_type: Database["public"]["Enums"]["system_note_type"]
+          platform_id: string | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string | null
+          note_type?: Database["public"]["Enums"]["system_note_type"]
+          platform_id?: string | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          content?: string | null
+          created_at?: string
+          id?: string
+          idea_id?: string | null
+          note_type?: Database["public"]["Enums"]["system_note_type"]
+          platform_id?: string | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "systems_idea_id_fkey"
+            columns: ["idea_id"]
+            isOneToOne: false
+            referencedRelation: "ideas"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "systems_platform_id_fkey"
+            columns: ["platform_id"]
+            isOneToOne: false
+            referencedRelation: "platforms"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       tags: {
         Row: {
           color: string | null
@@ -335,6 +386,7 @@ export type Database = {
         | "scheduled"
         | "archived"
         | "recycled"
+      system_note_type: "quick_thought" | "journal_entry"
       time_estimate: "quick" | "hour" | "day" | "week_plus"
     }
     CompositeTypes: {
@@ -473,6 +525,7 @@ export const Constants = {
         "archived",
         "recycled",
       ],
+      system_note_type: ["quick_thought", "journal_entry"],
       time_estimate: ["quick", "hour", "day", "week_plus"],
     },
   },
