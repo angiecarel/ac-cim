@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Edit, Trash2, Link2, Pin, PinOff } from 'lucide-react';
+import { Edit, Trash2, Link2, Pin, PinOff, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
@@ -26,6 +26,7 @@ interface QuickNoteCardProps {
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
   onView?: (note: SystemNote) => void;
+  onSendToBucket?: (note: SystemNote) => void;
   compact?: boolean;
 }
 
@@ -38,6 +39,7 @@ export function QuickNoteCard({
   onDelete,
   onTogglePin,
   onView,
+  onSendToBucket,
   compact = false,
 }: QuickNoteCardProps) {
   const colorStyle = getColorStyle(note.color, noteColors);
@@ -72,6 +74,11 @@ export function QuickNoteCard({
           {format(new Date(note.updated_at), 'MMM d')}
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+          {onSendToBucket && (
+            <Button variant="ghost" size="icon" className="h-6 w-6" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
+              <ArrowUpRight className="h-3 w-3" />
+            </Button>
+          )}
           {onTogglePin && (
             <Button
               variant="ghost"
@@ -120,6 +127,11 @@ export function QuickNoteCard({
           </CardTitle>
         </div>
         <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+          {onSendToBucket && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Button>
+          )}
           {onTogglePin && (
             <Button
               variant="ghost"

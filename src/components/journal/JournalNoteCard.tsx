@@ -1,7 +1,7 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
-import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles, Pin, PinOff } from 'lucide-react';
+import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles, Pin, PinOff, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -31,6 +31,7 @@ interface JournalNoteCardProps {
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
   onView?: (note: SystemNote) => void;
+  onSendToBucket?: (note: SystemNote) => void;
   compact?: boolean;
 }
 
@@ -42,6 +43,7 @@ export function JournalNoteCard({
   onDelete,
   onTogglePin,
   onView,
+  onSendToBucket,
   compact = false,
 }: JournalNoteCardProps) {
   const MoodIcon = note.mood && MOOD_ICONS[note.mood]?.icon;
@@ -72,6 +74,11 @@ export function JournalNoteCard({
           }
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+          {onSendToBucket && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </Button>
+          )}
           {onTogglePin && (
             <Button
               variant="ghost"
@@ -154,6 +161,11 @@ export function JournalNoteCard({
 
           {/* Actions */}
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            {onSendToBucket && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
+                <ArrowUpRight className="h-4 w-4" />
+              </Button>
+            )}
             {onTogglePin && (
               <Button
                 variant="ghost"

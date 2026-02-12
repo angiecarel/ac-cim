@@ -1,6 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
-import { Trash2, Pin, PinOff } from 'lucide-react';
+import { Trash2, Pin, PinOff, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 
@@ -8,9 +8,10 @@ interface ThoughtCardProps {
   note: SystemNote;
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
+  onSendToBucket?: (note: SystemNote) => void;
 }
 
-export function ThoughtCard({ note, onDelete, onTogglePin }: ThoughtCardProps) {
+export function ThoughtCard({ note, onDelete, onTogglePin, onSendToBucket }: ThoughtCardProps) {
   return (
     <div
       className={cn(
@@ -26,6 +27,17 @@ export function ThoughtCard({ note, onDelete, onTogglePin }: ThoughtCardProps) {
         {format(new Date(note.created_at), 'MMM d')}
       </span>
       <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        {onSendToBucket && (
+          <Button
+            variant="ghost"
+            size="icon"
+            className="h-7 w-7"
+            title="Send to Bucket"
+            onClick={() => onSendToBucket(note)}
+          >
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Button>
+        )}
         {onTogglePin && (
           <Button
             variant="ghost"
