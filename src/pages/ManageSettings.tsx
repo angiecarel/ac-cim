@@ -13,13 +13,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '@/components/ui/select';
-import {
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
@@ -35,12 +28,18 @@ import {
   Plus, 
   Pencil, 
   Trash2,
-  Loader2
+  Loader2,
+  FileText,
+  Key,
+  Zap,
 } from 'lucide-react';
 import { ContentType, Platform } from '@/types';
 import { ChangePasswordCard } from '@/components/settings/ChangePasswordCard';
 import { ZapierSettings } from '@/components/settings/ZapierSettings';
 import { TemplateManager } from '@/components/settings/TemplateManager';
+import { cn } from '@/lib/utils';
+
+type SettingsTab = 'types' | 'contexts' | 'templates' | 'account' | 'integrations';
 
 export function ManageSettings() {
   const {
@@ -54,6 +53,8 @@ export function ManageSettings() {
     deletePlatform,
   } = useIdea();
 
+  const [activeTab, setActiveTab] = useState<SettingsTab>('types');
+
   // Content Types state
   const [newContentTypeName, setNewContentTypeName] = useState('');
   const [editingContentType, setEditingContentType] = useState<ContentType | null>(null);
@@ -66,8 +67,6 @@ export function ManageSettings() {
   const [deletingPlatform, setDeletingPlatform] = useState<Platform | null>(null);
   const [platformLoading, setPlatformLoading] = useState(false);
 
-
-  // Content Types handlers
   const handleAddContentType = async () => {
     if (!newContentTypeName.trim()) return;
     setCTLoading(true);
@@ -92,7 +91,6 @@ export function ManageSettings() {
     setCTLoading(false);
   };
 
-  // Platform handlers
   const handleAddPlatform = async () => {
     if (!newPlatformName.trim()) return;
     setPlatformLoading(true);
@@ -117,31 +115,47 @@ export function ManageSettings() {
     setPlatformLoading(false);
   };
 
+  const tabs: { id: SettingsTab; label: string; icon: typeof FileType }[] = [
+    { id: 'types', label: 'IDEA TYPES', icon: FileType },
+    { id: 'contexts', label: 'CONTEXTS', icon: Layers },
+    { id: 'templates', label: 'TEMPLATES', icon: FileText },
+    { id: 'account', label: 'ACCOUNT', icon: Key },
+    { id: 'integrations', label: 'INTEGRATIONS', icon: Zap },
+  ];
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gradient">Manage Settings</h1>
-        <p className="text-muted-foreground mt-1">
-          Customize your account, idea types, and contexts
-        </p>
+        <h1 className="text-4xl font-bold uppercase" style={{ color: 'hsl(0 72% 45%)' }}>Manage Dashboard</h1>
+        <p className="text-muted-foreground mt-1">Customize your creative workspace.</p>
       </div>
 
-      {/* Account Section */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <ChangePasswordCard />
+      {/* Tab Navigation */}
+      <div className="border-2 border-border p-1 flex flex-wrap gap-0">
+        {tabs.map((tab) => {
+          const Icon = tab.icon;
+          const isActive = activeTab === tab.id;
+          return (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={cn(
+                'flex items-center gap-2 px-5 py-3 text-sm font-bold uppercase tracking-wide transition-colors flex-1 justify-center',
+                isActive
+                  ? 'bg-gradient-creative text-primary-foreground'
+                  : 'hover:bg-muted'
+              )}
+            >
+              <Icon className="h-4 w-4" />
+              {tab.label}
+            </button>
+          );
+        })}
       </div>
 
-      {/* Zapier Integration */}
-      <div className="grid lg:grid-cols-2 gap-6">
-        <ZapierSettings />
-      </div>
-
-      {/* Content Templates */}
-      <TemplateManager />
-
-      <div className="grid lg:grid-cols-2 gap-6">
-        {/* Idea Types */}
+      {/* Tab Content */}
+      {activeTab === 'types' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -150,7 +164,6 @@ export function ManageSettings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Add new */}
             <div className="flex gap-2">
               <Input
                 placeholder="New idea type..."
@@ -162,26 +175,17 @@ export function ManageSettings() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-
-            {/* List */}
             <div className="space-y-2">
               {contentTypes.map((ct) => (
                 <div key={ct.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
                   <div className="flex items-center gap-2">
                     <span>{ct.name}</span>
-                    {ct.is_system && (
-                      <Badge variant="secondary" className="text-xs">System</Badge>
-                    )}
+                    {ct.is_system && <Badge variant="secondary" className="text-xs">System</Badge>}
                   </div>
                   <div className="flex gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => setEditingContentType({ ...ct })}
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingContentType({ ...ct })}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
@@ -194,9 +198,7 @@ export function ManageSettings() {
                             <Label>Name</Label>
                             <Input
                               value={editingContentType?.name || ''}
-                              onChange={(e) => setEditingContentType(prev => 
-                                prev ? { ...prev, name: e.target.value } : null
-                              )}
+                              onChange={(e) => setEditingContentType(prev => prev ? { ...prev, name: e.target.value } : null)}
                             />
                           </div>
                           <Button onClick={handleUpdateContentType} disabled={ctLoading} className="w-full">
@@ -207,12 +209,7 @@ export function ManageSettings() {
                       </DialogContent>
                     </Dialog>
                     {!ct.is_system && (
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 text-destructive hover:text-destructive"
-                        onClick={() => setDeletingContentType(ct)}
-                      >
+                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingContentType(ct)}>
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     )}
@@ -222,8 +219,9 @@ export function ManageSettings() {
             </div>
           </CardContent>
         </Card>
+      )}
 
-        {/* Contexts */}
+      {activeTab === 'contexts' && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
@@ -232,7 +230,6 @@ export function ManageSettings() {
             </CardTitle>
           </CardHeader>
           <CardContent className="space-y-4">
-            {/* Add new */}
             <div className="flex gap-2">
               <Input
                 placeholder="Context name..."
@@ -245,8 +242,6 @@ export function ManageSettings() {
                 <Plus className="h-4 w-4" />
               </Button>
             </div>
-
-            {/* List */}
             <div className="space-y-2">
               {platforms.map((p) => (
                 <div key={p.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
@@ -254,12 +249,7 @@ export function ManageSettings() {
                   <div className="flex gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
-                          className="h-8 w-8"
-                          onClick={() => setEditingPlatform({ ...p })}
-                        >
+                        <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => setEditingPlatform({ ...p })}>
                           <Pencil className="h-4 w-4" />
                         </Button>
                       </DialogTrigger>
@@ -272,9 +262,7 @@ export function ManageSettings() {
                             <Label>Name</Label>
                             <Input
                               value={editingPlatform?.name || ''}
-                              onChange={(e) => setEditingPlatform(prev => 
-                                prev ? { ...prev, name: e.target.value } : null
-                              )}
+                              onChange={(e) => setEditingPlatform(prev => prev ? { ...prev, name: e.target.value } : null)}
                             />
                           </div>
                           <Button onClick={handleUpdatePlatform} disabled={platformLoading} className="w-full">
@@ -284,12 +272,7 @@ export function ManageSettings() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      className="h-8 w-8 text-destructive hover:text-destructive"
-                      onClick={() => setDeletingPlatform(p)}
-                    >
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingPlatform(p)}>
                       <Trash2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -298,7 +281,21 @@ export function ManageSettings() {
             </div>
           </CardContent>
         </Card>
-      </div>
+      )}
+
+      {activeTab === 'templates' && <TemplateManager />}
+
+      {activeTab === 'account' && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          <ChangePasswordCard />
+        </div>
+      )}
+
+      {activeTab === 'integrations' && (
+        <div className="grid lg:grid-cols-2 gap-6">
+          <ZapierSettings />
+        </div>
+      )}
 
       {/* Delete confirmations */}
       <AlertDialog open={!!deletingContentType} onOpenChange={(open) => !open && setDeletingContentType(null)}>
@@ -311,9 +308,7 @@ export function ManageSettings() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeleteContentType} className="bg-destructive hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDeleteContentType} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -328,9 +323,7 @@ export function ManageSettings() {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDeletePlatform} className="bg-destructive hover:bg-destructive/90">
-              Delete
-            </AlertDialogAction>
+            <AlertDialogAction onClick={handleDeletePlatform} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
