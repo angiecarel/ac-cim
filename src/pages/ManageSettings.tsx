@@ -178,10 +178,7 @@ export function ManageSettings() {
             <div className="space-y-2">
               {contentTypes.map((ct) => (
                 <div key={ct.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
-                  <div className="flex items-center gap-2">
-                    <span>{ct.name}</span>
-                    {ct.is_system && <Badge variant="secondary" className="text-xs">System</Badge>}
-                  </div>
+                  <span>{ct.name}</span>
                   <div className="flex gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
@@ -208,11 +205,9 @@ export function ManageSettings() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    {!ct.is_system && (
-                      <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingContentType(ct)}>
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    )}
+                    <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive hover:text-destructive" onClick={() => setDeletingContentType(ct)}>
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 </div>
               ))}
