@@ -25,6 +25,7 @@ interface QuickNoteCardProps {
   onEdit: (note: SystemNote) => void;
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
+  onView?: (note: SystemNote) => void;
   compact?: boolean;
 }
 
@@ -36,6 +37,7 @@ export function QuickNoteCard({
   onEdit,
   onDelete,
   onTogglePin,
+  onView,
   compact = false,
 }: QuickNoteCardProps) {
   const colorStyle = getColorStyle(note.color, noteColors);
@@ -48,11 +50,12 @@ export function QuickNoteCard({
   if (compact) {
     return (
       <div
-        className="group flex items-center gap-3 px-3 py-2 rounded-md border transition-all hover:shadow-sm"
+        className="group flex items-center gap-3 px-3 py-2 rounded-md border transition-all hover:shadow-sm cursor-pointer"
         style={{
           backgroundColor: colorStyle.bg,
           borderColor: colorStyle.border,
         }}
+        onClick={() => onView?.(note)}
       >
         {note.is_pinned && (
           <Pin className="h-3 w-3 text-primary flex-shrink-0" />
@@ -68,7 +71,7 @@ export function QuickNoteCard({
         <span className="text-xs text-muted-foreground">
           {format(new Date(note.updated_at), 'MMM d')}
         </span>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           {onTogglePin && (
             <Button
               variant="ghost"
@@ -98,13 +101,14 @@ export function QuickNoteCard({
   return (
     <Card
       className={cn(
-        "group relative transition-all hover:shadow-md",
+        "group relative transition-all hover:shadow-md cursor-pointer",
         note.is_pinned && "ring-2 ring-primary/30"
       )}
       style={{
         backgroundColor: colorStyle.bg,
         borderColor: colorStyle.border,
       }}
+      onClick={() => onView?.(note)}
     >
       <CardHeader className="pb-2">
         <div className="flex items-start gap-2">
@@ -115,7 +119,7 @@ export function QuickNoteCard({
             {note.title}
           </CardTitle>
         </div>
-        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           {onTogglePin && (
             <Button
               variant="ghost"
