@@ -18,6 +18,7 @@ import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
 import { LogFAB } from '@/components/journal/LogFAB';
 import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
+import { ViewJournalEntryDialog } from '@/components/journal/ViewJournalEntryDialog';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
@@ -460,29 +461,31 @@ export function SystemsView() {
             <Card className="divide-y divide-border overflow-hidden">
               {filteredJournalEntries.map((note) => (
                 <JournalNoteCard
-                  key={note.id}
-                  note={note}
-                  compact
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                />
+                   key={note.id}
+                   note={note}
+                   compact
+                   platform={getLinkedPlatform(note.platform_id)}
+                   idea={getLinkedIdea(note.idea_id)}
+                   onEdit={openEdit}
+                   onDelete={deleteSystem}
+                   onTogglePin={handleTogglePin}
+                   onView={setViewingNote}
+                 />
               ))}
             </Card>
           ) : (
             <div className="space-y-4">
               {filteredJournalEntries.map((note) => (
                 <JournalNoteCard
-                  key={note.id}
-                  note={note}
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                />
+                   key={note.id}
+                   note={note}
+                   platform={getLinkedPlatform(note.platform_id)}
+                   idea={getLinkedIdea(note.idea_id)}
+                   onEdit={openEdit}
+                   onDelete={deleteSystem}
+                   onTogglePin={handleTogglePin}
+                   onView={setViewingNote}
+                 />
               ))}
             </div>
           )}
@@ -535,7 +538,15 @@ export function SystemsView() {
         noteColors={noteColors}
       />
 
-      {/* Focus Mode Dialog */}
+      <ViewJournalEntryDialog
+        note={viewingNote && viewingNote.note_type === 'journal_entry' ? viewingNote : null}
+        open={!!viewingNote && viewingNote.note_type === 'journal_entry'}
+        onOpenChange={(open) => { if (!open) setViewingNote(null); }}
+        platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
+        idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
+      />
+
+
       <FocusModeDialog
         open={focusModeOpen}
         onOpenChange={setFocusModeOpen}

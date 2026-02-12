@@ -30,6 +30,7 @@ interface JournalNoteCardProps {
   onEdit: (note: SystemNote) => void;
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
+  onView?: (note: SystemNote) => void;
   compact?: boolean;
 }
 
@@ -40,6 +41,7 @@ export function JournalNoteCard({
   onEdit,
   onDelete,
   onTogglePin,
+  onView,
   compact = false,
 }: JournalNoteCardProps) {
   const MoodIcon = note.mood && MOOD_ICONS[note.mood]?.icon;
@@ -52,7 +54,7 @@ export function JournalNoteCard({
 
   if (compact) {
     return (
-      <div className="group flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-muted/30 transition-colors">
+      <div className="group flex items-center gap-4 px-4 py-3 border-b border-border hover:bg-muted/30 transition-colors cursor-pointer" onClick={() => onView?.(note)}>
         {note.is_pinned && (
           <Pin className="h-3.5 w-3.5 text-primary flex-shrink-0" />
         )}
@@ -69,7 +71,7 @@ export function JournalNoteCard({
             : format(new Date(note.updated_at), 'MMM d')
           }
         </span>
-        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
           {onTogglePin && (
             <Button
               variant="ghost"
@@ -98,9 +100,9 @@ export function JournalNoteCard({
 
   return (
     <Card className={cn(
-      "group w-full transition-all hover:shadow-md",
+      "group w-full transition-all hover:shadow-md cursor-pointer",
       note.is_pinned && "ring-2 ring-primary/30"
-    )}>
+    )} onClick={() => onView?.(note)}>
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
@@ -151,7 +153,7 @@ export function JournalNoteCard({
           </div>
 
           {/* Actions */}
-          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" onClick={(e) => e.stopPropagation()}>
             {onTogglePin && (
               <Button
                 variant="ghost"
