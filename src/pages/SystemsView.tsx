@@ -3,6 +3,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useSystems, SystemNote, SystemNoteType } from '@/hooks/useSystems';
 import { useNoteColors } from '@/hooks/useNoteColors';
 import { useIdea } from '@/contexts/IdeaContext';
+import { toast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -29,7 +30,7 @@ export function SystemsView() {
   const { user } = useAuth();
   const { systems, loading, createSystem, updateSystem, deleteSystem } = useSystems(user?.id);
   const { colors: noteColors, createColor, updateColor, deleteColor } = useNoteColors(user?.id);
-  const { platforms, ideas } = useIdea();
+  const { platforms, ideas, createIdea } = useIdea();
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<SystemNote | null>(null);
@@ -241,6 +242,20 @@ export function SystemsView() {
     setNewThought('');
   };
 
+  // Send to Bucket handler — converts a note into an idea
+  const handleSendToBucket = async (note: SystemNote) => {
+    const idea = await createIdea({
+      title: note.title,
+      description: note.content ? note.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : undefined,
+      status: 'developing',
+      priority: 'none',
+      platform_id: note.platform_id || undefined,
+    });
+    if (idea) {
+      toast({ title: 'Sent to Bucket', description: `"${note.title}" added to Idea Bucket` });
+    }
+  };
+
   // Filtered & sorted thoughts
   const filteredThoughts = useMemo(() => {
     let filtered = thoughts;
@@ -378,6 +393,7 @@ export function SystemsView() {
                   note={note}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
+                  onSendToBucket={handleSendToBucket}
                 />
               ))}
             </div>
@@ -472,6 +488,7 @@ export function SystemsView() {
                   onEdit={openEdit}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
+                  onSendToBucket={handleSendToBucket}
                   onView={setViewingNote}
                 />
               ))}
@@ -488,6 +505,7 @@ export function SystemsView() {
                   onEdit={openEdit}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
+                  onSendToBucket={handleSendToBucket}
                   onView={setViewingNote}
                 />
               ))}
@@ -546,6 +564,7 @@ export function SystemsView() {
                    onEdit={openEdit}
                    onDelete={deleteSystem}
                    onTogglePin={handleTogglePin}
+                   onSendToBucket={handleSendToBucket}
                    onView={setViewingNote}
                  />
               ))}
@@ -561,6 +580,7 @@ export function SystemsView() {
                    onEdit={openEdit}
                    onDelete={deleteSystem}
                    onTogglePin={handleTogglePin}
+                   onSendToBucket={handleSendToBucket}
                    onView={setViewingNote}
                  />
               ))}
