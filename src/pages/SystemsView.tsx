@@ -385,19 +385,20 @@ export function SystemsView() {
               <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No thoughts match your search.</p>
             </Card>
-          ) : (
-            <div className="space-y-1">
-              {filteredThoughts.map((note) => (
-                <ThoughtCard
-                  key={note.id}
-                  note={note}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                  onSendToBucket={handleSendToBucket}
-                />
-              ))}
-            </div>
-          )}
+           ) : (
+             <div className="space-y-1">
+               {filteredThoughts.map((note) => (
+                 <ThoughtCard
+                   key={note.id}
+                   note={note}
+                   onDelete={deleteSystem}
+                   onUpdate={(id, title) => updateSystem(id, { title })}
+                   onTogglePin={handleTogglePin}
+                   onSendToBucket={handleSendToBucket}
+                 />
+               ))}
+             </div>
+           )}
         </TabsContent>
 
         {/* Quick Notes Tab */}
