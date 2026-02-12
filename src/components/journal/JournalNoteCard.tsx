@@ -59,7 +59,7 @@ export function JournalNoteCard({
         {MoodIcon && (
           <MoodIcon className={cn('h-4 w-4 flex-shrink-0', moodColor)} />
         )}
-        <span className="flex-1 font-handwritten text-xl truncate">{note.title}</span>
+        <span className="flex-1 font-sans font-bold text-xl truncate">{note.title}</span>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -120,8 +120,8 @@ export function JournalNoteCard({
               )}
             </div>
 
-            {/* Title - handwritten font */}
-            <h3 className="font-handwritten text-2xl leading-tight mb-3">
+            {/* Title - bold sans-serif font */}
+            <h3 className="font-sans font-bold text-2xl leading-tight mb-3">
               {note.title}
             </h3>
 
