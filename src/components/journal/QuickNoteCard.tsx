@@ -61,7 +61,7 @@ export function QuickNoteCard({
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: colorStyle.border }}
         />
-        <span className="flex-1 font-sans font-bold text-lg truncate">{note.title}</span>
+        <span className="flex-1 font-sans font-bold text-base truncate text-foreground">{note.title}</span>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -111,7 +111,7 @@ export function QuickNoteCard({
           {note.is_pinned && (
             <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
           )}
-          <CardTitle className="text-2xl font-sans font-bold leading-snug pr-16 flex-1">
+          <CardTitle className="text-lg font-sans font-bold leading-snug pr-16 flex-1 text-foreground">
             {note.title}
           </CardTitle>
         </div>
@@ -141,7 +141,7 @@ export function QuickNoteCard({
       </CardHeader>
       <CardContent className="space-y-3">
         {contentPreview && (
-          <p className="text-sm text-muted-foreground line-clamp-3">
+          <p className="text-sm text-foreground/70 line-clamp-3">
             {contentPreview}
           </p>
         )}
@@ -162,7 +162,7 @@ export function QuickNoteCard({
           </div>
         )}
 
-        <p className="text-xs text-muted-foreground">
+        <p className="text-xs text-foreground/50">
           {format(new Date(note.updated_at), 'MMM d, yyyy')}
         </p>
       </CardContent>
