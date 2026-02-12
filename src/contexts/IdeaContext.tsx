@@ -195,6 +195,10 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
     
+    if (filters.energyLevel?.length && (!idea.energy_level || !filters.energyLevel.includes(idea.energy_level))) {
+      return false;
+    }
+    
     if (filters.dateRange?.from || filters.dateRange?.to) {
       const ideaDate = new Date(idea.created_at);
       if (filters.dateRange.from && ideaDate < filters.dateRange.from) return false;
