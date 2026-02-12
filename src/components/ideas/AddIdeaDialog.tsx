@@ -35,6 +35,11 @@ interface AddIdeaDialogProps {
 }
 
 export function AddIdeaDialog({ open, onOpenChange }: AddIdeaDialogProps) {
+  if (!open) return null;
+  return <AddIdeaDialogInner open={open} onOpenChange={onOpenChange} />;
+}
+
+function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
   const { user } = useAuth();
   const { createIdea, contentTypes, tags, createTag, setIdeaTags } = useIdea();
   const { templates } = useContentTemplates(user?.id);
