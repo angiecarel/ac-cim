@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Idea, IdeaStatus, IdeaPriority } from '@/types';
+import { Idea, IdeaStatus, IdeaPriority, EnergyLevel } from '@/types';
 import { IdeaCard } from '@/components/ideas/IdeaCard';
 import { IdeaListItem } from '@/components/ideas/IdeaListItem';
 import { AddIdeaDialog } from '@/components/ideas/AddIdeaDialog';
@@ -90,11 +90,26 @@ export function IdeaBucket() {
     setFilters({ ...filters, platform: updated.length > 0 ? updated : undefined });
   };
 
+  const toggleEnergyFilter = (level: EnergyLevel) => {
+    const current = filters.energyLevel || [];
+    const updated = current.includes(level)
+      ? current.filter(e => e !== level)
+      : [...current, level];
+    setFilters({ ...filters, energyLevel: updated.length > 0 ? updated : undefined });
+  };
+
+  const energyOptions: { value: EnergyLevel; label: string }[] = [
+    { value: 'low', label: 'Low' },
+    { value: 'medium', label: 'Medium' },
+    { value: 'high', label: 'High' },
+  ];
+
   const hasActiveFilters = !!(
     filters.status?.length ||
     filters.priority?.length ||
     filters.contentType?.length ||
     filters.platform?.length ||
+    filters.energyLevel?.length ||
     filters.search
   );
 
@@ -307,6 +322,35 @@ export function IdeaBucket() {
               </div>
             </PopoverContent>
           </Popover>
+
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                Energy
+                {filters.energyLevel?.length ? (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5">
+                    {filters.energyLevel.length}
+                  </Badge>
+                ) : null}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-48 bg-popover" align="start">
+              <div className="space-y-2">
+                {energyOptions.map((option) => (
+                  <div key={option.value} className="flex items-center space-x-2">
+                    <Checkbox
+                      id={`energy-${option.value}`}
+                      checked={filters.energyLevel?.includes(option.value)}
+                      onCheckedChange={() => toggleEnergyFilter(option.value)}
+                    />
+                    <Label htmlFor={`energy-${option.value}`} className="text-sm">
+                      {option.label}
+                    </Label>
+                  </div>
+                ))}
+              </div>
+            </PopoverContent>
+          </Popover>
         </div>
       </div>
 
@@ -344,6 +388,12 @@ export function IdeaBucket() {
               </Badge>
             ) : null;
           })}
+          {filters.energyLevel?.map((e) => (
+            <Badge key={e} variant="secondary" className="gap-1">
+              {e}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => toggleEnergyFilter(e as EnergyLevel)} />
+            </Badge>
+          ))}
           {filters.search && (
             <Badge variant="secondary" className="gap-1">
               Search: {filters.search}
