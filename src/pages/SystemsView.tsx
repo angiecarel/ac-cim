@@ -17,6 +17,7 @@ import { QuickNoteDialog } from '@/components/journal/QuickNoteDialog';
 import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
 import { LogFAB } from '@/components/journal/LogFAB';
 import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
+import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
@@ -40,6 +41,7 @@ export function SystemsView() {
   const [colorFilter, setColorFilter] = useState<ColorFilter>('__all__');
   const [searchQuery, setSearchQuery] = useState('');
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
+  const [viewingNote, setViewingNote] = useState<SystemNote | null>(null);
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
@@ -392,6 +394,7 @@ export function SystemsView() {
                   onEdit={openEdit}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
+                  onView={setViewingNote}
                 />
               ))}
             </div>
@@ -407,6 +410,7 @@ export function SystemsView() {
                   onEdit={openEdit}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
+                  onView={setViewingNote}
                 />
               ))}
             </div>
@@ -520,6 +524,16 @@ export function SystemsView() {
           onDeleteColor={deleteColor}
         />
       )}
+
+      {/* View Quick Note Dialog */}
+      <ViewQuickNoteDialog
+        note={viewingNote}
+        open={!!viewingNote}
+        onOpenChange={(open) => { if (!open) setViewingNote(null); }}
+        platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
+        idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
+        noteColors={noteColors}
+      />
 
       {/* Focus Mode Dialog */}
       <FocusModeDialog
