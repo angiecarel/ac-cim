@@ -24,20 +24,20 @@
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
 
-    /* Primary - Coral/Orange creative accent */
+    /* Primary - Black (Bauhaus) */
     --primary: 0 0% 0%;
     --primary-foreground: 0 0% 100%;
 
     /* Secondary - Soft warm gray */
-    --secondary: 0 0% 96%;
+    --secondary: 40 20% 95%;
     --secondary-foreground: 0 0% 0%;
 
     /* Muted surfaces */
-    --muted: 0 0% 96%;
+    --muted: 40 15% 95%;
     --muted-foreground: 0 0% 45%;
 
-    /* Accent - Warm peach */
-    --accent: 0 0% 90%;
+    /* Accent - Warm cream */
+    --accent: 42 60% 90%;
     --accent-foreground: 0 0% 0%;
 
     /* Destructive */
@@ -64,34 +64,34 @@
     --priority-none: 220 9% 46%;
     --priority-good: 142 76% 36%;
     --priority-better: 217 91% 60%;
-    --priority-best: 175 65% 45%;
+    --priority-best: 0 72% 45%;
 
-    /* Gradients */
-    --gradient-creative: linear-gradient(135deg, hsl(175 65% 45%) 0%, hsl(190 70% 40%) 100%);
-    --gradient-creative-subtle: linear-gradient(135deg, hsl(175 65% 45% / 0.1) 0%, hsl(190 70% 40% / 0.1) 100%);
-    --gradient-hero: linear-gradient(135deg, hsl(175 65% 45%) 0%, hsl(200 75% 50%) 100%);
+    /* Gradients - Warm red/gold Bauhaus */
+    --gradient-creative: linear-gradient(135deg, hsl(0 72% 45%) 0%, hsl(0 65% 38%) 100%);
+    --gradient-creative-subtle: linear-gradient(135deg, hsl(0 72% 45% / 0.1) 0%, hsl(45 90% 55% / 0.1) 100%);
+    --gradient-hero: linear-gradient(135deg, hsl(0 72% 45%) 0%, hsl(30 80% 50%) 100%);
 
     /* Shadows */
     --shadow-sm: 3px 3px 0px 0px #000000;
     --shadow-md: 8px 8px 0px 0px #000000;
     --shadow-lg: 12px 12px 0px 0px #000000;
-    --shadow-creative: 0 10px 40px -10px hsl(175 65% 45% / 0.3);
+    --shadow-creative: 0 10px 40px -10px hsl(0 72% 45% / 0.3);
 
     /* Sidebar */
-    --sidebar-background: 30 20% 98%;
+    --sidebar-background: 40 25% 97%;
     --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 0 0% 0%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 0 0% 90%;
+    --sidebar-accent: 45 90% 60%;
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 0 0% 0%;
     --sidebar-ring: 0 0% 0%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
-    --sidebar: 0 0% 98%;
+    --chart-1: 0 72% 45%;
+    --chart-2: 45 90% 55%;
+    --chart-3: 30 80% 50%;
+    --chart-4: 0 0% 25%;
+    --chart-5: 20 70% 55%;
+    --sidebar: 40 25% 97%;
     --font-sans: 'Space Grotesk', ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, 'Noto Sans', sans-serif;
     --font-serif: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
     --font-mono: 'Space Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono', 'Courier New', monospace;
