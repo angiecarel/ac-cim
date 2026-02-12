@@ -9,7 +9,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X } from 'lucide-react';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, MessageCircle } from 'lucide-react';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
 import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
@@ -19,6 +19,7 @@ import { LogFAB } from '@/components/journal/LogFAB';
 import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
 import { ViewJournalEntryDialog } from '@/components/journal/ViewJournalEntryDialog';
+import { ThoughtCard } from '@/components/journal/ThoughtCard';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
@@ -46,6 +47,10 @@ export function SystemsView() {
 
   const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
+  const thoughts = systems.filter((s) => s.note_type === 'thought');
+
+  // State for inline thought input
+  const [newThought, setNewThought] = useState('');
 
   // Filter quick thoughts by color and search
   const filteredQuickThoughts = useMemo(() => {
@@ -213,7 +218,7 @@ export function SystemsView() {
   const handleQuickCaptureSave = async (data: { title: string; content: string; type: SystemNoteType }) => {
     await createSystem({
       title: data.title,
-      content: data.content || null,
+      content: data.type === 'thought' ? null : (data.content || null),
       note_type: data.type,
       platform_id: null,
       idea_id: null,
@@ -222,6 +227,33 @@ export function SystemsView() {
       color: null,
     });
   };
+
+  // Inline thought add handler
+  const handleAddThought = async () => {
+    if (!newThought.trim()) return;
+    await createSystem({
+      title: newThought.trim(),
+      content: null,
+      note_type: 'thought' as SystemNoteType,
+      platform_id: null,
+      idea_id: null,
+    });
+    setNewThought('');
+  };
+
+  // Filtered & sorted thoughts
+  const filteredThoughts = useMemo(() => {
+    let filtered = thoughts;
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(n => n.title.toLowerCase().includes(query));
+    }
+    return filtered.sort((a, b) => {
+      if (a.is_pinned && !b.is_pinned) return -1;
+      if (!a.is_pinned && b.is_pinned) return 1;
+      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    });
+  }, [thoughts, searchQuery]);
 
   const openAdd = (type: SystemNoteType) => {
     setEditingNote(null);
@@ -295,8 +327,12 @@ export function SystemsView() {
       </div>
 
       {/* Tabs */}
-      <Tabs defaultValue="quick" className="space-y-6">
+      <Tabs defaultValue="thoughts" className="space-y-6">
         <TabsList>
+          <TabsTrigger value="thoughts" className="gap-2">
+            <MessageCircle className="h-4 w-4" />
+            Thoughts
+          </TabsTrigger>
           <TabsTrigger value="quick" className="gap-2">
             <StickyNote className="h-4 w-4" />
             Quick Notes
@@ -306,6 +342,47 @@ export function SystemsView() {
             Journal Entries
           </TabsTrigger>
         </TabsList>
+
+        {/* Thoughts Tab */}
+        <TabsContent value="thoughts" className="space-y-4">
+          {/* Inline input */}
+          <div className="flex gap-2">
+            <Input
+              placeholder="What's on your mind?"
+              value={newThought}
+              onChange={(e) => setNewThought(e.target.value)}
+              onKeyDown={(e) => { if (e.key === 'Enter') handleAddThought(); }}
+              className="flex-1"
+            />
+            <Button onClick={handleAddThought} disabled={!newThought.trim()} className="gap-2">
+              <Plus className="h-4 w-4" />
+              Add
+            </Button>
+          </div>
+
+          {thoughts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No thoughts yet. Jot down a quick one-liner!</p>
+            </Card>
+          ) : filteredThoughts.length === 0 ? (
+            <Card className="p-8 text-center">
+              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+              <p className="text-muted-foreground">No thoughts match your search.</p>
+            </Card>
+          ) : (
+            <div className="space-y-1">
+              {filteredThoughts.map((note) => (
+                <ThoughtCard
+                  key={note.id}
+                  note={note}
+                  onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
+                />
+              ))}
+            </div>
+          )}
+        </TabsContent>
 
         {/* Quick Notes Tab */}
         <TabsContent value="quick" className="space-y-4">

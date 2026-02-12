@@ -3,7 +3,7 @@ import { supabase } from '@/integrations/supabase/client';
 import { toast } from '@/hooks/use-toast';
 import { triggerZapierWebhook, ZAPIER_EVENTS } from '@/lib/zapier';
 
-export type SystemNoteType = 'quick_thought' | 'journal_entry';
+export type SystemNoteType = 'quick_thought' | 'journal_entry' | 'thought';
 
 export interface SystemNote {
   id: string;

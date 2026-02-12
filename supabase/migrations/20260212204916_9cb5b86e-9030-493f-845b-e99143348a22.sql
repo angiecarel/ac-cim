@@ -1,0 +1,1 @@
+ALTER TYPE public.system_note_type ADD VALUE 'thought';

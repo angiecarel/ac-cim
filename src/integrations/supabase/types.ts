@@ -514,7 +514,7 @@ export type Database = {
         | "scheduled"
         | "archived"
         | "recycled"
-      system_note_type: "quick_thought" | "journal_entry"
+      system_note_type: "quick_thought" | "journal_entry" | "thought"
       time_estimate: "quick" | "hour" | "day" | "week_plus"
     }
     CompositeTypes: {
@@ -653,7 +653,7 @@ export const Constants = {
         "archived",
         "recycled",
       ],
-      system_note_type: ["quick_thought", "journal_entry"],
+      system_note_type: ["quick_thought", "journal_entry", "thought"],
       time_estimate: ["quick", "hour", "day", "week_plus"],
     },
   },
