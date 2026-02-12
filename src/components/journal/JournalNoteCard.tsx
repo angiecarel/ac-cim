@@ -59,7 +59,7 @@ export function JournalNoteCard({
         {MoodIcon && (
           <MoodIcon className={cn('h-4 w-4 flex-shrink-0', moodColor)} />
         )}
-        <span className="flex-1 font-sans font-bold text-base truncate text-foreground">{note.title}</span>
+        <span className="flex-1 font-sans font-bold text-base truncate text-gray-900">{note.title}</span>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -105,7 +105,7 @@ export function JournalNoteCard({
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
             {/* Header row with date and mood */}
-            <div className="flex items-center gap-3 mb-2 text-sm text-foreground/60">
+            <div className="flex items-center gap-3 mb-2 text-sm text-gray-500">
               {note.is_pinned && (
                 <Pin className="h-4 w-4 text-primary" />
               )}
@@ -121,13 +121,13 @@ export function JournalNoteCard({
             </div>
 
             {/* Title - bold sans-serif font */}
-            <h3 className="font-sans font-bold text-lg leading-tight mb-3 text-foreground">
+            <h3 className="font-sans font-bold text-lg leading-tight mb-3 text-gray-900">
               {note.title}
             </h3>
 
             {/* Content preview - 4 lines */}
             {contentPreview && (
-              <p className="text-sm text-foreground/70 line-clamp-4 leading-relaxed">
+              <p className="text-sm text-gray-600 line-clamp-4 leading-relaxed">
                 {contentPreview}
               </p>
             )}
