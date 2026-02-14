@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Idea, QuickLink, Tag } from '@/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -75,7 +76,14 @@ export function IdeaListItem({ idea, onView, onEdit, onSchedule, compact = false
       {/* Main content */}
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-2">
-          <h3 className="font-medium truncate">{idea.title}</h3>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <h3 className="font-medium truncate">{idea.title}</h3>
+              </TooltipTrigger>
+              <TooltipContent side="top" className="max-w-xs"><p>{idea.title}</p></TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           {idea.is_timely && (
             <Badge variant="destructive" className="h-5 animate-pulse-soft">
               <Clock className="h-3 w-3 mr-1" />

@@ -39,6 +39,7 @@ import { Loader2, CalendarIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { TagMultiSelect } from './TagMultiSelect';
+import { IdeaFileManager } from './IdeaFileManager';
 
 interface EditIdeaDialogProps {
   idea: Idea | null;
@@ -345,6 +346,13 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
                  </Select>
                </div>
              </div>
+
+            {/* File Attachments */}
+            {idea && (
+              <div className="pt-2 border-t">
+                <IdeaFileManager ideaId={idea.id} />
+              </div>
+            )}
 
             <div className="flex justify-between gap-2 pt-4 border-t">
               <Button 

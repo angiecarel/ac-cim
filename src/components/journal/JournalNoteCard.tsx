@@ -4,6 +4,7 @@ import { SystemNote } from '@/hooks/useSystems';
 import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles, Pin, PinOff, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const MOOD_ICONS: Record<string, { icon: typeof Smile; color: string }> = {
   great: { icon: Sparkles, color: 'text-yellow-500' },
@@ -63,7 +64,14 @@ export function JournalNoteCard({
         {MoodIcon && (
           <MoodIcon className={cn('h-4 w-4 flex-shrink-0', moodColor)} />
         )}
-        <span className="flex-1 font-sans font-bold text-base truncate text-gray-900">{note.title}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="flex-1 font-sans font-bold text-base truncate text-gray-900">{note.title}</span>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs"><p>{note.title}</p></TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -130,9 +138,16 @@ export function JournalNoteCard({
             </div>
 
             {/* Title - bold sans-serif font */}
-            <h3 className="font-sans font-bold text-lg leading-tight mb-3 text-gray-900">
-              {note.title}
-            </h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <h3 className="font-sans font-bold text-lg leading-tight mb-3 text-gray-900 truncate">
+                    {note.title}
+                  </h3>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs"><p>{note.title}</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
 
             {/* Content preview - 4 lines */}
             {contentPreview && (
