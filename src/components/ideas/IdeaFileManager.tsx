@@ -25,18 +25,23 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
   const { user } = useAuth();
   const { getIdeaFiles, uploadFile, deleteFile, getFileUrl, uploading } = useIdeaFiles(user?.id);
   const [files, setFiles] = useState<IdeaFile[]>([]);
+  const [isDragging, setIsDragging] = useState(false);
 
   useEffect(() => {
     getIdeaFiles(ideaId).then(setFiles);
   }, [ideaId, getIdeaFiles]);
 
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const selectedFiles = e.target.files;
-    if (!selectedFiles) return;
-    for (const file of Array.from(selectedFiles)) {
+  const processFiles = async (fileList: FileList | File[]) => {
+    for (const file of Array.from(fileList)) {
       const uploaded = await uploadFile(ideaId, file);
       if (uploaded) setFiles(prev => [uploaded, ...prev]);
     }
+  };
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFiles = e.target.files;
+    if (!selectedFiles) return;
+    await processFiles(selectedFiles);
     e.target.value = '';
   };
 
@@ -45,8 +50,38 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
     setFiles(prev => prev.filter(f => f.id !== file.id));
   };
 
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!readOnly) setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+  };
+
+  const handleDrop = async (e: React.DragEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
+    if (readOnly || uploading || !e.dataTransfer.files.length) return;
+    await processFiles(e.dataTransfer.files);
+  };
+
   return (
-    <div className="space-y-2">
+    <div
+      className="space-y-2"
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
+    >
+      {isDragging && (
+        <div className="border-2 border-dashed border-primary/50 rounded-lg p-4 text-center text-sm text-primary/70 bg-primary/5 animate-pulse">
+          Drop files here to attach
+        </div>
+      )}
       <div className="flex items-center justify-between">
         <span className="text-sm font-medium text-muted-foreground">
           Attachments {files.length > 0 && `(${files.length})`}
