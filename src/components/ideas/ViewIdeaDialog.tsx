@@ -14,6 +14,7 @@ import { cn } from '@/lib/utils';
 import { statusConfig } from '@/lib/statusLabels';
 import { useIdea } from '@/contexts/IdeaContext';
 import { SparkDialog } from './SparkDialog';
+import { IdeaFileManager } from './IdeaFileManager';
 
 interface ViewIdeaDialogProps {
   idea: Idea | null;
@@ -169,6 +170,9 @@ export function ViewIdeaDialog({ idea, open, onOpenChange, onEdit, onDuplicate }
               </div>
             )}
           </div>
+
+          {/* Attachments */}
+          <IdeaFileManager ideaId={idea.id} readOnly />
 
            {/* Actions */}
           <div className="flex flex-wrap justify-between gap-2 pt-4 border-t">

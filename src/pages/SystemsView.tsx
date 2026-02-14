@@ -256,6 +256,15 @@ export function SystemsView() {
     }
   };
 
+  // Move thought to quick note or journal entry
+  const handleMoveTo = async (id: string, noteType: 'quick_thought' | 'journal_entry') => {
+    await updateSystem(id, { 
+      note_type: noteType,
+      entry_date: noteType === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
+    });
+    toast({ title: noteType === 'quick_thought' ? 'Moved to Quick Notes' : 'Moved to Journal Entries' });
+  };
+
   // Filtered & sorted thoughts
   const filteredThoughts = useMemo(() => {
     let filtered = thoughts;
@@ -395,6 +404,7 @@ export function SystemsView() {
                    onUpdate={(id, title) => updateSystem(id, { title })}
                    onTogglePin={handleTogglePin}
                    onSendToBucket={handleSendToBucket}
+                   onMoveTo={handleMoveTo}
                  />
                ))}
              </div>

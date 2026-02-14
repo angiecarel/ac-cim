@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { Idea, Tag } from '@/types';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -68,7 +69,14 @@ export function IdeaCard({ idea, onView, onEdit, onSchedule, quickLinks = [] }: 
       <CardHeader className="pb-2">
         <div className="flex items-start justify-between gap-2">
           <div className="flex-1 min-w-0">
-            <h3 className="font-semibold text-foreground truncate">{idea.title}</h3>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <h3 className="font-semibold text-foreground truncate">{idea.title}</h3>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs"><p>{idea.title}</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
             <div className="flex flex-wrap gap-1.5 mt-2">
               <Badge variant="secondary" className={statusInfo.className}>
                 <StatusIcon className="h-3 w-3 mr-1" />

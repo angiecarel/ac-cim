@@ -6,6 +6,7 @@ import { Edit, Trash2, Link2, Pin, PinOff, ArrowUpRight } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 interface Platform {
   id: string;
@@ -66,7 +67,14 @@ export function QuickNoteCard({
           className="w-2 h-2 rounded-full flex-shrink-0"
           style={{ backgroundColor: colorStyle.border }}
         />
-        <span className="flex-1 font-sans font-bold text-base truncate text-gray-900">{note.title}</span>
+        <TooltipProvider>
+          <Tooltip>
+            <TooltipTrigger asChild>
+              <span className="flex-1 font-sans font-bold text-base truncate text-gray-900">{note.title}</span>
+            </TooltipTrigger>
+            <TooltipContent side="top" className="max-w-xs"><p>{note.title}</p></TooltipContent>
+          </Tooltip>
+        </TooltipProvider>
         {platform && (
           <span className="text-xs text-muted-foreground hidden sm:inline">{platform.name}</span>
         )}
@@ -123,7 +131,14 @@ export function QuickNoteCard({
             <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
           )}
           <CardTitle className="text-lg font-sans font-bold leading-snug pr-16 flex-1 text-gray-900">
-            {note.title}
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <span className="block truncate">{note.title}</span>
+                </TooltipTrigger>
+                <TooltipContent side="top" className="max-w-xs"><p>{note.title}</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardTitle>
         </div>
         <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
