@@ -12,6 +12,7 @@ import {
   CalendarIcon,
   MoreHorizontal,
   Archive,
+  Recycle,
   Eye,
   Compass,
   Target,
@@ -38,7 +39,7 @@ interface IdeaCardProps {
 }
 
 export function IdeaCard({ idea, onView, onEdit, onSchedule, quickLinks = [] }: IdeaCardProps) {
-  const { updateIdea, archiveIdea, tags, getIdeaTags } = useIdea();
+  const { updateIdea, archiveIdea, recycleIdea, tags, getIdeaTags } = useIdea();
   const [ideaTags, setIdeaTags] = useState<Tag[]>([]);
   const statusInfo = statusConfig[idea.status];
   const StatusIcon = statusInfo.icon;
@@ -128,6 +129,13 @@ export function IdeaCard({ idea, onView, onEdit, onSchedule, quickLinks = [] }: 
                 Plan
               </DropdownMenuItem>
               <DropdownMenuSeparator />
+              <DropdownMenuItem 
+                onClick={(e) => { e.stopPropagation(); recycleIdea(idea.id); }}
+                className="text-muted-foreground"
+              >
+                <Recycle className="h-4 w-4 mr-2" />
+                Recycle
+              </DropdownMenuItem>
               <DropdownMenuItem 
                 onClick={(e) => { e.stopPropagation(); archiveIdea(idea.id); }}
                 className="text-destructive focus:text-destructive"
