@@ -400,11 +400,16 @@ export function SystemsView() {
                  <ThoughtCard
                    key={note.id}
                    note={note}
+                   ideas={ideas}
                    onDelete={deleteSystem}
-                   onUpdate={(id, title) => updateSystem(id, { title })}
+                   onUpdate={(id, updates) => updateSystem(id, updates)}
                    onTogglePin={handleTogglePin}
                    onSendToBucket={handleSendToBucket}
                    onMoveTo={handleMoveTo}
+                   onCreateIdea={async (title) => {
+                     const idea = await createIdea({ title, status: 'developing', priority: 'none' });
+                     return idea ? { id: idea.id, title: idea.title } : null;
+                   }}
                  />
                ))}
              </div>
