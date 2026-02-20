@@ -614,6 +614,10 @@ export function SystemsView() {
           ideas={ideas}
           onSave={handleJournalSave}
           onOpenFocusMode={handleOpenFocusMode}
+          onCreateIdea={async (title) => {
+            const idea = await createIdea({ title, status: 'developing', priority: 'none' });
+            return idea ? { id: idea.id, title: idea.title } : null;
+          }}
         />
       )}
 
@@ -633,6 +637,10 @@ export function SystemsView() {
           onCreateColor={createColor}
           onUpdateColor={updateColor}
           onDeleteColor={deleteColor}
+          onCreateIdea={async (title) => {
+            const idea = await createIdea({ title, status: 'developing', priority: 'none' });
+            return idea ? { id: idea.id, title: idea.title } : null;
+          }}
         />
       )}
 

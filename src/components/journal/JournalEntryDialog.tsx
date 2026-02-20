@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { RichTextEditor, getWordCount } from './RichTextEditor';
 import { SystemNote, SystemNoteType } from '@/hooks/useSystems';
 import { format } from 'date-fns';
-import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles } from 'lucide-react';
+import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles, Plus, Check, X } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 const MOOD_OPTIONS = [
@@ -47,6 +47,7 @@ interface JournalEntryDialogProps {
     mood: string | null;
   }) => void;
   onOpenFocusMode?: () => void;
+  onCreateIdea?: (title: string) => Promise<{ id: string; title: string } | null>;
 }
 
 export function JournalEntryDialog({
@@ -58,6 +59,7 @@ export function JournalEntryDialog({
   ideas,
   onSave,
   onOpenFocusMode,
+  onCreateIdea,
 }: JournalEntryDialogProps) {
   const [title, setTitle] = useState('');
   const [content, setContent] = useState('');
@@ -65,6 +67,12 @@ export function JournalEntryDialog({
   const [ideaId, setIdeaId] = useState('');
   const [entryDate, setEntryDate] = useState<Date>(new Date());
   const [mood, setMood] = useState('');
+
+  // Inline idea creation state
+  const [showNewIdeaInput, setShowNewIdeaInput] = useState(false);
+  const [newIdeaTitle, setNewIdeaTitle] = useState('');
+  const [creatingIdea, setCreatingIdea] = useState(false);
+  const newIdeaInputRef = useRef<HTMLInputElement>(null);
 
   const isJournal = noteType === 'journal_entry';
   const linkableIdeas = ideas.filter((i) => !['archived', 'recycled'].includes(i.status));
@@ -86,7 +94,26 @@ export function JournalEntryDialog({
       setEntryDate(new Date());
       setMood('');
     }
+    setShowNewIdeaInput(false);
+    setNewIdeaTitle('');
   }, [editingNote, open]);
+
+  const handleCreateNewIdea = async () => {
+    if (!newIdeaTitle.trim() || !onCreateIdea) return;
+    setCreatingIdea(true);
+    const created = await onCreateIdea(newIdeaTitle.trim());
+    setCreatingIdea(false);
+    if (created) {
+      setIdeaId(created.id);
+      setShowNewIdeaInput(false);
+      setNewIdeaTitle('');
+    }
+  };
+
+  const handleCancelNewIdea = () => {
+    setShowNewIdeaInput(false);
+    setNewIdeaTitle('');
+  };
 
   const handleSave = () => {
     if (!title.trim()) return;
@@ -230,7 +257,14 @@ export function JournalEntryDialog({
             </div>
             <div>
               <Label>Link to Idea</Label>
-              <Select value={ideaId || '__none__'} onValueChange={(v) => setIdeaId(v === '__none__' ? '' : v)}>
+              <Select value={ideaId || '__none__'} onValueChange={(v) => {
+                if (v === '__create__') {
+                  setShowNewIdeaInput(true);
+                  setTimeout(() => newIdeaInputRef.current?.focus(), 50);
+                } else {
+                  setIdeaId(v === '__none__' ? '' : v);
+                }
+              }}>
                 <SelectTrigger className="mt-1.5">
                   <SelectValue placeholder="Select idea" />
                 </SelectTrigger>
@@ -241,8 +275,51 @@ export function JournalEntryDialog({
                       {i.title}
                     </SelectItem>
                   ))}
+                  {onCreateIdea && (
+                    <SelectItem value="__create__" className="text-primary font-medium">
+                      <span className="flex items-center gap-1.5">
+                        <Plus className="h-3.5 w-3.5" />
+                        Create new idea…
+                      </span>
+                    </SelectItem>
+                  )}
                 </SelectContent>
               </Select>
+
+              {/* Inline new idea input */}
+              {showNewIdeaInput && (
+                <div className="flex gap-1.5 mt-2">
+                  <Input
+                    ref={newIdeaInputRef}
+                    placeholder="New idea title…"
+                    value={newIdeaTitle}
+                    onChange={(e) => setNewIdeaTitle(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') handleCreateNewIdea();
+                      if (e.key === 'Escape') handleCancelNewIdea();
+                    }}
+                    className="h-8 text-sm"
+                  />
+                  <Button
+                    size="icon"
+                    className="h-8 w-8 shrink-0"
+                    onClick={handleCreateNewIdea}
+                    disabled={!newIdeaTitle.trim() || creatingIdea}
+                    title="Create idea"
+                  >
+                    <Check className="h-3.5 w-3.5" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    variant="ghost"
+                    className="h-8 w-8 shrink-0"
+                    onClick={handleCancelNewIdea}
+                    title="Cancel"
+                  >
+                    <X className="h-3.5 w-3.5" />
+                  </Button>
+                </div>
+              )}
             </div>
           </div>
 
