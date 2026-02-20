@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Badge } from '@/components/ui/badge';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -11,6 +12,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from '@/components/ui/dialog';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -28,7 +34,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ExternalLink, Plus, Pencil, Trash2, Loader2, X, Search } from 'lucide-react';
+import { ExternalLink, Plus, Pencil, Trash2, Loader2, X, Search, Filter } from 'lucide-react';
 import { QuickLink, QUICKLINK_TYPES } from '@/types';
 import { cn } from '@/lib/utils';
 
@@ -58,9 +64,18 @@ export function QuickLinksManager() {
   const [deletingQuickLink, setDeletingQuickLink] = useState<QuickLink | null>(null);
   const [qlLoading, setQLLoading] = useState(false);
 
-  // Search & filter
+  // Search & filter (multi-select)
   const [search, setSearch] = useState('');
-  const [activeTypeFilter, setActiveTypeFilter] = useState<string | null>(null);
+  const [activeTypeFilters, setActiveTypeFilters] = useState<Set<string>>(new Set());
+
+  const toggleTypeFilter = (type: string) => {
+    setActiveTypeFilters(prev => {
+      const next = new Set(prev);
+      if (next.has(type)) next.delete(type);
+      else next.add(type);
+      return next;
+    });
+  };
 
   const resolvedNewType = showCustomInput ? newCustomType : newLinkType;
 
@@ -108,14 +123,11 @@ export function QuickLinksManager() {
   const filtered = useMemo(() => {
     return quickLinks.filter(l => {
       const matchesSearch = !search || l.name.toLowerCase().includes(search.toLowerCase()) || l.url.toLowerCase().includes(search.toLowerCase());
-      const matchesType = !activeTypeFilter
-        ? true
-        : activeTypeFilter === UNCATEGORIZED
-          ? !l.link_type
-          : l.link_type === activeTypeFilter;
-      return matchesSearch && matchesType;
+      if (activeTypeFilters.size === 0) return matchesSearch;
+      const key = l.link_type || UNCATEGORIZED;
+      return matchesSearch && activeTypeFilters.has(key);
     });
-  }, [quickLinks, search, activeTypeFilter]);
+  }, [quickLinks, search, activeTypeFilters]);
 
   // Group filtered links by type
   const grouped = useMemo(() => {
@@ -135,54 +147,95 @@ export function QuickLinksManager() {
   });
 
   const hasUncategorized = quickLinks.some(l => !l.link_type);
+  const filterCount = activeTypeFilters.size;
 
   return (
     <>
       {/* Header */}
-      <div className="flex items-center justify-between gap-4 mb-4">
-        <div className="flex items-center gap-2 flex-1">
-          <div className="relative flex-1 max-w-xs">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              placeholder="Search links..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="pl-9"
-            />
-            {search && (
-              <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
-                <X className="h-3 w-3" />
-              </button>
-            )}
-          </div>
-          {/* Type filter chips */}
-          <div className="flex gap-1 flex-wrap">
-            {allTypes.map(type => (
-              <Badge
-                key={type}
-                variant={activeTypeFilter === type ? 'default' : 'outline'}
-                className="cursor-pointer select-none"
-                onClick={() => setActiveTypeFilter(activeTypeFilter === type ? null : type)}
-              >
-                {type}
-              </Badge>
-            ))}
-            {hasUncategorized && (
-              <Badge
-                variant={activeTypeFilter === UNCATEGORIZED ? 'default' : 'outline'}
-                className="cursor-pointer select-none"
-                onClick={() => setActiveTypeFilter(activeTypeFilter === UNCATEGORIZED ? null : UNCATEGORIZED)}
-              >
-                Other
-              </Badge>
-            )}
-          </div>
+      <div className="flex items-center justify-between gap-2 mb-4 flex-wrap">
+        {/* Search */}
+        <div className="relative flex-1 min-w-[180px] max-w-sm">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+          <Input
+            placeholder="Search links..."
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+            className="pl-9"
+          />
+          {search && (
+            <button onClick={() => setSearch('')} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+              <X className="h-3 w-3" />
+            </button>
+          )}
         </div>
-        <Button variant="outline" size="sm" onClick={() => setShowAddForm(!showAddForm)}>
-          <Plus className="h-4 w-4 mr-1" />
-          Add
-        </Button>
+
+        <div className="flex gap-2 items-center">
+          {/* Filter dropdown */}
+          <Popover>
+            <PopoverTrigger asChild>
+              <Button variant="outline" size="sm" className="gap-2">
+                <Filter className="h-4 w-4" />
+                Filter
+                {filterCount > 0 && (
+                  <Badge variant="secondary" className="ml-1 h-5 px-1.5">{filterCount}</Badge>
+                )}
+              </Button>
+            </PopoverTrigger>
+            <PopoverContent className="w-52 bg-popover z-50" align="start">
+              <div className="space-y-1">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2">Filter by Type</p>
+                {allTypes.map(type => (
+                  <div key={type} className="flex items-center gap-2 py-1">
+                    <Checkbox
+                      id={`filter-${type}`}
+                      checked={activeTypeFilters.has(type)}
+                      onCheckedChange={() => toggleTypeFilter(type)}
+                    />
+                    <label htmlFor={`filter-${type}`} className="text-sm cursor-pointer select-none flex-1">{type}</label>
+                  </div>
+                ))}
+                {hasUncategorized && (
+                  <div className="flex items-center gap-2 py-1">
+                    <Checkbox
+                      id={`filter-${UNCATEGORIZED}`}
+                      checked={activeTypeFilters.has(UNCATEGORIZED)}
+                      onCheckedChange={() => toggleTypeFilter(UNCATEGORIZED)}
+                    />
+                    <label htmlFor={`filter-${UNCATEGORIZED}`} className="text-sm cursor-pointer select-none flex-1">Other</label>
+                  </div>
+                )}
+                {filterCount > 0 && (
+                  <Button variant="ghost" size="sm" className="w-full mt-2 text-muted-foreground" onClick={() => setActiveTypeFilters(new Set())}>
+                    Clear filters
+                  </Button>
+                )}
+                {allTypes.length === 0 && !hasUncategorized && (
+                  <p className="text-sm text-muted-foreground">No types yet</p>
+                )}
+              </div>
+            </PopoverContent>
+          </Popover>
+
+          {/* Add button */}
+          <Button variant="outline" size="sm" onClick={() => setShowAddForm(!showAddForm)}>
+            <Plus className="h-4 w-4 mr-1" />
+            Add
+          </Button>
+        </div>
       </div>
+
+      {/* Active filter badges */}
+      {filterCount > 0 && (
+        <div className="flex flex-wrap gap-2 mb-4">
+          {Array.from(activeTypeFilters).map(type => (
+            <Badge key={type} variant="secondary" className="gap-1">
+              {type === UNCATEGORIZED ? 'Other' : type}
+              <X className="h-3 w-3 cursor-pointer" onClick={() => toggleTypeFilter(type)} />
+            </Badge>
+          ))}
+        </div>
+      )}
+
 
       {/* Add form */}
       {showAddForm && (
