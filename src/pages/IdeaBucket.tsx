@@ -1,4 +1,5 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { useIdea } from '@/contexts/IdeaContext';
 import { Idea, IdeaStatus, IdeaPriority, EnergyLevel } from '@/types';
 import { IdeaCard } from '@/components/ideas/IdeaCard';
@@ -48,11 +49,25 @@ export function IdeaBucket() {
     duplicateIdea,
   } = useIdea();
 
+
+  const [searchParams, setSearchParams] = useSearchParams();
   const [showAddDialog, setShowAddDialog] = useState(false);
   const [viewingIdea, setViewingIdea] = useState<Idea | null>(null);
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [schedulingIdea, setSchedulingIdea] = useState<Idea | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+
+  // Auto-open idea from URL param (e.g. navigated from ThoughtCard)
+  useEffect(() => {
+    const ideaId = searchParams.get('ideaId');
+    if (ideaId && !ideasLoading) {
+      const idea = [...timelyIdeas, ...nonTimelyIdeas].find(i => i.id === ideaId);
+      if (idea) {
+        setViewingIdea(idea);
+        setSearchParams({}, { replace: true });
+      }
+    }
+  }, [searchParams, ideasLoading, timelyIdeas, nonTimelyIdeas]);
 
   const handleSearch = (value: string) => {
     setSearchQuery(value);

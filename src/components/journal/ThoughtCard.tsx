@@ -1,4 +1,5 @@
 import { useState, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { SystemNote } from '@/hooks/useSystems';
@@ -38,6 +39,7 @@ interface ThoughtCardProps {
 }
 
 export function ThoughtCard({ note, ideas = [], onDelete, onUpdate, onTogglePin, onSendToBucket, onMoveTo, onCreateIdea }: ThoughtCardProps) {
+  const navigate = useNavigate();
   const [isEditing, setIsEditing] = useState(false);
   const [editedTitle, setEditedTitle] = useState(note.title);
   const [editedIdeaId, setEditedIdeaId] = useState(note.idea_id || '');
@@ -202,7 +204,11 @@ export function ThoughtCard({ note, ideas = [], onDelete, onUpdate, onTogglePin,
         </Tooltip>
       </TooltipProvider>
       {linkedIdea && (
-        <span className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted px-2 py-0.5 rounded-full shrink-0 max-w-[140px] truncate">
+        <span
+          className="hidden sm:flex items-center gap-1 text-xs text-muted-foreground bg-muted hover:bg-accent hover:text-accent-foreground px-2 py-0.5 rounded-full shrink-0 max-w-[140px] truncate cursor-pointer transition-colors"
+          onClick={(e) => { e.stopPropagation(); navigate(`/ideas?ideaId=${linkedIdea.id}`); }}
+          title={`Go to: ${linkedIdea.title}`}
+        >
           <Link className="h-3 w-3 shrink-0" />
           <span className="truncate">{linkedIdea.title}</span>
         </span>
