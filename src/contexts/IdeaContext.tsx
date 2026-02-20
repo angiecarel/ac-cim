@@ -36,8 +36,8 @@ interface IdeaContextType {
   // QuickLinks
   quickLinks: QuickLink[];
   quickLinksLoading: boolean;
-  createQuickLink: (name: string, url: string, contentTypeId?: string | null) => Promise<void>;
-  updateQuickLink: (id: string, name: string, url: string, contentTypeId?: string | null) => Promise<void>;
+  createQuickLink: (name: string, url: string, contentTypeId?: string | null, linkType?: string | null) => Promise<void>;
+  updateQuickLink: (id: string, name: string, url: string, contentTypeId?: string | null, linkType?: string | null) => Promise<void>;
   deleteQuickLink: (id: string) => Promise<void>;
   
   // Tags

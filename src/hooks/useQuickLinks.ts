@@ -38,7 +38,7 @@ export function useQuickLinks(userId: string | undefined) {
     fetchQuickLinks();
   }, [fetchQuickLinks]);
 
-  const createQuickLink = useCallback(async (name: string, url: string, contentTypeId?: string | null) => {
+  const createQuickLink = useCallback(async (name: string, url: string, contentTypeId?: string | null, linkType?: string | null) => {
     if (!userId) return;
 
     try {
@@ -49,6 +49,7 @@ export function useQuickLinks(userId: string | undefined) {
           name,
           url,
           content_type_id: contentTypeId || null,
+          link_type: linkType || null,
         })
         .select(`
           *,
@@ -65,11 +66,11 @@ export function useQuickLinks(userId: string | undefined) {
     }
   }, [userId]);
 
-  const updateQuickLink = useCallback(async (id: string, name: string, url: string, contentTypeId?: string | null) => {
+  const updateQuickLink = useCallback(async (id: string, name: string, url: string, contentTypeId?: string | null, linkType?: string | null) => {
     try {
       const { error } = await supabase
         .from('quicklinks')
-        .update({ name, url, content_type_id: contentTypeId || null })
+        .update({ name, url, content_type_id: contentTypeId || null, link_type: linkType || null })
         .eq('id', id);
 
       if (error) throw error;
