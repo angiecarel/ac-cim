@@ -217,7 +217,13 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
   
   // Separate timely and non-timely ideas
   const timelyIdeas = filteredIdeas.filter(i => i.is_timely);
-  const nonTimelyIdeas = filteredIdeas.filter(i => !i.is_timely);
+  const nonTimelyIdeasRaw = filteredIdeas.filter(i => !i.is_timely);
+
+  // Pin "best" priority ideas to the top
+  const nonTimelyIdeas = [
+    ...nonTimelyIdeasRaw.filter(i => i.priority === 'best'),
+    ...nonTimelyIdeasRaw.filter(i => i.priority !== 'best'),
+  ];
   
   return (
     <IdeaContext.Provider
