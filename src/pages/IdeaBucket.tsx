@@ -26,7 +26,8 @@ import {
   Filter,
   X,
   Clock,
-  Loader2
+  Loader2,
+  Star,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { statusOptions, priorityOptions } from '@/lib/statusLabels';
@@ -429,14 +430,34 @@ export function IdeaBucket() {
           )}
 
           {/* Regular ideas */}
-          {nonTimelyIdeas.length > 0 && (
-            <div className="space-y-3">
-              {timelyIdeas.length > 0 && (
-                <h2 className="font-semibold text-lg">All Ideas</h2>
-              )}
-              {renderIdeas(nonTimelyIdeas)}
-            </div>
-          )}
+          {nonTimelyIdeas.length > 0 && (() => {
+            const bestIdeas = nonTimelyIdeas.filter(i => i.priority === 'best');
+            const restIdeas = nonTimelyIdeas.filter(i => i.priority !== 'best');
+            return (
+              <div className="space-y-6">
+                {bestIdeas.length > 0 && (
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Star className="h-4 w-4" style={{ color: 'hsl(var(--priority-best))', fill: 'hsl(var(--priority-best))' }} />
+                      <h2 className="font-semibold text-base text-muted-foreground uppercase tracking-wide text-xs">Best Priority</h2>
+                    </div>
+                    {renderIdeas(bestIdeas)}
+                    {restIdeas.length > 0 && (
+                      <div className="border-t border-border pt-2" />
+                    )}
+                  </div>
+                )}
+                {restIdeas.length > 0 && (
+                  <div className="space-y-3">
+                    {timelyIdeas.length > 0 && bestIdeas.length === 0 && (
+                      <h2 className="font-semibold text-lg">All Ideas</h2>
+                    )}
+                    {renderIdeas(restIdeas)}
+                  </div>
+                )}
+              </div>
+            );
+          })()}
 
           {/* Empty state */}
           {allIdeas.length === 0 && (
