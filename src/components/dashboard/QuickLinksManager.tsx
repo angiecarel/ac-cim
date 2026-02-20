@@ -29,33 +29,42 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
-import { ExternalLink, Plus, Pencil, Trash2, Loader2 } from 'lucide-react';
-import { QuickLink } from '@/types';
+import { ExternalLink, Plus, Pencil, Trash2, Loader2, X } from 'lucide-react';
+import { QuickLink, QUICKLINK_TYPES } from '@/types';
 
 export function QuickLinksManager() {
   const {
-    contentTypes,
     quickLinks,
     createQuickLink,
     updateQuickLink,
     deleteQuickLink,
   } = useIdea();
 
-  const [newQuickLinkName, setNewQuickLinkName] = useState('');
-  const [newQuickLinkUrl, setNewQuickLinkUrl] = useState('');
-  const [newQuickLinkType, setNewQuickLinkType] = useState<string>('');
+  const [newName, setNewName] = useState('');
+  const [newUrl, setNewUrl] = useState('');
+  const [newLinkType, setNewLinkType] = useState<string>('');
+  const [newCustomType, setNewCustomType] = useState('');
+  const [showCustomInput, setShowCustomInput] = useState(false);
+
   const [editingQuickLink, setEditingQuickLink] = useState<QuickLink | null>(null);
+  const [editCustomType, setEditCustomType] = useState('');
+  const [showEditCustomInput, setShowEditCustomInput] = useState(false);
+
   const [deletingQuickLink, setDeletingQuickLink] = useState<QuickLink | null>(null);
   const [qlLoading, setQLLoading] = useState(false);
   const [showAddForm, setShowAddForm] = useState(false);
 
+  const resolvedNewType = showCustomInput ? newCustomType : newLinkType;
+
   const handleAddQuickLink = async () => {
-    if (!newQuickLinkName.trim() || !newQuickLinkUrl.trim()) return;
+    if (!newName.trim() || !newUrl.trim()) return;
     setQLLoading(true);
-    await createQuickLink(newQuickLinkName.trim(), newQuickLinkUrl.trim(), newQuickLinkType || null);
-    setNewQuickLinkName('');
-    setNewQuickLinkUrl('');
-    setNewQuickLinkType('');
+    await createQuickLink(newName.trim(), newUrl.trim(), null, resolvedNewType || null);
+    setNewName('');
+    setNewUrl('');
+    setNewLinkType('');
+    setNewCustomType('');
+    setShowCustomInput(false);
     setShowAddForm(false);
     setQLLoading(false);
   };
@@ -63,13 +72,17 @@ export function QuickLinksManager() {
   const handleUpdateQuickLink = async () => {
     if (!editingQuickLink) return;
     setQLLoading(true);
+    const finalType = showEditCustomInput ? editCustomType : editingQuickLink.link_type;
     await updateQuickLink(
-      editingQuickLink.id, 
-      editingQuickLink.name, 
+      editingQuickLink.id,
+      editingQuickLink.name,
       editingQuickLink.url,
-      editingQuickLink.content_type_id
+      editingQuickLink.content_type_id,
+      finalType || null,
     );
     setEditingQuickLink(null);
+    setShowEditCustomInput(false);
+    setEditCustomType('');
     setQLLoading(false);
   };
 
@@ -81,6 +94,12 @@ export function QuickLinksManager() {
     setQLLoading(false);
   };
 
+  const getLinkTypeSelectValue = (type: string | null) => {
+    if (!type) return '__none__';
+    if ((QUICKLINK_TYPES as readonly string[]).includes(type)) return type;
+    return '__custom__';
+  };
+
   return (
     <>
       <Card>
@@ -89,9 +108,9 @@ export function QuickLinksManager() {
             <ExternalLink className="h-5 w-5 text-primary" />
             QuickLinks
           </CardTitle>
-          <Button 
-            variant="outline" 
-            size="sm" 
+          <Button
+            variant="outline"
+            size="sm"
             onClick={() => setShowAddForm(!showAddForm)}
           >
             <Plus className="h-4 w-4 mr-1" />
@@ -101,54 +120,86 @@ export function QuickLinksManager() {
         <CardContent className="space-y-4">
           {/* Add form */}
           {showAddForm && (
-            <div className="p-3 rounded-lg bg-muted/50 space-y-3">
-              <div className="flex gap-2 flex-wrap">
+            <div className="p-3 border border-border bg-muted/30 space-y-3">
+              <div className="space-y-2">
+                <Label>Name</Label>
                 <Input
-                  placeholder="Name"
-                  value={newQuickLinkName}
-                  onChange={(e) => setNewQuickLinkName(e.target.value)}
-                  className="w-32"
+                  placeholder="e.g. ChatGPT"
+                  value={newName}
+                  onChange={(e) => setNewName(e.target.value)}
                 />
+              </div>
+              <div className="space-y-2">
+                <Label>URL</Label>
                 <Input
-                  placeholder="URL"
-                  value={newQuickLinkUrl}
-                  onChange={(e) => setNewQuickLinkUrl(e.target.value)}
-                  className="flex-1 min-w-[150px]"
+                  placeholder="https://..."
+                  value={newUrl}
+                  onChange={(e) => setNewUrl(e.target.value)}
                 />
-                <Select
-                  value={newQuickLinkType || "__all__"}
-                  onValueChange={(v) => setNewQuickLinkType(v === "__all__" ? "" : v)}
-                >
-                  <SelectTrigger className="w-32">
-                    <SelectValue placeholder="All types" />
-                  </SelectTrigger>
-                  <SelectContent position="popper" side="bottom" className="bg-popover">
-                    <SelectItem value="__all__">All types</SelectItem>
-                    {contentTypes.map((ct) => (
-                      <SelectItem key={ct.id} value={ct.id}>
-                        {ct.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              </div>
+              <div className="space-y-2">
+                <Label>Type</Label>
+                {showCustomInput ? (
+                  <div className="flex gap-2">
+                    <Input
+                      placeholder="Enter custom type..."
+                      value={newCustomType}
+                      onChange={(e) => setNewCustomType(e.target.value)}
+                      className="flex-1"
+                      autoFocus
+                    />
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => { setShowCustomInput(false); setNewCustomType(''); }}
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ) : (
+                  <Select
+                    value={newLinkType || '__none__'}
+                    onValueChange={(v) => {
+                      if (v === '__custom__') {
+                        setShowCustomInput(true);
+                        setNewLinkType('');
+                      } else {
+                        setNewLinkType(v === '__none__' ? '' : v);
+                      }
+                    }}
+                  >
+                    <SelectTrigger>
+                      <SelectValue placeholder="Select type..." />
+                    </SelectTrigger>
+                    <SelectContent className="bg-popover z-50">
+                      <SelectItem value="__none__">No type</SelectItem>
+                      {QUICKLINK_TYPES.map((t) => (
+                        <SelectItem key={t} value={t}>{t}</SelectItem>
+                      ))}
+                      <SelectItem value="__custom__">+ Add custom...</SelectItem>
+                    </SelectContent>
+                  </Select>
+                )}
               </div>
               <div className="flex gap-2">
-                <Button 
-                  onClick={handleAddQuickLink} 
-                  disabled={qlLoading || !newQuickLinkName.trim() || !newQuickLinkUrl.trim()}
+                <Button
+                  onClick={handleAddQuickLink}
+                  disabled={qlLoading || !newName.trim() || !newUrl.trim()}
                   size="sm"
                 >
                   {qlLoading && <Loader2 className="h-4 w-4 animate-spin mr-1" />}
                   Save
                 </Button>
-                <Button 
-                  variant="ghost" 
+                <Button
+                  variant="ghost"
                   size="sm"
                   onClick={() => {
                     setShowAddForm(false);
-                    setNewQuickLinkName('');
-                    setNewQuickLinkUrl('');
-                    setNewQuickLinkType('');
+                    setNewName('');
+                    setNewUrl('');
+                    setNewLinkType('');
+                    setNewCustomType('');
+                    setShowCustomInput(false);
                   }}
                 >
                   Cancel
@@ -170,25 +221,33 @@ export function QuickLinksManager() {
               {quickLinks.map((link) => (
                 <div
                   key={link.id}
-                  className="group relative flex items-center gap-2 p-3 rounded-lg bg-muted/50 hover:bg-muted transition-colors"
+                  className="group relative flex flex-col gap-1 p-3 border border-border bg-muted/30 hover:bg-muted transition-colors"
                 >
                   <a
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 flex-1 min-w-0 text-sm font-medium"
+                    className="flex items-center gap-2 text-sm font-medium min-w-0"
                   >
                     <ExternalLink className="h-4 w-4 text-primary flex-shrink-0" />
                     <span className="truncate">{link.name}</span>
                   </a>
-                  <div className="opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
+                  {link.link_type && (
+                    <Badge variant="secondary" className="text-xs w-fit">{link.link_type}</Badge>
+                  )}
+                  <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1">
                     <Dialog>
                       <DialogTrigger asChild>
-                        <Button 
-                          variant="ghost" 
-                          size="icon" 
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           className="h-6 w-6"
-                          onClick={() => setEditingQuickLink({ ...link })}
+                          onClick={() => {
+                            setEditingQuickLink({ ...link });
+                            const isCustom = link.link_type && !(QUICKLINK_TYPES as readonly string[]).includes(link.link_type);
+                            setShowEditCustomInput(!!isCustom);
+                            setEditCustomType(isCustom ? link.link_type! : '');
+                          }}
                         >
                           <Pencil className="h-3 w-3" />
                         </Button>
@@ -202,7 +261,7 @@ export function QuickLinksManager() {
                             <Label>Name</Label>
                             <Input
                               value={editingQuickLink?.name || ''}
-                              onChange={(e) => setEditingQuickLink(prev => 
+                              onChange={(e) => setEditingQuickLink(prev =>
                                 prev ? { ...prev, name: e.target.value } : null
                               )}
                             />
@@ -211,31 +270,58 @@ export function QuickLinksManager() {
                             <Label>URL</Label>
                             <Input
                               value={editingQuickLink?.url || ''}
-                              onChange={(e) => setEditingQuickLink(prev => 
+                              onChange={(e) => setEditingQuickLink(prev =>
                                 prev ? { ...prev, url: e.target.value } : null
                               )}
                             />
                           </div>
                           <div className="space-y-2">
-                            <Label>Idea Type Filter</Label>
-                            <Select 
-                              value={editingQuickLink?.content_type_id || "__all__"} 
-                              onValueChange={(v) => setEditingQuickLink(prev => 
-                                prev ? { ...prev, content_type_id: v === "__all__" ? null : v } : null
-                              )}
-                            >
-                              <SelectTrigger>
-                                <SelectValue placeholder="All types" />
-                              </SelectTrigger>
-                              <SelectContent position="popper" side="bottom" className="bg-popover">
-                                <SelectItem value="__all__">All types</SelectItem>
-                                {contentTypes.map((ct) => (
-                                  <SelectItem key={ct.id} value={ct.id}>
-                                    {ct.name}
-                                  </SelectItem>
-                                ))}
-                              </SelectContent>
-                            </Select>
+                            <Label>Type</Label>
+                            {showEditCustomInput ? (
+                              <div className="flex gap-2">
+                                <Input
+                                  placeholder="Enter custom type..."
+                                  value={editCustomType}
+                                  onChange={(e) => setEditCustomType(e.target.value)}
+                                  className="flex-1"
+                                  autoFocus
+                                />
+                                <Button
+                                  variant="ghost"
+                                  size="icon"
+                                  onClick={() => {
+                                    setShowEditCustomInput(false);
+                                    setEditCustomType('');
+                                    setEditingQuickLink(prev => prev ? { ...prev, link_type: null } : null);
+                                  }}
+                                >
+                                  <X className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            ) : (
+                              <Select
+                                value={getLinkTypeSelectValue(editingQuickLink?.link_type ?? null)}
+                                onValueChange={(v) => {
+                                  if (v === '__custom__') {
+                                    setShowEditCustomInput(true);
+                                  } else {
+                                    const val = v === '__none__' ? null : v;
+                                    setEditingQuickLink(prev => prev ? { ...prev, link_type: val } : null);
+                                  }
+                                }}
+                              >
+                                <SelectTrigger>
+                                  <SelectValue placeholder="Select type..." />
+                                </SelectTrigger>
+                                <SelectContent className="bg-popover z-50">
+                                  <SelectItem value="__none__">No type</SelectItem>
+                                  {QUICKLINK_TYPES.map((t) => (
+                                    <SelectItem key={t} value={t}>{t}</SelectItem>
+                                  ))}
+                                  <SelectItem value="__custom__">+ Add custom...</SelectItem>
+                                </SelectContent>
+                              </Select>
+                            )}
                           </div>
                           <Button onClick={handleUpdateQuickLink} disabled={qlLoading} className="w-full">
                             {qlLoading && <Loader2 className="h-4 w-4 animate-spin mr-2" />}
@@ -244,9 +330,9 @@ export function QuickLinksManager() {
                         </div>
                       </DialogContent>
                     </Dialog>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
+                    <Button
+                      variant="ghost"
+                      size="icon"
                       className="h-6 w-6 text-destructive hover:text-destructive"
                       onClick={() => setDeletingQuickLink(link)}
                     >

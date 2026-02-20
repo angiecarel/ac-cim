@@ -86,11 +86,15 @@ export interface IdeaFile {
   created_at: string;
 }
 
+export const QUICKLINK_TYPES = ['LLM', 'Biz Link', 'Automation', 'Multiple'] as const;
+export type QuickLinkType = typeof QUICKLINK_TYPES[number];
+
 export interface QuickLink {
   id: string;
   user_id: string;
   name: string;
   url: string;
+  link_type: string | null;
   content_type_id: string | null;
   created_at: string;
   updated_at: string;

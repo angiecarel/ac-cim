@@ -332,6 +332,7 @@ export type Database = {
           content_type_id: string | null
           created_at: string
           id: string
+          link_type: string | null
           name: string
           updated_at: string
           url: string
@@ -341,6 +342,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           id?: string
+          link_type?: string | null
           name: string
           updated_at?: string
           url: string
@@ -350,6 +352,7 @@ export type Database = {
           content_type_id?: string | null
           created_at?: string
           id?: string
+          link_type?: string | null
           name?: string
           updated_at?: string
           url?: string
