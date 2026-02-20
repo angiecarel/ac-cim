@@ -52,6 +52,7 @@ export function QuickLinksManager() {
 
   // Edit/delete state
   const [editingQuickLink, setEditingQuickLink] = useState<QuickLink | null>(null);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
   const [editCustomType, setEditCustomType] = useState('');
   const [showEditCustomInput, setShowEditCustomInput] = useState(false);
   const [deletingQuickLink, setDeletingQuickLink] = useState<QuickLink | null>(null);
@@ -78,6 +79,7 @@ export function QuickLinksManager() {
     const finalType = showEditCustomInput ? editCustomType : editingQuickLink.link_type;
     await updateQuickLink(editingQuickLink.id, editingQuickLink.name, editingQuickLink.url, editingQuickLink.content_type_id, finalType || null);
     setEditingQuickLink(null); setShowEditCustomInput(false); setEditCustomType('');
+    setEditDialogOpen(false);
     setQLLoading(false);
   };
 
@@ -275,7 +277,7 @@ export function QuickLinksManager() {
                       <span className="truncate">{link.name}</span>
                     </a>
                     <div className="absolute top-1 right-1 opacity-0 group-hover:opacity-100 transition-opacity flex gap-0.5">
-                      <Dialog>
+                      <Dialog open={editDialogOpen && editingQuickLink?.id === link.id} onOpenChange={(open) => { setEditDialogOpen(open); if (!open) { setEditingQuickLink(null); setShowEditCustomInput(false); setEditCustomType(''); } }}>
                         <DialogTrigger asChild>
                           <Button
                             variant="ghost"
@@ -283,6 +285,7 @@ export function QuickLinksManager() {
                             className="h-6 w-6"
                             onClick={() => {
                               setEditingQuickLink({ ...link });
+                              setEditDialogOpen(true);
                               const isCustom = link.link_type && !(QUICKLINK_TYPES as readonly string[]).includes(link.link_type);
                               setShowEditCustomInput(!!isCustom);
                               setEditCustomType(isCustom ? link.link_type! : '');
