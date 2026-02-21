@@ -29,7 +29,9 @@ import {
   Clock,
   Loader2,
   Star,
+  Download,
 } from 'lucide-react';
+import { downloadCsv, formatIdeaForCsv } from '@/lib/exportCsv';
 import { cn } from '@/lib/utils';
 import { statusOptions, priorityOptions } from '@/lib/statusLabels';
 
@@ -179,8 +181,24 @@ export function IdeaBucket() {
           </p>
         </div>
 
-        {/* View mode toggle */}
-        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
+        <div className="flex items-center gap-2">
+          {/* Export button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const rows = allIdeas.map(formatIdeaForCsv);
+              downloadCsv(rows, `ideas-export-${new Date().toISOString().split('T')[0]}.csv`);
+            }}
+            disabled={allIdeas.length === 0}
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+
+          {/* View mode toggle */}
+          <div className="flex items-center gap-1 p-1 bg-muted rounded-lg">
           <Button
             variant="ghost"
             size="sm"
@@ -205,6 +223,7 @@ export function IdeaBucket() {
           >
             <List className="h-4 w-4" />
           </Button>
+          </div>
         </div>
       </div>
 

@@ -10,7 +10,8 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, MessageCircle } from 'lucide-react';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, MessageCircle, Download } from 'lucide-react';
+import { downloadCsv, formatSystemForCsv } from '@/lib/exportCsv';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
 import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
@@ -328,8 +329,24 @@ export function SystemsView() {
           <p className="text-muted-foreground mt-1">Quick notes and journal entries</p>
         </div>
         
-        {/* Global Search */}
-        <div className="relative w-full sm:w-64">
+        <div className="flex items-center gap-2 w-full sm:w-auto">
+          {/* Export button */}
+          <Button
+            variant="outline"
+            size="sm"
+            className="gap-2"
+            onClick={() => {
+              const rows = systems.map(formatSystemForCsv);
+              downloadCsv(rows, `log-export-${new Date().toISOString().split('T')[0]}.csv`);
+            }}
+            disabled={systems.length === 0}
+          >
+            <Download className="h-4 w-4" />
+            Export
+          </Button>
+
+          {/* Global Search */}
+          <div className="relative flex-1 sm:w-64">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
             placeholder="Search notes..."
@@ -346,7 +363,8 @@ export function SystemsView() {
             >
               <X className="h-3.5 w-3.5" />
             </Button>
-          )}
+            )}
+          </div>
         </div>
       </div>
 
