@@ -473,7 +473,7 @@ export function IdeaBucket() {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <Star className="h-4 w-4" style={{ color: 'hsl(var(--priority-best))', fill: 'hsl(var(--priority-best))' }} />
-                      <h2 className="font-semibold text-base text-muted-foreground uppercase tracking-wide text-xs">Best Priority</h2>
+                      <h2 className="font-semibold text-base text-muted-foreground uppercase tracking-wide text-xs">Best</h2>
                     </div>
                     {renderIdeas(bestIdeas)}
                     {restIdeas.length > 0 && (
