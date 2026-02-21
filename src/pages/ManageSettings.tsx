@@ -32,14 +32,18 @@ import {
   FileText,
   Key,
   Zap,
+  Download,
 } from 'lucide-react';
+import { useAuth } from '@/contexts/AuthContext';
+import { useSystems } from '@/hooks/useSystems';
+import { downloadCsv, formatIdeaForCsv, formatSystemForCsv } from '@/lib/exportCsv';
 import { ContentType, Platform } from '@/types';
 import { ChangePasswordCard } from '@/components/settings/ChangePasswordCard';
 import { ZapierSettings } from '@/components/settings/ZapierSettings';
 import { TemplateManager } from '@/components/settings/TemplateManager';
 import { cn } from '@/lib/utils';
 
-type SettingsTab = 'types' | 'contexts' | 'templates' | 'account' | 'integrations';
+type SettingsTab = 'types' | 'contexts' | 'templates' | 'account' | 'integrations' | 'export';
 
 export function ManageSettings() {
   const {
@@ -52,6 +56,10 @@ export function ManageSettings() {
     updatePlatform,
     deletePlatform,
   } = useIdea();
+
+  const { user } = useAuth();
+  const { systems } = useSystems(user?.id);
+  const { ideas } = useIdea();
 
   const [activeTab, setActiveTab] = useState<SettingsTab>('types');
 
@@ -121,7 +129,10 @@ export function ManageSettings() {
     { id: 'templates', label: 'TEMPLATES', icon: FileText },
     { id: 'account', label: 'ACCOUNT', icon: Key },
     { id: 'integrations', label: 'INTEGRATIONS', icon: Zap },
+    { id: 'export', label: 'EXPORT', icon: Download },
   ];
+
+  
 
   return (
     <div className="space-y-8">
@@ -290,6 +301,46 @@ export function ManageSettings() {
         <div className="grid lg:grid-cols-2 gap-6">
           <ZapierSettings />
         </div>
+      )}
+
+      {activeTab === 'export' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Download className="h-5 w-5 text-primary" />
+              Export Data
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">Download your data as CSV files that can be opened in any spreadsheet application.</p>
+            <div className="flex flex-wrap gap-3">
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => {
+                  const rows = ideas.map(formatIdeaForCsv);
+                  downloadCsv(rows, `ideas-export-${new Date().toISOString().split('T')[0]}.csv`);
+                }}
+                disabled={ideas.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Export Ideas ({ideas.length})
+              </Button>
+              <Button
+                variant="outline"
+                className="gap-2"
+                onClick={() => {
+                  const rows = systems.map(formatSystemForCsv);
+                  downloadCsv(rows, `log-export-${new Date().toISOString().split('T')[0]}.csv`);
+                }}
+                disabled={systems.length === 0}
+              >
+                <Download className="h-4 w-4" />
+                Export Log ({systems.length})
+              </Button>
+            </div>
+          </CardContent>
+        </Card>
       )}
 
       {/* Delete confirmations */}
