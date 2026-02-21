@@ -8,6 +8,7 @@ import { IdeaProvider } from "@/contexts/IdeaContext";
 import { AuthForm } from "@/components/auth/AuthForm";
 import { ResetPassword } from "@/pages/ResetPassword";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { PageTransition } from "@/components/layout/PageTransition";
 import { Dashboard } from "@/pages/Dashboard";
 import { IdeaBucket } from "@/pages/IdeaBucket";
 import { CalendarView } from "@/pages/CalendarView";
@@ -40,14 +41,14 @@ function AppContent() {
     <IdeaProvider>
       <AppLayout>
         <Routes>
-          <Route path="/" element={<Dashboard />} />
-          <Route path="/ideas" element={<IdeaBucket />} />
-          <Route path="/calendar" element={<CalendarView />} />
-          <Route path="/systems" element={<SystemsView />} />
-          <Route path="/quicklinks" element={<QuickLinksPage />} />
-          <Route path="/history" element={<PastIdeas />} />
-          <Route path="/archive" element={<ArchiveView />} />
-          <Route path="/settings" element={<ManageSettings />} />
+          <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
+          <Route path="/ideas" element={<PageTransition><IdeaBucket /></PageTransition>} />
+          <Route path="/calendar" element={<PageTransition><CalendarView /></PageTransition>} />
+          <Route path="/systems" element={<PageTransition><SystemsView /></PageTransition>} />
+          <Route path="/quicklinks" element={<PageTransition><QuickLinksPage /></PageTransition>} />
+          <Route path="/history" element={<PageTransition><PastIdeas /></PageTransition>} />
+          <Route path="/archive" element={<PageTransition><ArchiveView /></PageTransition>} />
+          <Route path="/settings" element={<PageTransition><ManageSettings /></PageTransition>} />
           <Route path="*" element={<NotFound />} />
         </Routes>
       </AppLayout>
