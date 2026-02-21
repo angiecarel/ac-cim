@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom';
 import { useIdea } from '@/contexts/IdeaContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { AnimatedCard } from '@/components/layout/AnimatedCard';
 import { QuickLinksManager } from '@/components/dashboard/QuickLinksManager';
 import { 
   Lightbulb, 
@@ -68,22 +69,23 @@ export function Dashboard() {
 
       {/* Stats Grid */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
-        {statCards.map((stat) => (
-          <Link 
-            key={stat.label} 
-            to="/ideas"
-            onClick={() => stat.status && setFilters({ status: [stat.status] })}
-          >
-            <Card className="card-hover h-full">
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center text-center">
-                  <stat.icon className={`h-8 w-8 ${stat.color} mb-2`} />
-                  <p className="text-3xl font-bold">{stat.value}</p>
-                  <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
-                </div>
-              </CardContent>
-            </Card>
-          </Link>
+        {statCards.map((stat, index) => (
+          <AnimatedCard key={stat.label} index={index}>
+            <Link 
+              to="/ideas"
+              onClick={() => stat.status && setFilters({ status: [stat.status] })}
+            >
+              <Card className="h-full">
+                <CardContent className="pt-6">
+                  <div className="flex flex-col items-center text-center">
+                    <stat.icon className={`h-8 w-8 ${stat.color} mb-2`} />
+                    <p className="text-3xl font-bold">{stat.value}</p>
+                    <p className="text-sm text-muted-foreground mt-1">{stat.label}</p>
+                  </div>
+                </CardContent>
+              </Card>
+            </Link>
+          </AnimatedCard>
         ))}
       </div>
 
