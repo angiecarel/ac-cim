@@ -116,7 +116,7 @@ export function QuickNoteCard({
   return (
     <Card
       className={cn(
-        "group relative transition-all hover:shadow-md cursor-pointer",
+        "group relative transition-all hover:shadow-md cursor-pointer overflow-hidden",
         note.is_pinned && "ring-2 ring-primary/30"
       )}
       style={{
@@ -130,13 +130,13 @@ export function QuickNoteCard({
           {note.is_pinned && (
             <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
           )}
-          <CardTitle className="text-lg font-sans font-bold leading-snug pr-16 flex-1 text-gray-900">
+          <CardTitle className="text-lg font-sans font-bold leading-snug pr-20 flex-1 text-gray-900">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
                   <span className="block truncate">{note.title}</span>
                 </TooltipTrigger>
-                <TooltipContent side="top" className="max-w-xs"><p>{note.title}</p></TooltipContent>
+                <TooltipContent side="bottom" align="start" className="max-w-xs"><p>{note.title}</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
           </CardTitle>
