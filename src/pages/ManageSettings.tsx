@@ -33,6 +33,7 @@ import {
   Key,
   Zap,
   Download,
+  Tag,
 } from 'lucide-react';
 import { useAuth } from '@/contexts/AuthContext';
 import { useSystems } from '@/hooks/useSystems';
@@ -43,7 +44,7 @@ import { ZapierSettings } from '@/components/settings/ZapierSettings';
 import { TemplateManager } from '@/components/settings/TemplateManager';
 import { cn } from '@/lib/utils';
 
-type SettingsTab = 'types' | 'contexts' | 'templates' | 'account' | 'integrations' | 'export';
+type SettingsTab = 'types' | 'tags' | 'contexts' | 'templates' | 'account' | 'integrations' | 'export';
 
 export function ManageSettings() {
   const {
@@ -55,6 +56,8 @@ export function ManageSettings() {
     createPlatform,
     updatePlatform,
     deletePlatform,
+    tags,
+    deleteTag,
   } = useIdea();
 
   const { user } = useAuth();
@@ -74,6 +77,8 @@ export function ManageSettings() {
   const [editingPlatform, setEditingPlatform] = useState<Platform | null>(null);
   const [deletingPlatform, setDeletingPlatform] = useState<Platform | null>(null);
   const [platformLoading, setPlatformLoading] = useState(false);
+  const [deletingTag, setDeletingTag] = useState<{ id: string; name: string } | null>(null);
+  const [tagLoading, setTagLoading] = useState(false);
 
   const handleAddContentType = async () => {
     if (!newContentTypeName.trim()) return;
@@ -123,8 +128,17 @@ export function ManageSettings() {
     setPlatformLoading(false);
   };
 
+  const handleDeleteTag = async () => {
+    if (!deletingTag) return;
+    setTagLoading(true);
+    await deleteTag(deletingTag.id);
+    setDeletingTag(null);
+    setTagLoading(false);
+  };
+
   const tabs: { id: SettingsTab; label: string; icon: typeof FileType }[] = [
     { id: 'types', label: 'IDEA TYPES', icon: FileType },
+    { id: 'tags', label: 'TAGS', icon: Tag },
     { id: 'contexts', label: 'CONTEXTS', icon: Layers },
     { id: 'templates', label: 'TEMPLATES', icon: FileText },
     { id: 'account', label: 'ACCOUNT', icon: Key },
@@ -223,6 +237,44 @@ export function ManageSettings() {
                 </div>
               ))}
             </div>
+          </CardContent>
+        </Card>
+      )}
+
+      {activeTab === 'tags' && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Tag className="h-5 w-5 text-primary" />
+              Tags
+            </CardTitle>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            <p className="text-sm text-muted-foreground">
+              Tags are created inline when adding or editing ideas. Here you can manage and delete existing tags.
+            </p>
+            {tags.length === 0 ? (
+              <p className="text-sm text-muted-foreground italic">No tags created yet. Add tags when creating or editing an idea.</p>
+            ) : (
+              <div className="space-y-2">
+                {tags.map((tag) => (
+                  <div key={tag.id} className="flex items-center justify-between p-2 rounded-lg bg-muted/50">
+                    <div className="flex items-center gap-2">
+                      <div className="w-3 h-3 rounded-full" style={{ backgroundColor: tag.color || '#6366f1' }} />
+                      <span>{tag.name}</span>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-8 w-8 text-destructive hover:text-destructive"
+                      onClick={() => setDeletingTag({ id: tag.id, name: tag.name })}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
           </CardContent>
         </Card>
       )}
@@ -370,6 +422,21 @@ export function ManageSettings() {
           <AlertDialogFooter>
             <AlertDialogCancel>Cancel</AlertDialogCancel>
             <AlertDialogAction onClick={handleDeletePlatform} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
+
+      <AlertDialog open={!!deletingTag} onOpenChange={(open) => !open && setDeletingTag(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Tag?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This will remove the tag "{deletingTag?.name}" from all ideas that use it.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={handleDeleteTag} className="bg-destructive hover:bg-destructive/90">Delete</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
