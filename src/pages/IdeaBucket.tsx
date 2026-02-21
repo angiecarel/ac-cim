@@ -34,6 +34,7 @@ import {
 import { downloadCsv, formatIdeaForCsv } from '@/lib/exportCsv';
 import { cn } from '@/lib/utils';
 import { statusOptions, priorityOptions } from '@/lib/statusLabels';
+import { AnimatedCard } from '@/components/layout/AnimatedCard';
 
 export function IdeaBucket() {
   const {
@@ -139,15 +140,16 @@ export function IdeaBucket() {
     if (viewMode === 'grid') {
       return (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {ideas.map((idea) => (
-            <IdeaCard
-              key={idea.id}
-              idea={idea}
-              onView={setViewingIdea}
-              onEdit={setEditingIdea}
-              onSchedule={setSchedulingIdea}
-              quickLinks={quickLinks}
-            />
+          {ideas.map((idea, idx) => (
+            <AnimatedCard key={idea.id} index={idx}>
+              <IdeaCard
+                idea={idea}
+                onView={setViewingIdea}
+                onEdit={setEditingIdea}
+                onSchedule={setSchedulingIdea}
+                quickLinks={quickLinks}
+              />
+            </AnimatedCard>
           ))}
         </div>
       );
@@ -155,16 +157,17 @@ export function IdeaBucket() {
 
     return (
       <div className="border rounded-lg overflow-hidden">
-        {ideas.map((idea) => (
-          <IdeaListItem
-            key={idea.id}
-            idea={idea}
-            onView={setViewingIdea}
-            onEdit={setEditingIdea}
-            onSchedule={setSchedulingIdea}
-            compact={viewMode === 'compact'}
-            quickLinks={quickLinks}
-          />
+        {ideas.map((idea, idx) => (
+          <AnimatedCard key={idea.id} index={idx}>
+            <IdeaListItem
+              idea={idea}
+              onView={setViewingIdea}
+              onEdit={setEditingIdea}
+              onSchedule={setSchedulingIdea}
+              compact={viewMode === 'compact'}
+              quickLinks={quickLinks}
+            />
+          </AnimatedCard>
         ))}
       </div>
     );

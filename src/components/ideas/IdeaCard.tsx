@@ -62,7 +62,7 @@ export function IdeaCard({ idea, onView, onEdit, onSchedule, quickLinks = [] }: 
   return (
     <Card 
       className={cn(
-        'card-hover cursor-pointer group',
+        'cursor-pointer group transition-shadow',
         idea.is_timely && 'timely-highlight'
       )}
       onClick={() => onView(idea)}
