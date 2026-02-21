@@ -22,6 +22,7 @@ import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
 import { ViewJournalEntryDialog } from '@/components/journal/ViewJournalEntryDialog';
 import { ThoughtCard } from '@/components/journal/ThoughtCard';
+import { AnimatedCard } from '@/components/layout/AnimatedCard';
 
 type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
@@ -414,10 +415,10 @@ export function SystemsView() {
             </Card>
            ) : (
              <div className="space-y-1">
-               {filteredThoughts.map((note) => (
+               {filteredThoughts.map((note, index) => (
+                 <AnimatedCard key={note.id} index={index}>
                  <ThoughtCard
-                   key={note.id}
-                   note={note}
+                    note={note}
                    ideas={ideas}
                    onDelete={deleteSystem}
                    onUpdate={(id, updates) => updateSystem(id, updates)}
@@ -429,6 +430,7 @@ export function SystemsView() {
                      return idea ? { id: idea.id, title: idea.title } : null;
                    }}
                  />
+                 </AnimatedCard>
                ))}
              </div>
            )}
@@ -529,19 +531,20 @@ export function SystemsView() {
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedQuickThoughts.map((note) => (
-                <QuickNoteCard
-                  key={note.id}
-                  note={note}
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  noteColors={noteColors}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                  onSendToBucket={handleSendToBucket}
-                  onView={setViewingNote}
-                />
+              {sortedQuickThoughts.map((note, index) => (
+                <AnimatedCard key={note.id} index={index}>
+                  <QuickNoteCard
+                    note={note}
+                    platform={getLinkedPlatform(note.platform_id)}
+                    idea={getLinkedIdea(note.idea_id)}
+                    noteColors={noteColors}
+                    onEdit={openEdit}
+                    onDelete={deleteSystem}
+                    onTogglePin={handleTogglePin}
+                    onSendToBucket={handleSendToBucket}
+                    onView={setViewingNote}
+                  />
+                </AnimatedCard>
               ))}
             </div>
           )}
@@ -605,18 +608,19 @@ export function SystemsView() {
             </Card>
           ) : (
             <div className="space-y-4">
-              {filteredJournalEntries.map((note) => (
-                <JournalNoteCard
-                   key={note.id}
-                   note={note}
-                   platform={getLinkedPlatform(note.platform_id)}
-                   idea={getLinkedIdea(note.idea_id)}
-                   onEdit={openEdit}
-                   onDelete={deleteSystem}
-                   onTogglePin={handleTogglePin}
-                   onSendToBucket={handleSendToBucket}
-                   onView={setViewingNote}
-                 />
+              {filteredJournalEntries.map((note, index) => (
+                <AnimatedCard key={note.id} index={index}>
+                  <JournalNoteCard
+                     note={note}
+                     platform={getLinkedPlatform(note.platform_id)}
+                     idea={getLinkedIdea(note.idea_id)}
+                     onEdit={openEdit}
+                     onDelete={deleteSystem}
+                     onTogglePin={handleTogglePin}
+                     onSendToBucket={handleSendToBucket}
+                     onView={setViewingNote}
+                   />
+                </AnimatedCard>
               ))}
             </div>
           )}
