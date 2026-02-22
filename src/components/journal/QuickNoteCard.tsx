@@ -141,7 +141,7 @@ export function QuickNoteCard({
             </TooltipProvider>
           </CardTitle>
         </div>
-        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
+        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm rounded-md p-0.5 shadow-sm border border-border/50" onClick={(e) => e.stopPropagation()}>
           {onSendToBucket && (
             <Button variant="ghost" size="icon" className="h-7 w-7" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
               <ArrowUpRight className="h-3.5 w-3.5" />
