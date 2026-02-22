@@ -130,7 +130,7 @@ export function QuickNoteCard({
           {note.is_pinned && (
             <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
           )}
-          <CardTitle className="text-lg font-sans font-bold leading-snug pr-20 flex-1 text-gray-900">
+          <CardTitle className="text-lg font-sans font-bold leading-snug pr-24 flex-1 text-gray-900">
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
