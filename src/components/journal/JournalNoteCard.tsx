@@ -1,13 +1,13 @@
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
-import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles, Pin, PinOff, ArrowUpRight } from 'lucide-react';
+import { Edit, Trash2, Link2, Smile, Frown, Meh, Heart, Sparkles as SparklesIcon, Pin, PinOff, StickyNote } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const MOOD_ICONS: Record<string, { icon: typeof Smile; color: string }> = {
-  great: { icon: Sparkles, color: 'text-yellow-500' },
+  great: { icon: SparklesIcon, color: 'text-yellow-500' },
   good: { icon: Smile, color: 'text-green-500' },
   okay: { icon: Meh, color: 'text-blue-500' },
   low: { icon: Frown, color: 'text-orange-500' },
@@ -32,7 +32,8 @@ interface JournalNoteCardProps {
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
   onView?: (note: SystemNote) => void;
-  onSendToBucket?: (note: SystemNote) => void;
+  onPromoteToIdea?: (note: SystemNote) => void;
+  onMoveTo?: (id: string) => void;
   compact?: boolean;
 }
 
@@ -44,13 +45,13 @@ export function JournalNoteCard({
   onDelete,
   onTogglePin,
   onView,
-  onSendToBucket,
+  onPromoteToIdea,
+  onMoveTo,
   compact = false,
 }: JournalNoteCardProps) {
   const MoodIcon = note.mood && MOOD_ICONS[note.mood]?.icon;
   const moodColor = note.mood && MOOD_ICONS[note.mood]?.color;
 
-  // Strip HTML for preview
   const contentPreview = note.content
     ? note.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     : '';
@@ -82,9 +83,14 @@ export function JournalNoteCard({
           }
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-          {onSendToBucket && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
-              <ArrowUpRight className="h-3.5 w-3.5" />
+          {onPromoteToIdea && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
+              <SparklesIcon className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {onMoveTo && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Move to Notes" onClick={() => onMoveTo(note.id)}>
+              <StickyNote className="h-3.5 w-3.5" />
             </Button>
           )}
           {onTogglePin && (
@@ -121,7 +127,6 @@ export function JournalNoteCard({
       <CardContent className="p-5">
         <div className="flex items-start justify-between gap-4">
           <div className="flex-1 min-w-0">
-            {/* Header row with date and mood */}
             <div className="flex items-center gap-3 mb-2 text-sm text-gray-500">
               {note.is_pinned && (
                 <Pin className="h-4 w-4 text-primary" />
@@ -137,7 +142,6 @@ export function JournalNoteCard({
               )}
             </div>
 
-            {/* Title - bold sans-serif font */}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
@@ -149,14 +153,12 @@ export function JournalNoteCard({
               </Tooltip>
             </TooltipProvider>
 
-            {/* Content preview - 4 lines */}
             {contentPreview && (
               <p className="text-sm text-gray-600 line-clamp-4 leading-relaxed">
                 {contentPreview}
               </p>
             )}
 
-            {/* Tags */}
             {(platform || idea) && (
               <div className="flex flex-wrap gap-2 mt-3">
                 {platform && (
@@ -176,9 +178,14 @@ export function JournalNoteCard({
 
           {/* Actions */}
           <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" onClick={(e) => e.stopPropagation()}>
-            {onSendToBucket && (
-              <Button variant="ghost" size="icon" className="h-8 w-8" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
-                <ArrowUpRight className="h-4 w-4" />
+            {onPromoteToIdea && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
+                <SparklesIcon className="h-4 w-4" />
+              </Button>
+            )}
+            {onMoveTo && (
+              <Button variant="ghost" size="icon" className="h-8 w-8" title="Move to Notes" onClick={() => onMoveTo(note.id)}>
+                <StickyNote className="h-4 w-4" />
               </Button>
             )}
             {onTogglePin && (

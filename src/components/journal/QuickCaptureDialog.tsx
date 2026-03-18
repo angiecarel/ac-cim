@@ -8,10 +8,9 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
-import { StickyNote, BookOpen, MessageCircle } from 'lucide-react';
-import { cn } from '@/lib/utils';
+import { StickyNote, BookOpen } from 'lucide-react';
 
-type CaptureType = 'quick_thought' | 'journal_entry' | 'thought';
+type CaptureType = 'quick_thought' | 'journal_entry';
 
 interface QuickCaptureDialogProps {
   open: boolean;
@@ -33,8 +32,7 @@ export function QuickCaptureDialog({
     if (open) {
       setTitle('');
       setContent('');
-      setType('thought');
-      // Focus input after dialog opens
+      setType('quick_thought');
       setTimeout(() => inputRef.current?.focus(), 100);
     }
   }, [open]);
@@ -53,18 +51,8 @@ export function QuickCaptureDialog({
           <DialogTitle>Quick Capture</DialogTitle>
         </DialogHeader>
         <form onSubmit={handleSubmit} className="space-y-4">
-          {/* Type toggle */}
+          {/* Type toggle — Note or Journal Entry */}
           <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={type === 'thought' ? 'default' : 'outline'}
-              size="sm"
-              className="flex-1 gap-2"
-              onClick={() => setType('thought')}
-            >
-              <MessageCircle className="h-4 w-4" />
-              Thought
-            </Button>
             <Button
               type="button"
               variant={type === 'quick_thought' ? 'default' : 'outline'}
@@ -73,7 +61,7 @@ export function QuickCaptureDialog({
               onClick={() => setType('quick_thought')}
             >
               <StickyNote className="h-4 w-4" />
-              Quick Note
+              Note
             </Button>
             <Button
               type="button"
@@ -83,7 +71,7 @@ export function QuickCaptureDialog({
               onClick={() => setType('journal_entry')}
             >
               <BookOpen className="h-4 w-4" />
-              Journal
+              Journal Entry
             </Button>
           </div>
 
@@ -96,16 +84,14 @@ export function QuickCaptureDialog({
             className="font-handwritten text-lg"
           />
 
-          {/* Optional content (hidden for thoughts) */}
-          {type !== 'thought' && (
-            <Textarea
-              placeholder="Add details (optional)"
-              value={content}
-              onChange={(e) => setContent(e.target.value)}
-              rows={3}
-              className="resize-none"
-            />
-          )}
+          {/* Optional content */}
+          <Textarea
+            placeholder="Add details (optional)"
+            value={content}
+            onChange={(e) => setContent(e.target.value)}
+            rows={3}
+            className="resize-none"
+          />
 
           {/* Actions */}
           <div className="flex justify-end gap-2">

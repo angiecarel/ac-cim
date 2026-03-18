@@ -1,50 +1,77 @@
 
+# Restructuring CIM: From Content Manager to Creative Idea Library
 
-# Streamline Log Flow: Merge Thoughts + Quick Notes, Promote to Idea
+## ✅ Implementation Status: COMPLETE
 
-## What Changes
-
-1. **Merge Thoughts and Quick Notes into a single "Notes" type** — the current `thought` and `quick_thought` note types become one unified "Notes" tab. Notes can optionally have a body, color, linked idea, and platform — they grow richer as needed. The inline input stays for fast capture; clicking a note opens it for editing with optional body/color.
-
-2. **"Promote to Idea" replaces "Send to Bucket"** — when promoting, the note's data creates an Idea in the Bucket (with the correct `idea_category` matching the log's category), then the note is **deleted** from the Log. No duplication.
-
-3. **Keep two tabs: Notes and Journal Entries** — Journal Entries remain separate for reflective writing with mood and rich text. "Move to Journal" converts a Note into a Journal Entry (current behavior). "Move to Notes" converts a Journal Entry back.
-
-4. **Quick Capture FAB** simplifies to two options: Note or Journal Entry.
+This plan has been fully implemented. The application has been restructured from a content publishing pipeline to a creative thought repository.
 
 ---
 
-## Technical Plan
+## Changes Made
 
-### 1. Unify Note Types in the Database
-- No schema change needed — we keep the `note_type` column but treat `thought` and `quick_thought` as equivalent. In code, we'll query both types together for the "Notes" tab and standardize new notes to use `quick_thought` (since it supports body/color).
-- Migrate existing `thought` entries to `quick_thought` via a data update so they appear in the unified Notes tab.
+### 1. Status Labels (UI Only - DB enums unchanged)
+| Database Value | Old Label | New Label |
+|----------------|-----------|-----------|
+| `hold` | Hold | **Captured** |
+| `developing` | Developing | **Exploring** |
+| `ready` | Ready | **Actionable** |
+| `scheduled` | Scheduled | **Planned** |
+| `archived` | Archived | Archived |
+| `recycled` | Recycled | Recycled |
 
-### 2. Update LogView.tsx
-- Remove the Thoughts tab. Rename "Quick Notes" tab to "Notes".
-- The "Notes" tab shows all `quick_thought` entries (which now includes former thoughts).
-- The inline thought input at the top of the Notes tab stays for quick capture — creates a `quick_thought` with just a title.
-- Keep the Journal Entries tab as-is.
+### 2. Terminology Changes
+- "Platform" → **"Context"** throughout the UI
+- "Scheduled Date" → **"Planned Date"**
+- "Schedule" action → **"Plan"**
+- Calendar description updated to "View your planned ideas"
 
-### 3. Update "Send to Bucket" → "Promote to Idea"
-- Rename the action and icon across ThoughtCard, QuickNoteCard, and JournalNoteCard.
-- On promote: create an Idea (title, description from content, `idea_category` matching `log_category`), then **delete** the note from the systems table.
-- Show a success toast with the idea title.
+### 3. New Idea Type Categories
+Added to content_types table:
+- **Content** - Anything meant to be published
+- **Business** - Revenue, strategy, operations  
+- **Product** - Features, tools, offerings
+- **Automation** - Systems, workflows, AI assistants (already existed)
+- **Research** - Things to explore or learn
+- **Inspiration** - References, motivation, aesthetics (already existed)
+- **Personal** - Self-development, life ideas
 
-### 4. Update QuickCaptureDialog (FAB)
-- Remove the three-way toggle (Thought / Quick Note / Journal).
-- Replace with two options: "Note" (`quick_thought`) and "Journal Entry" (`journal_entry`).
+### 4. New Context Categories
+Added to platforms table:
+- **Internal** 🏠 - Your team, personal use
+- **Client-facing** 🤝 - Proposals, presentations
+- **Product** 📦 - Your app, service, course
 
-### 5. Update "Move to" Options
-- From Notes: "Move to Journal Entry" (changes `note_type` to `journal_entry`).
-- From Journal: "Move to Note" (changes `note_type` to `quick_thought`).
-- Remove the current "Move to Quick Note" / "Move to Journal Entry" / "Move to Thought" three-way options.
+### 5. Updated Files
+- `src/lib/statusLabels.ts` - New centralized status/label configuration
+- `src/components/ideas/IdeaCard.tsx` - Updated status labels and icons
+- `src/components/ideas/IdeaListItem.tsx` - Updated status labels and icons
+- `src/components/ideas/AddIdeaDialog.tsx` - Platform → Context
+- `src/components/ideas/EditIdeaDialog.tsx` - Platform → Context, status labels
+- `src/components/ideas/ViewIdeaDialog.tsx` - Platform → Context, status labels
+- `src/components/ideas/ScheduleIdeaDialog.tsx` - Schedule → Plan
+- `src/pages/IdeaBucket.tsx` - Platform filter → Context filter
+- `src/pages/Dashboard.tsx` - Updated stat card labels
+- `src/pages/CalendarView.tsx` - Updated descriptions
+- `src/pages/ManageSettings.tsx` - Platforms → Contexts
 
-### 6. Files Changed
-- `src/pages/LogView.tsx` — remove Thoughts tab, merge into Notes, update promote logic
-- `src/components/journal/QuickCaptureDialog.tsx` — simplify to 2 types
-- `src/components/journal/ThoughtCard.tsx` — remove or merge into QuickNoteCard
-- `src/components/journal/QuickNoteCard.tsx` — add inline title-only display mode, rename Send to Bucket → Promote
-- `src/components/journal/JournalNoteCard.tsx` — rename Send to Bucket → Promote
-- Data migration: update existing `thought` records to `quick_thought`
+### 6. Database Function Updated
+`handle_new_user()` function now creates the expanded set of idea types and contexts for new users.
 
+---
+
+## What Stayed the Same
+- **Priority levels**: Good, Better, Best (works perfectly for all idea types)
+- **Database enum values**: No breaking changes to schema
+- **Timely flag**: Still marks ideas needing immediate attention
+- **Calendar functionality**: Same behavior, just renamed "Planned" instead of "Scheduled"
+
+---
+
+## Future Enhancements (Not Implemented)
+These optional features were discussed but not implemented:
+- [ ] Multi-select Tags system (alternative to single-select Context)
+- [ ] Source field (where the idea came from)
+- [ ] Next Action field (GTD-style)
+- [ ] Energy Level field (Low/Medium/High)
+- [ ] Time Estimate field (Quick/Hour/Day/Week+)
+- [ ] Multi-date system (start_date, due_date, review_date)

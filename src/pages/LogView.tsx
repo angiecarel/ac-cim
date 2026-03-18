@@ -10,7 +10,7 @@ import { Input } from '@/components/ui/input';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, MessageCircle, Download } from 'lucide-react';
+import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, Download, Sparkles } from 'lucide-react';
 import { downloadCsv, formatSystemForCsv } from '@/lib/exportCsv';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
@@ -21,7 +21,6 @@ import { LogFAB } from '@/components/journal/LogFAB';
 import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
 import { ViewJournalEntryDialog } from '@/components/journal/ViewJournalEntryDialog';
-import { ThoughtCard } from '@/components/journal/ThoughtCard';
 import { AnimatedCard } from '@/components/layout/AnimatedCard';
 
 type ViewMode = 'expanded' | 'compact';
@@ -54,25 +53,23 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<SystemNote | null>(null);
 
-  const quickThoughts = systems.filter((s) => s.note_type === 'quick_thought');
+  // Unified: all quick_thought entries (formerly thoughts + quick notes)
+  const notes = systems.filter((s) => s.note_type === 'quick_thought');
   const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
-  const thoughts = systems.filter((s) => s.note_type === 'thought');
 
-  // State for inline thought input
+  // State for inline note input
   const [newThought, setNewThought] = useState('');
 
-  // Filter quick thoughts by color and search
-  const filteredQuickThoughts = useMemo(() => {
-    let filtered = quickThoughts;
+  // Filter notes by color and search
+  const filteredNotes = useMemo(() => {
+    let filtered = notes;
     
-    // Apply color filter
     if (colorFilter === '__none__') {
       filtered = filtered.filter(n => !n.color);
     } else if (colorFilter !== '__all__') {
       filtered = filtered.filter(n => n.color === colorFilter);
     }
     
-    // Apply search filter
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
       filtered = filtered.filter(n => 
@@ -82,13 +79,12 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
     }
     
     return filtered;
-  }, [quickThoughts, colorFilter, searchQuery]);
+  }, [notes, colorFilter, searchQuery]);
 
-  // Sort quick thoughts based on selected option (pinned always first)
-  const sortedQuickThoughts = useMemo(() => {
-    const sorted = [...filteredQuickThoughts];
+  // Sort notes (pinned always first)
+  const sortedNotes = useMemo(() => {
+    const sorted = [...filteredNotes];
     
-    // First sort by the selected option
     switch (quickNoteSortBy) {
       case 'date_desc':
         sorted.sort((a, b) => 
@@ -107,23 +103,18 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         sorted.sort((a, b) => b.title.localeCompare(a.title));
         break;
       case 'color':
-        sorted.sort((a, b) => {
-          const colorA = a.color || '';
-          const colorB = b.color || '';
-          return colorA.localeCompare(colorB);
-        });
+        sorted.sort((a, b) => (a.color || '').localeCompare(b.color || ''));
         break;
     }
     
-    // Then stable-sort pinned items to the top
     return sorted.sort((a, b) => {
       if (a.is_pinned && !b.is_pinned) return -1;
       if (!a.is_pinned && b.is_pinned) return 1;
       return 0;
     });
-  }, [filteredQuickThoughts, quickNoteSortBy]);
+  }, [filteredNotes, quickNoteSortBy]);
 
-  // Filter and sort journal entries (search + pinned first)
+  // Filter and sort journal entries
   const filteredJournalEntries = useMemo(() => {
     let filtered = journalEntries;
     
@@ -135,12 +126,9 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
       );
     }
     
-    // Sort by date descending, then pinned first
     return filtered.sort((a, b) => {
-      // Pinned first
       if (a.is_pinned && !b.is_pinned) return -1;
       if (!a.is_pinned && b.is_pinned) return 1;
-      // Then by date
       return new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime();
     });
   }, [journalEntries, searchQuery]);
@@ -227,7 +215,7 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
   const handleQuickCaptureSave = async (data: { title: string; content: string; type: SystemNoteType }) => {
     await createSystem({
       title: data.title,
-      content: data.type === 'thought' ? null : (data.content || null),
+      content: data.content || null,
       note_type: data.type,
       platform_id: null,
       idea_id: null,
@@ -237,55 +225,43 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
     });
   };
 
-  // Inline thought add handler
+  // Inline note add handler
   const handleAddThought = async () => {
     if (!newThought.trim()) return;
     await createSystem({
       title: newThought.trim(),
       content: null,
-      note_type: 'thought' as SystemNoteType,
+      note_type: 'quick_thought',
       platform_id: null,
       idea_id: null,
     });
     setNewThought('');
   };
 
-  // Send to Bucket handler — converts a note into an idea
-  const handleSendToBucket = async (note: SystemNote) => {
+  // Promote to Idea — creates an idea then deletes the note
+  const handlePromoteToIdea = async (note: SystemNote) => {
     const idea = await createIdea({
       title: note.title,
       description: note.content ? note.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim() : undefined,
       status: 'developing',
       priority: 'none',
       platform_id: note.platform_id || undefined,
+      idea_category: logCategory,
     });
     if (idea) {
-      toast({ title: 'Sent to Bucket', description: `"${note.title}" added to Idea Bucket` });
+      await deleteSystem(note.id);
+      toast({ title: 'Promoted to Idea', description: `"${note.title}" moved to Idea Bucket` });
     }
   };
 
-  // Move thought to quick note or journal entry
-  const handleMoveTo = async (id: string, noteType: 'quick_thought' | 'journal_entry') => {
+  // Move between note types
+  const handleMoveTo = async (id: string, targetType: 'quick_thought' | 'journal_entry') => {
     await updateSystem(id, { 
-      note_type: noteType,
-      entry_date: noteType === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
+      note_type: targetType,
+      entry_date: targetType === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
     });
-    toast({ title: noteType === 'quick_thought' ? 'Moved to Quick Notes' : 'Moved to Journal Entries' });
+    toast({ title: targetType === 'quick_thought' ? 'Moved to Notes' : 'Moved to Journal Entries' });
   };
-
-  // Filtered & sorted thoughts
-  const filteredThoughts = useMemo(() => {
-    let filtered = thoughts;
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(n => n.title.toLowerCase().includes(query));
-    }
-    return filtered.sort((a, b) => {
-      if (a.is_pinned && !b.is_pinned) return -1;
-      if (!a.is_pinned && b.is_pinned) return 1;
-      return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
-    });
-  }, [thoughts, searchQuery]);
 
   const openAdd = (type: SystemNoteType) => {
     setEditingNote(null);
@@ -337,7 +313,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto">
-          {/* Export button */}
           <Button
             variant="outline"
             size="sm"
@@ -352,39 +327,34 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
             Export
           </Button>
 
-          {/* Global Search */}
           <div className="relative flex-1 sm:w-64">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search notes..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            className="pl-9 pr-9"
-          />
-          {searchQuery && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
-              onClick={() => setSearchQuery('')}
-            >
-              <X className="h-3.5 w-3.5" />
-            </Button>
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search notes..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-9 pr-9"
+            />
+            {searchQuery && (
+              <Button
+                variant="ghost"
+                size="icon"
+                className="absolute right-1 top-1/2 -translate-y-1/2 h-7 w-7"
+                onClick={() => setSearchQuery('')}
+              >
+                <X className="h-3.5 w-3.5" />
+              </Button>
             )}
           </div>
         </div>
       </div>
 
-      {/* Tabs */}
-      <Tabs defaultValue="thoughts" className="space-y-6">
+      {/* Tabs — Notes + Journal Entries */}
+      <Tabs defaultValue="notes" className="space-y-6">
         <TabsList>
-          <TabsTrigger value="thoughts" className="gap-2">
-            <MessageCircle className="h-4 w-4" />
-            Thoughts
-          </TabsTrigger>
-          <TabsTrigger value="quick" className="gap-2">
+          <TabsTrigger value="notes" className="gap-2">
             <StickyNote className="h-4 w-4" />
-            Quick Notes
+            Notes
           </TabsTrigger>
           <TabsTrigger value="journal" className="gap-2">
             <BookOpen className="h-4 w-4" />
@@ -392,9 +362,9 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
           </TabsTrigger>
         </TabsList>
 
-        {/* Thoughts Tab */}
-        <TabsContent value="thoughts" className="space-y-4">
-          {/* Inline input */}
+        {/* Notes Tab (unified thoughts + quick notes) */}
+        <TabsContent value="notes" className="space-y-4">
+          {/* Inline quick capture */}
           <div className="flex gap-2">
             <Input
               placeholder="What's on your mind?"
@@ -409,41 +379,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
             </Button>
           </div>
 
-          {thoughts.length === 0 ? (
-            <Card className="p-8 text-center">
-              <MessageCircle className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No thoughts yet. Jot down a quick one-liner!</p>
-            </Card>
-          ) : filteredThoughts.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No thoughts match your search.</p>
-            </Card>
-           ) : (
-             <div className="space-y-1">
-               {filteredThoughts.map((note, index) => (
-                 <AnimatedCard key={note.id} index={index}>
-                 <ThoughtCard
-                    note={note}
-                   ideas={ideas}
-                   onDelete={deleteSystem}
-                   onUpdate={(id, updates) => updateSystem(id, updates)}
-                   onTogglePin={handleTogglePin}
-                   onSendToBucket={handleSendToBucket}
-                   onMoveTo={handleMoveTo}
-                   onCreateIdea={async (title) => {
-                     const idea = await createIdea({ title, status: 'developing', priority: 'none' });
-                     return idea ? { id: idea.id, title: idea.title } : null;
-                   }}
-                 />
-                 </AnimatedCard>
-               ))}
-             </div>
-           )}
-        </TabsContent>
-
-        {/* Quick Notes Tab */}
-        <TabsContent value="quick" className="space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-4">
             <div className="flex items-center gap-2">
               <ToggleGroup
@@ -462,7 +397,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
                 </ToggleGroupItem>
               </ToggleGroup>
               
-              {/* Sort dropdown */}
               <Select value={quickNoteSortBy} onValueChange={(v) => setQuickNoteSortBy(v as SortOption)}>
                 <SelectTrigger className="w-[140px]">
                   <ArrowUpDown className="h-4 w-4 mr-2" />
@@ -477,7 +411,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
                 </SelectContent>
               </Select>
 
-              {/* Color filter dropdown */}
               <Select value={colorFilter} onValueChange={(v) => setColorFilter(v as ColorFilter)}>
                 <SelectTrigger className="w-[160px]">
                   <Palette className="h-4 w-4 mr-2" />
@@ -507,19 +440,19 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
             </Button>
           </div>
 
-          {quickThoughts.length === 0 ? (
+          {notes.length === 0 ? (
             <Card className="p-8 text-center">
               <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No quick notes yet. Capture a fleeting idea!</p>
+              <p className="text-muted-foreground">No notes yet. Jot down a quick thought or capture an idea!</p>
             </Card>
-          ) : sortedQuickThoughts.length === 0 ? (
+          ) : sortedNotes.length === 0 ? (
             <Card className="p-8 text-center">
               <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
               <p className="text-muted-foreground">No notes match your search.</p>
             </Card>
           ) : quickNoteViewMode === 'compact' ? (
             <div className="space-y-1">
-              {sortedQuickThoughts.map((note) => (
+              {sortedNotes.map((note) => (
                 <QuickNoteCard
                   key={note.id}
                   note={note}
@@ -530,14 +463,15 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
                   onEdit={openEdit}
                   onDelete={deleteSystem}
                   onTogglePin={handleTogglePin}
-                  onSendToBucket={handleSendToBucket}
+                  onPromoteToIdea={handlePromoteToIdea}
+                  onMoveTo={(id) => handleMoveTo(id, 'journal_entry')}
                   onView={setViewingNote}
                 />
               ))}
             </div>
           ) : (
             <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedQuickThoughts.map((note, index) => (
+              {sortedNotes.map((note, index) => (
                 <AnimatedCard key={note.id} index={index}>
                   <QuickNoteCard
                     note={note}
@@ -547,7 +481,8 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
                     onEdit={openEdit}
                     onDelete={deleteSystem}
                     onTogglePin={handleTogglePin}
-                    onSendToBucket={handleSendToBucket}
+                    onPromoteToIdea={handlePromoteToIdea}
+                    onMoveTo={(id) => handleMoveTo(id, 'journal_entry')}
                     onView={setViewingNote}
                   />
                 </AnimatedCard>
@@ -599,17 +534,18 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
             <Card className="divide-y divide-border overflow-hidden">
               {filteredJournalEntries.map((note) => (
                 <JournalNoteCard
-                   key={note.id}
-                   note={note}
-                   compact
-                   platform={getLinkedPlatform(note.platform_id)}
-                   idea={getLinkedIdea(note.idea_id)}
-                   onEdit={openEdit}
-                   onDelete={deleteSystem}
-                   onTogglePin={handleTogglePin}
-                   onSendToBucket={handleSendToBucket}
-                   onView={setViewingNote}
-                 />
+                  key={note.id}
+                  note={note}
+                  compact
+                  platform={getLinkedPlatform(note.platform_id)}
+                  idea={getLinkedIdea(note.idea_id)}
+                  onEdit={openEdit}
+                  onDelete={deleteSystem}
+                  onTogglePin={handleTogglePin}
+                  onPromoteToIdea={handlePromoteToIdea}
+                  onMoveTo={(id) => handleMoveTo(id, 'quick_thought')}
+                  onView={setViewingNote}
+                />
               ))}
             </Card>
           ) : (
@@ -617,15 +553,16 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
               {filteredJournalEntries.map((note, index) => (
                 <AnimatedCard key={note.id} index={index}>
                   <JournalNoteCard
-                     note={note}
-                     platform={getLinkedPlatform(note.platform_id)}
-                     idea={getLinkedIdea(note.idea_id)}
-                     onEdit={openEdit}
-                     onDelete={deleteSystem}
-                     onTogglePin={handleTogglePin}
-                     onSendToBucket={handleSendToBucket}
-                     onView={setViewingNote}
-                   />
+                    note={note}
+                    platform={getLinkedPlatform(note.platform_id)}
+                    idea={getLinkedIdea(note.idea_id)}
+                    onEdit={openEdit}
+                    onDelete={deleteSystem}
+                    onTogglePin={handleTogglePin}
+                    onPromoteToIdea={handlePromoteToIdea}
+                    onMoveTo={(id) => handleMoveTo(id, 'quick_thought')}
+                    onView={setViewingNote}
+                  />
                 </AnimatedCard>
               ))}
             </div>
@@ -680,7 +617,7 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
       {/* View Quick Note Dialog */}
       <ViewQuickNoteDialog
         note={viewingNote}
-        open={!!viewingNote}
+        open={!!viewingNote && viewingNote.note_type !== 'journal_entry'}
         onOpenChange={(open) => { if (!open) setViewingNote(null); }}
         platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
         idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
@@ -694,7 +631,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
         idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
       />
-
 
       <FocusModeDialog
         open={focusModeOpen}
