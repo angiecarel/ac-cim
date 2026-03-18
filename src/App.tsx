@@ -12,7 +12,8 @@ import { PageTransition } from "@/components/layout/PageTransition";
 import { Dashboard } from "@/pages/Dashboard";
 import { IdeaBucket } from "@/pages/IdeaBucket";
 import { CalendarView } from "@/pages/CalendarView";
-import { SystemsView } from "@/pages/SystemsView";
+import { CreativeLog } from "@/pages/CreativeLog";
+import { BusinessLog } from "@/pages/BusinessLog";
 import { QuickLinksPage } from "@/pages/QuickLinksPage";
 import { PastIdeas } from "@/pages/PastIdeas";
 import { ArchiveView } from "@/pages/ArchiveView";
@@ -44,7 +45,8 @@ function AppContent() {
           <Route path="/" element={<PageTransition><Dashboard /></PageTransition>} />
           <Route path="/ideas" element={<PageTransition><IdeaBucket /></PageTransition>} />
           <Route path="/calendar" element={<PageTransition><CalendarView /></PageTransition>} />
-          <Route path="/systems" element={<PageTransition><SystemsView /></PageTransition>} />
+          <Route path="/log/creative" element={<PageTransition><CreativeLog /></PageTransition>} />
+          <Route path="/log/business" element={<PageTransition><BusinessLog /></PageTransition>} />
           <Route path="/quicklinks" element={<PageTransition><QuickLinksPage /></PageTransition>} />
           <Route path="/history" element={<PageTransition><PastIdeas /></PageTransition>} />
           <Route path="/archive" element={<PageTransition><ArchiveView /></PageTransition>} />

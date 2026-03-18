@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   PenTool,
+  Briefcase,
   Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -24,7 +25,8 @@ const navItems = [
   { path: '/', label: 'Dashboard', icon: LayoutDashboard },
   { path: '/ideas', label: 'Idea Bucket', icon: Lightbulb },
   { path: '/calendar', label: 'Calendar', icon: Calendar },
-  { path: '/systems', label: 'Log', icon: PenTool },
+  { path: '/log/creative', label: 'Creative Log', icon: PenTool },
+  { path: '/log/business', label: 'Business Log', icon: Briefcase },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
   { path: '/archive', label: 'Archive', icon: Archive },

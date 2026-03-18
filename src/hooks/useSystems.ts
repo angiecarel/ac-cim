@@ -21,7 +21,9 @@ export interface SystemNote {
   updated_at: string;
 }
 
-export function useSystems(userId: string | undefined) {
+export type LogCategory = 'creative' | 'business';
+
+export function useSystems(userId: string | undefined, logCategory?: LogCategory) {
   const [systems, setSystems] = useState<SystemNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [webhookUrl, setWebhookUrl] = useState<string | null>(null);
@@ -52,11 +54,16 @@ export function useSystems(userId: string | undefined) {
     }
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('systems')
         .select('*')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false });
+        .eq('user_id', userId);
+      
+      if (logCategory) {
+        query = query.eq('log_category', logCategory);
+      }
+      
+      const { data, error } = await query.order('updated_at', { ascending: false });
 
       if (error) throw error;
       setSystems((data as SystemNote[]) || []);
@@ -70,7 +77,7 @@ export function useSystems(userId: string | undefined) {
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, logCategory]);
 
   useEffect(() => {
     fetchSystems();
@@ -81,19 +88,23 @@ export function useSystems(userId: string | undefined) {
       if (!userId) return null;
 
       try {
+        const insertData: Record<string, unknown> = {
+          user_id: userId,
+          title: system.title || 'Untitled',
+          content: system.content || null,
+          note_type: system.note_type || 'quick_thought',
+          platform_id: system.platform_id || null,
+          idea_id: system.idea_id || null,
+          entry_date: system.entry_date || null,
+          mood: system.mood || null,
+          color: system.color || null,
+        };
+        if (logCategory) {
+          insertData.log_category = logCategory;
+        }
         const { data, error } = await supabase
           .from('systems')
-          .insert({
-            user_id: userId,
-            title: system.title || 'Untitled',
-            content: system.content || null,
-            note_type: system.note_type || 'quick_thought',
-            platform_id: system.platform_id || null,
-            idea_id: system.idea_id || null,
-            entry_date: system.entry_date || null,
-            mood: system.mood || null,
-            color: system.color || null,
-          })
+          .insert(insertData as any)
           .select()
           .single();
 

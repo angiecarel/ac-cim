@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSystems, SystemNote, SystemNoteType } from '@/hooks/useSystems';
+import { useSystems, SystemNote, SystemNoteType, LogCategory } from '@/hooks/useSystems';
 import { useNoteColors } from '@/hooks/useNoteColors';
 import { useIdea } from '@/contexts/IdeaContext';
 import { toast } from '@/hooks/use-toast';
@@ -28,9 +28,15 @@ type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
 type ColorFilter = '__all__' | '__none__' | string;
 
-export function SystemsView() {
+interface LogViewProps {
+  logCategory: LogCategory;
+  title: string;
+  description: string;
+}
+
+export function LogView({ logCategory, title, description }: LogViewProps) {
   const { user } = useAuth();
-  const { systems, loading, createSystem, updateSystem, deleteSystem } = useSystems(user?.id);
+  const { systems, loading, createSystem, updateSystem, deleteSystem } = useSystems(user?.id, logCategory);
   const { colors: noteColors, createColor, updateColor, deleteColor } = useNoteColors(user?.id);
   const { platforms, ideas, createIdea } = useIdea();
 
@@ -326,8 +332,8 @@ export function SystemsView() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold text-gradient">Log</h1>
-          <p className="text-muted-foreground mt-1">Quick notes and journal entries</p>
+          <h1 className="text-3xl font-bold text-gradient">{title}</h1>
+          <p className="text-muted-foreground mt-1">{description}</p>
         </div>
         
         <div className="flex items-center gap-2 w-full sm:w-auto">
