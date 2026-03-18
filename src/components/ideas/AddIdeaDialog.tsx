@@ -107,7 +107,8 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
       next_action: nextAction.trim() || null,
       energy_level: energyLevel || null,
       time_estimate: timeEstimate || null,
-    });
+      idea_category: ideaCategory,
+    } as any);
     
     // Set tags for the new idea
     if (newIdea && selectedTagIds.length > 0) {
