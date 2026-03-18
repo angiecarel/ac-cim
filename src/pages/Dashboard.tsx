@@ -95,7 +95,7 @@ export function Dashboard() {
 
       {/* QuickLinks Section */}
       <div className="grid lg:grid-cols-2 gap-6">
-        <QuickLinksManager />
+        <QuickLinksPreview />
 
         {/* Recent Activity placeholder */}
         <Card>
