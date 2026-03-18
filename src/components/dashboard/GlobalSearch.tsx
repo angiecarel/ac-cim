@@ -61,8 +61,9 @@ export function GlobalSearch() {
     setQuery('');
   };
 
-  const handleNoteClick = () => {
-    navigate('/systems');
+  const handleNoteClick = (note: { log_category?: string }) => {
+    const category = (note as any).log_category === 'business' ? 'business' : 'creative';
+    navigate(`/log/${category}`);
     setOpen(false);
     setQuery('');
   };
