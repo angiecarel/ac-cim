@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Idea, IdeaStatus, IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
+import { Idea, IdeaStatus, IdeaPriority, IdeaCategory } from '@/types';
 import { toast } from 'sonner';
 
 export function useIdeas(userId: string | undefined) {
