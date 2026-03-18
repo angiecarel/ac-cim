@@ -77,7 +77,7 @@ export function useSystems(userId: string | undefined, logCategory?: LogCategory
     } finally {
       setLoading(false);
     }
-  }, [userId]);
+  }, [userId, logCategory]);
 
   useEffect(() => {
     fetchSystems();
@@ -88,19 +88,23 @@ export function useSystems(userId: string | undefined, logCategory?: LogCategory
       if (!userId) return null;
 
       try {
+        const insertData: Record<string, unknown> = {
+          user_id: userId,
+          title: system.title || 'Untitled',
+          content: system.content || null,
+          note_type: system.note_type || 'quick_thought',
+          platform_id: system.platform_id || null,
+          idea_id: system.idea_id || null,
+          entry_date: system.entry_date || null,
+          mood: system.mood || null,
+          color: system.color || null,
+        };
+        if (logCategory) {
+          insertData.log_category = logCategory;
+        }
         const { data, error } = await supabase
           .from('systems')
-          .insert({
-            user_id: userId,
-            title: system.title || 'Untitled',
-            content: system.content || null,
-            note_type: system.note_type || 'quick_thought',
-            platform_id: system.platform_id || null,
-            idea_id: system.idea_id || null,
-            entry_date: system.entry_date || null,
-            mood: system.mood || null,
-            color: system.color || null,
-          })
+          .insert(insertData)
           .select()
           .single();
 
