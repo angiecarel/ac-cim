@@ -1,4 +1,4 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
@@ -131,82 +131,68 @@ export function QuickNoteCard({
       }}
       onClick={() => onView?.(note)}
     >
-      <CardHeader className="pb-2">
-        <div className="flex items-start gap-2">
-          {note.is_pinned && (
-            <Pin className="h-4 w-4 text-primary flex-shrink-0 mt-1" />
-          )}
-          <CardTitle className="text-lg font-sans font-bold leading-snug flex-1 min-w-0 overflow-hidden text-gray-900">
+      <CardContent className="p-4 flex flex-col h-[160px]">
+        <div className="flex items-start justify-between gap-2 mb-2">
+          <div className="flex items-center gap-2 min-w-0 flex-1">
+            {note.is_pinned && (
+              <Pin className="h-4 w-4 text-primary flex-shrink-0" />
+            )}
             <TooltipProvider>
               <Tooltip>
                 <TooltipTrigger asChild>
-                  <span className="block truncate">{note.title}</span>
+                  <h3 className="font-sans font-bold text-base leading-tight text-foreground truncate">{note.title}</h3>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="start" className="max-w-xs"><p>{note.title}</p></TooltipContent>
               </Tooltip>
             </TooltipProvider>
-          </CardTitle>
+          </div>
+          <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0" onClick={(e) => e.stopPropagation()}>
+            {onPromoteToIdea && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
+                <Sparkles className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {onMoveTo && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" title="Move to Journal" onClick={() => onMoveTo(note.id)}>
+                <BookOpen className="h-3.5 w-3.5" />
+              </Button>
+            )}
+            {onTogglePin && (
+              <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onTogglePin(note.id, !note.is_pinned)}>
+                {note.is_pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
+              </Button>
+            )}
+            <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
+              <Edit className="h-3.5 w-3.5" />
+            </Button>
+            <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive hover:text-destructive" onClick={() => onDelete(note.id)}>
+              <Trash2 className="h-3.5 w-3.5" />
+            </Button>
+          </div>
         </div>
-        <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm rounded-md p-0.5 shadow-sm border border-border/50" onClick={(e) => e.stopPropagation()}>
-          {onPromoteToIdea && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
-              <Sparkles className="h-3.5 w-3.5" />
-            </Button>
-          )}
-          {onMoveTo && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" title="Move to Journal" onClick={() => onMoveTo(note.id)}>
-              <BookOpen className="h-3.5 w-3.5" />
-            </Button>
-          )}
-          {onTogglePin && (
-            <Button
-              variant="ghost"
-              size="icon"
-              className="h-7 w-7"
-              onClick={() => onTogglePin(note.id, !note.is_pinned)}
-            >
-              {note.is_pinned ? <PinOff className="h-3.5 w-3.5" /> : <Pin className="h-3.5 w-3.5" />}
-            </Button>
-          )}
-          <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(note)}>
-            <Edit className="h-3.5 w-3.5" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="h-7 w-7 text-destructive hover:text-destructive"
-            onClick={() => onDelete(note.id)}
-          >
-            <Trash2 className="h-3.5 w-3.5" />
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="space-y-3">
-        {contentPreview && (
-          <p className="text-sm text-gray-600 line-clamp-3">
-            {contentPreview}
-          </p>
-        )}
 
-        {(platform || idea) && (
-          <div className="flex flex-wrap gap-2">
+        <p className="text-sm text-muted-foreground line-clamp-2 flex-1">
+          {contentPreview || '\u00A0'}
+        </p>
+
+        <div className="flex items-center justify-between gap-2 mt-auto pt-2">
+          <div className="flex flex-wrap gap-1.5 min-w-0">
             {platform && (
-              <span className="inline-flex items-center gap-1 text-xs bg-background/50 px-2 py-1 rounded-full">
+              <span className="inline-flex items-center gap-1 text-xs bg-background/50 px-2 py-0.5 rounded-full truncate">
                 {platform.name}
               </span>
             )}
             {idea && (
-              <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-1 rounded-full">
-                <Link2 className="h-3 w-3" />
-                {idea.title}
+              <span className="inline-flex items-center gap-1 text-xs bg-primary/10 text-primary px-2 py-0.5 rounded-full truncate">
+                <Link2 className="h-3 w-3 shrink-0" />
+                <span className="truncate">{idea.title}</span>
               </span>
             )}
           </div>
-        )}
-
-        <p className="text-xs text-gray-500">
-          {format(new Date(note.updated_at), 'MMM d, yyyy')}
-        </p>
+          <span className="text-xs text-muted-foreground flex-shrink-0">
+            {format(new Date(note.updated_at), 'MMM d, yyyy')}
+          </span>
+        </div>
       </CardContent>
     </Card>
   );
