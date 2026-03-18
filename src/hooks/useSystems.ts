@@ -54,11 +54,16 @@ export function useSystems(userId: string | undefined, logCategory?: LogCategory
     }
 
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('systems')
         .select('*')
-        .eq('user_id', userId)
-        .order('updated_at', { ascending: false });
+        .eq('user_id', userId);
+      
+      if (logCategory) {
+        query = query.eq('log_category', logCategory);
+      }
+      
+      const { data, error } = await query.order('updated_at', { ascending: false });
 
       if (error) throw error;
       setSystems((data as SystemNote[]) || []);
