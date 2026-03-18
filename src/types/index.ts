@@ -3,6 +3,7 @@ export type IdeaStatus = 'hold' | 'developing' | 'ready' | 'scheduled' | 'archiv
 export type IdeaPriority = 'none' | 'good' | 'better' | 'best';
 export type EnergyLevel = 'low' | 'medium' | 'high';
 export type TimeEstimate = 'quick' | 'hour' | 'day' | 'week_plus';
+export type IdeaCategory = 'creative' | 'business';
 
 // Database types
 export interface Profile {
