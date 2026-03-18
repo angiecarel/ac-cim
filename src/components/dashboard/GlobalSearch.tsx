@@ -43,7 +43,7 @@ export function GlobalSearch() {
     : [];
 
   const matchedNotes = searchLower
-    ? systems
+    ? allSystems
         .filter(
           (n) =>
             n.title.toLowerCase().includes(searchLower) ||
