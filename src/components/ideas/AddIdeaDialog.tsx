@@ -189,21 +189,36 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contentType">Idea Type</Label>
-            <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
-              <SelectTrigger id="contentType">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent position="popper" side="bottom" className="bg-popover">
-                <SelectItem value="__none__">None</SelectItem>
-                {contentTypes.map((ct) => (
-                  <SelectItem key={ct.id} value={ct.id}>
-                    {ct.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="contentType">Idea Type</Label>
+              <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
+                <SelectTrigger id="contentType">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="__none__">None</SelectItem>
+                  {contentTypes.map((ct) => (
+                    <SelectItem key={ct.id} value={ct.id}>
+                      {ct.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ideaCategory">Category</Label>
+              <Select value={ideaCategory} onValueChange={(v) => setIdeaCategory(v as IdeaCategory)}>
+                <SelectTrigger id="ideaCategory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="creative">Creative</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

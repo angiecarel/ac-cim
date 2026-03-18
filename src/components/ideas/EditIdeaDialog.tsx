@@ -210,7 +210,18 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
               </div>
 
               <div className="space-y-2">
-                <Label>Tags</Label>
+                <Label>Category</Label>
+                <Select value={ideaCategory} onValueChange={(v) => setIdeaCategory(v as IdeaCategory)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper" side="bottom" className="bg-popover">
+                    <SelectItem value="creative">Creative</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
                 <TagMultiSelect
                   tags={tags}
                   selectedTagIds={selectedTagIds}
