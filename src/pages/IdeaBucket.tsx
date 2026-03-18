@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Idea, IdeaStatus, IdeaPriority, EnergyLevel } from '@/types';
+import { Idea, IdeaStatus, IdeaPriority, EnergyLevel, IdeaCategory } from '@/types';
 import { IdeaCard } from '@/components/ideas/IdeaCard';
 import { IdeaListItem } from '@/components/ideas/IdeaListItem';
 import { AddIdeaDialog } from '@/components/ideas/AddIdeaDialog';
