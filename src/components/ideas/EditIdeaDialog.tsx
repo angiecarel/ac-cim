@@ -67,6 +67,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
   const [nextAction, setNextAction] = useState('');
   const [energyLevel, setEnergyLevel] = useState<EnergyLevel | null>(null);
   const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | null>(null);
+  const [ideaCategory, setIdeaCategory] = useState<IdeaCategory>('creative');
 
   useEffect(() => {
     if (idea && open) {
