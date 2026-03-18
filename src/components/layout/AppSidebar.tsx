@@ -28,6 +28,7 @@ const navItems = [
   { path: '/log/creative', label: 'Creative Log', icon: PenTool },
   { path: '/log/business', label: 'Business Log', icon: Briefcase },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
+  { path: '/history', label: 'Past Ideas', icon: History },
   { path: '/archive', label: 'Archive', icon: Archive },
   { path: '/settings', label: 'Manage', icon: Settings },
 ];
