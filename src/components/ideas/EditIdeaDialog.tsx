@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate } from '@/types';
+import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate, IdeaCategory } from '@/types';
 import { Loader2, CalendarIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
