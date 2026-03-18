@@ -104,7 +104,7 @@ export function useSystems(userId: string | undefined, logCategory?: LogCategory
         }
         const { data, error } = await supabase
           .from('systems')
-          .insert(insertData)
+          .insert(insertData as any)
           .select()
           .single();
 
