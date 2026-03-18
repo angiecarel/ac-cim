@@ -231,8 +231,46 @@ export function IdeaBucket() {
         </div>
       </div>
 
-      {/* Search and Filters */}
-      <div className="flex flex-col sm:flex-row gap-3">
+      {/* Category Toggle + Search and Filters */}
+      <div className="flex flex-col gap-3">
+        {/* Category Toggle */}
+        <div className="flex items-center gap-1 p-1 bg-muted rounded-lg w-fit">
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'text-sm',
+              !filters.ideaCategory && 'bg-background shadow-sm'
+            )}
+            onClick={() => setFilters({ ...filters, ideaCategory: undefined })}
+          >
+            All
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'text-sm',
+              filters.ideaCategory === 'creative' && 'bg-background shadow-sm'
+            )}
+            onClick={() => setFilters({ ...filters, ideaCategory: 'creative' })}
+          >
+            Creative
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className={cn(
+              'text-sm',
+              filters.ideaCategory === 'business' && 'bg-background shadow-sm'
+            )}
+            onClick={() => setFilters({ ...filters, ideaCategory: 'business' })}
+          >
+            Business
+          </Button>
+        </div>
+
+        <div className="flex flex-col sm:flex-row gap-3">
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input

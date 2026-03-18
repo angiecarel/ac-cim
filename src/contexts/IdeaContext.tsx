@@ -183,6 +183,10 @@ export function IdeaProvider({ children }: { children: React.ReactNode }) {
       return false;
     }
     
+    if (filters.ideaCategory && (idea as any).idea_category !== filters.ideaCategory) {
+      return false;
+    }
+    
     if (filters.contentType?.length && !filters.contentType.includes(idea.content_type_id || '')) {
       return false;
     }
