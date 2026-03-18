@@ -132,7 +132,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       next_action: nextAction.trim() || null,
       energy_level: energyLevel,
       time_estimate: timeEstimate,
-    });
+      idea_category: ideaCategory,
+    } as any);
     
     // Update idea tags
     await setIdeaTags(idea.id, selectedTagIds);
