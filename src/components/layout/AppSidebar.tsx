@@ -15,6 +15,7 @@ import {
   Menu,
   X,
   PenTool,
+  Briefcase,
   Link2,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
