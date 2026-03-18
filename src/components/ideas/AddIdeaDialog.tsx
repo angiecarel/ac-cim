@@ -25,7 +25,7 @@ import {
 import { useIdea } from '@/contexts/IdeaContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContentTemplates, ContentTemplate } from '@/hooks/useContentTemplates';
-import { IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
+import { IdeaPriority, EnergyLevel, TimeEstimate, IdeaCategory } from '@/types';
 import { Loader2, FileText, ChevronDown } from 'lucide-react';
 import { TagMultiSelect } from './TagMultiSelect';
 
