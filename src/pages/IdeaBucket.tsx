@@ -129,6 +129,7 @@ export function IdeaBucket() {
     filters.contentType?.length ||
     filters.platform?.length ||
     filters.energyLevel?.length ||
+    filters.ideaCategory ||
     filters.search
   );
 
