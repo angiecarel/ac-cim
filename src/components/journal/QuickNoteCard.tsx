@@ -2,7 +2,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Edit, Trash2, Link2, Pin, PinOff, ArrowUpRight } from 'lucide-react';
+import { Edit, Trash2, Link2, Pin, PinOff, Sparkles, BookOpen } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
@@ -27,7 +27,8 @@ interface QuickNoteCardProps {
   onDelete: (id: string) => void;
   onTogglePin?: (id: string, isPinned: boolean) => void;
   onView?: (note: SystemNote) => void;
-  onSendToBucket?: (note: SystemNote) => void;
+  onPromoteToIdea?: (note: SystemNote) => void;
+  onMoveTo?: (id: string) => void;
   compact?: boolean;
 }
 
@@ -40,12 +41,12 @@ export function QuickNoteCard({
   onDelete,
   onTogglePin,
   onView,
-  onSendToBucket,
+  onPromoteToIdea,
+  onMoveTo,
   compact = false,
 }: QuickNoteCardProps) {
   const colorStyle = getColorStyle(note.color, noteColors);
 
-  // Strip HTML for preview
   const contentPreview = note.content
     ? note.content.replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim()
     : '';
@@ -82,9 +83,14 @@ export function QuickNoteCard({
           {format(new Date(note.updated_at), 'MMM d')}
         </span>
         <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity" onClick={(e) => e.stopPropagation()}>
-          {onSendToBucket && (
-            <Button variant="ghost" size="icon" className="h-6 w-6" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
-              <ArrowUpRight className="h-3 w-3" />
+          {onPromoteToIdea && (
+            <Button variant="ghost" size="icon" className="h-6 w-6" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
+              <Sparkles className="h-3 w-3" />
+            </Button>
+          )}
+          {onMoveTo && (
+            <Button variant="ghost" size="icon" className="h-6 w-6" title="Move to Journal" onClick={() => onMoveTo(note.id)}>
+              <BookOpen className="h-3 w-3" />
             </Button>
           )}
           {onTogglePin && (
@@ -142,9 +148,14 @@ export function QuickNoteCard({
           </CardTitle>
         </div>
         <div className="absolute top-3 right-3 flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity bg-background/90 backdrop-blur-sm rounded-md p-0.5 shadow-sm border border-border/50" onClick={(e) => e.stopPropagation()}>
-          {onSendToBucket && (
-            <Button variant="ghost" size="icon" className="h-7 w-7" title="Send to Bucket" onClick={() => onSendToBucket(note)}>
-              <ArrowUpRight className="h-3.5 w-3.5" />
+          {onPromoteToIdea && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Promote to Idea" onClick={() => onPromoteToIdea(note)}>
+              <Sparkles className="h-3.5 w-3.5" />
+            </Button>
+          )}
+          {onMoveTo && (
+            <Button variant="ghost" size="icon" className="h-7 w-7" title="Move to Journal" onClick={() => onMoveTo(note.id)}>
+              <BookOpen className="h-3.5 w-3.5" />
             </Button>
           )}
           {onTogglePin && (
