@@ -161,7 +161,7 @@ export function GlobalSearch() {
                   {matchedNotes.map((note) => (
                     <button
                       key={note.id}
-                      onClick={handleNoteClick}
+                      onClick={() => handleNoteClick(note)}
                       className="w-full flex items-center gap-3 px-3 py-2.5 text-left hover:bg-accent transition-colors"
                     >
                       <FileText className="h-4 w-4 text-secondary-foreground flex-shrink-0" />
