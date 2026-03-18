@@ -4,6 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AnimatedCard } from '@/components/layout/AnimatedCard';
 import { QuickLinksManager } from '@/components/dashboard/QuickLinksManager';
+import { GlobalSearch } from '@/components/dashboard/GlobalSearch';
 import { 
   Lightbulb, 
   Pause, 
@@ -44,6 +45,9 @@ export function Dashboard() {
           </Button>
         </Link>
       </div>
+
+      {/* Global Search */}
+      <GlobalSearch />
 
       {/* Timely Alert */}
       {stats.timely > 0 && (
