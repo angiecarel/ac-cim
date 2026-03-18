@@ -173,6 +173,7 @@ export type Database = {
           description: string | null
           energy_level: Database["public"]["Enums"]["energy_level"] | null
           id: string
+          idea_category: string
           is_timely: boolean
           next_action: string | null
           platform_id: string | null
@@ -192,6 +193,7 @@ export type Database = {
           description?: string | null
           energy_level?: Database["public"]["Enums"]["energy_level"] | null
           id?: string
+          idea_category?: string
           is_timely?: boolean
           next_action?: string | null
           platform_id?: string | null
@@ -211,6 +213,7 @@ export type Database = {
           description?: string | null
           energy_level?: Database["public"]["Enums"]["energy_level"] | null
           id?: string
+          idea_category?: string
           is_timely?: boolean
           next_action?: string | null
           platform_id?: string | null

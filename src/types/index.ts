@@ -3,6 +3,7 @@ export type IdeaStatus = 'hold' | 'developing' | 'ready' | 'scheduled' | 'archiv
 export type IdeaPriority = 'none' | 'good' | 'better' | 'best';
 export type EnergyLevel = 'low' | 'medium' | 'high';
 export type TimeEstimate = 'quick' | 'hour' | 'day' | 'week_plus';
+export type IdeaCategory = 'creative' | 'business';
 
 // Database types
 export interface Profile {
@@ -68,6 +69,7 @@ export interface Idea {
   time_estimate: TimeEstimate | null;
   created_at: string;
   updated_at: string;
+  idea_category: IdeaCategory;
   // Joined data
   content_type?: ContentType | null;
   platform?: Platform | null;
@@ -112,6 +114,7 @@ export interface IdeaFilters {
   platform?: string[];
   priority?: IdeaPriority[];
   energyLevel?: EnergyLevel[];
+  ideaCategory?: IdeaCategory;
   dateRange?: {
     from: Date | null;
     to: Date | null;

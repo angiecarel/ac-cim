@@ -34,7 +34,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
 import { useIdea } from '@/contexts/IdeaContext';
-import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate } from '@/types';
+import { Idea, IdeaPriority, IdeaStatus, EnergyLevel, TimeEstimate, IdeaCategory } from '@/types';
 import { Loader2, CalendarIcon, Trash2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
@@ -67,6 +67,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
   const [nextAction, setNextAction] = useState('');
   const [energyLevel, setEnergyLevel] = useState<EnergyLevel | null>(null);
   const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | null>(null);
+  const [ideaCategory, setIdeaCategory] = useState<IdeaCategory>('creative');
 
   useEffect(() => {
     if (idea && open) {
@@ -84,6 +85,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       setNextAction(idea.next_action || '');
       setEnergyLevel(idea.energy_level || null);
       setTimeEstimate(idea.time_estimate || null);
+      setIdeaCategory((idea as any).idea_category || 'creative');
     }
   }, [idea, open]);
 
@@ -130,7 +132,8 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       next_action: nextAction.trim() || null,
       energy_level: energyLevel,
       time_estimate: timeEstimate,
-    });
+      idea_category: ideaCategory,
+    } as any);
     
     // Update idea tags
     await setIdeaTags(idea.id, selectedTagIds);
@@ -207,14 +210,27 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
               </div>
 
               <div className="space-y-2">
-                <Label>Tags</Label>
-                <TagMultiSelect
-                  tags={tags}
-                  selectedTagIds={selectedTagIds}
-                  onTagsChange={setSelectedTagIds}
-                  onCreateTag={createTag}
-                />
+                <Label>Category</Label>
+                <Select value={ideaCategory} onValueChange={(v) => setIdeaCategory(v as IdeaCategory)}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent position="popper" side="bottom" className="bg-popover">
+                    <SelectItem value="creative">Creative</SelectItem>
+                    <SelectItem value="business">Business</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label>Tags</Label>
+              <TagMultiSelect
+                tags={tags}
+                selectedTagIds={selectedTagIds}
+                onTagsChange={setSelectedTagIds}
+                onCreateTag={createTag}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">

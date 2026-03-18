@@ -25,7 +25,7 @@ import {
 import { useIdea } from '@/contexts/IdeaContext';
 import { useAuth } from '@/contexts/AuthContext';
 import { useContentTemplates, ContentTemplate } from '@/hooks/useContentTemplates';
-import { IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
+import { IdeaPriority, EnergyLevel, TimeEstimate, IdeaCategory } from '@/types';
 import { Loader2, FileText, ChevronDown } from 'lucide-react';
 import { TagMultiSelect } from './TagMultiSelect';
 
@@ -56,6 +56,7 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
   const [nextAction, setNextAction] = useState('');
   const [energyLevel, setEnergyLevel] = useState<EnergyLevel | ''>('');
   const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | ''>('');
+  const [ideaCategory, setIdeaCategory] = useState<IdeaCategory>('creative');
   const [templatePopoverOpen, setTemplatePopoverOpen] = useState(false);
 
   // Filter templates based on selected content type
@@ -77,6 +78,7 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
       setNextAction('');
       setEnergyLevel('');
       setTimeEstimate('');
+      setIdeaCategory('creative');
     }
   }, [open]);
 
@@ -105,7 +107,8 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
       next_action: nextAction.trim() || null,
       energy_level: energyLevel || null,
       time_estimate: timeEstimate || null,
-    });
+      idea_category: ideaCategory,
+    } as any);
     
     // Set tags for the new idea
     if (newIdea && selectedTagIds.length > 0) {
@@ -186,21 +189,36 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
             />
           </div>
 
-          <div className="space-y-2">
-            <Label htmlFor="contentType">Idea Type</Label>
-            <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
-              <SelectTrigger id="contentType">
-                <SelectValue placeholder="Select type" />
-              </SelectTrigger>
-              <SelectContent position="popper" side="bottom" className="bg-popover">
-                <SelectItem value="__none__">None</SelectItem>
-                {contentTypes.map((ct) => (
-                  <SelectItem key={ct.id} value={ct.id}>
-                    {ct.name}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label htmlFor="contentType">Idea Type</Label>
+              <Select value={contentTypeId || "__none__"} onValueChange={(v) => setContentTypeId(v === "__none__" ? "" : v)}>
+                <SelectTrigger id="contentType">
+                  <SelectValue placeholder="Select type" />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="__none__">None</SelectItem>
+                  {contentTypes.map((ct) => (
+                    <SelectItem key={ct.id} value={ct.id}>
+                      {ct.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="ideaCategory">Category</Label>
+              <Select value={ideaCategory} onValueChange={(v) => setIdeaCategory(v as IdeaCategory)}>
+                <SelectTrigger id="ideaCategory">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent position="popper" side="bottom" className="bg-popover">
+                  <SelectItem value="creative">Creative</SelectItem>
+                  <SelectItem value="business">Business</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
           </div>
 
           <div className="space-y-2">

@@ -1,0 +1,1 @@
+ALTER TABLE public.ideas ADD COLUMN idea_category text NOT NULL DEFAULT 'creative';

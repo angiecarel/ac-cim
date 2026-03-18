@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Idea, IdeaStatus, IdeaPriority, EnergyLevel, TimeEstimate } from '@/types';
+import { Idea, IdeaStatus, IdeaPriority, IdeaCategory } from '@/types';
 import { toast } from 'sonner';
 
 export function useIdeas(userId: string | undefined) {
@@ -51,9 +51,7 @@ export function useIdeas(userId: string | undefined) {
     if (!userId) return null;
 
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .insert({
+      const insertData: Record<string, unknown> = {
           user_id: userId,
           title: idea.title || 'Untitled Idea',
           description: idea.description,
@@ -68,7 +66,13 @@ export function useIdeas(userId: string | undefined) {
           next_action: idea.next_action || null,
           energy_level: idea.energy_level || null,
           time_estimate: idea.time_estimate || null,
-        })
+        };
+        if ((idea as any).idea_category) {
+          insertData.idea_category = (idea as any).idea_category;
+        }
+        const { data, error } = await supabase
+          .from('ideas')
+          .insert(insertData as any)
         .select(`
           *,
           content_type:content_types(*),
@@ -96,9 +100,7 @@ export function useIdeas(userId: string | undefined) {
 
   const updateIdea = useCallback(async (id: string, updates: Partial<Idea>) => {
     try {
-      const { error } = await supabase
-        .from('ideas')
-        .update({
+      const updateData: Record<string, unknown> = {
           title: updates.title,
           description: updates.description,
           content: updates.content,
@@ -112,7 +114,13 @@ export function useIdeas(userId: string | undefined) {
           next_action: updates.next_action,
           energy_level: updates.energy_level,
           time_estimate: updates.time_estimate,
-        })
+        };
+        if ((updates as any).idea_category !== undefined) {
+          updateData.idea_category = (updates as any).idea_category;
+        }
+        const { error } = await supabase
+        .from('ideas')
+        .update(updateData as any)
         .eq('id', id);
 
       if (error) throw error;
