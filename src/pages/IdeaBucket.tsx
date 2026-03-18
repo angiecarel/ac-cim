@@ -429,6 +429,7 @@ export function IdeaBucket() {
             </PopoverContent>
           </Popover>
         </div>
+        </div>
       </div>
 
       {/* Active filters */}
