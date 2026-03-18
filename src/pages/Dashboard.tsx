@@ -46,6 +46,9 @@ export function Dashboard() {
         </Link>
       </div>
 
+      {/* Global Search */}
+      <GlobalSearch />
+
       {/* Timely Alert */}
       {stats.timely > 0 && (
         <Link to="/ideas">
