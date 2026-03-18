@@ -3,7 +3,7 @@ import { useIdea } from '@/contexts/IdeaContext';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { AnimatedCard } from '@/components/layout/AnimatedCard';
-import { QuickLinksManager } from '@/components/dashboard/QuickLinksManager';
+import { QuickLinksPreview } from '@/components/dashboard/QuickLinksPreview';
 import { GlobalSearch } from '@/components/dashboard/GlobalSearch';
 import { 
   Lightbulb, 
