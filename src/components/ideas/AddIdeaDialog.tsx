@@ -78,6 +78,7 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
       setNextAction('');
       setEnergyLevel('');
       setTimeEstimate('');
+      setIdeaCategory('creative');
     }
   }, [open]);
 
