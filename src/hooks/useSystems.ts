@@ -21,7 +21,9 @@ export interface SystemNote {
   updated_at: string;
 }
 
-export function useSystems(userId: string | undefined) {
+export type LogCategory = 'creative' | 'business';
+
+export function useSystems(userId: string | undefined, logCategory?: LogCategory) {
   const [systems, setSystems] = useState<SystemNote[]>([]);
   const [loading, setLoading] = useState(true);
   const [webhookUrl, setWebhookUrl] = useState<string | null>(null);
