@@ -1,0 +1,1 @@
+ALTER TABLE public.systems ADD COLUMN log_category text NOT NULL DEFAULT 'creative';
