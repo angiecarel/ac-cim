@@ -114,6 +114,7 @@ export interface IdeaFilters {
   platform?: string[];
   priority?: IdeaPriority[];
   energyLevel?: EnergyLevel[];
+  ideaCategory?: IdeaCategory;
   dateRange?: {
     from: Date | null;
     to: Date | null;

@@ -100,9 +100,7 @@ export function useIdeas(userId: string | undefined) {
 
   const updateIdea = useCallback(async (id: string, updates: Partial<Idea>) => {
     try {
-      const { error } = await supabase
-        .from('ideas')
-        .update({
+      const updateData: Record<string, unknown> = {
           title: updates.title,
           description: updates.description,
           content: updates.content,
@@ -116,7 +114,13 @@ export function useIdeas(userId: string | undefined) {
           next_action: updates.next_action,
           energy_level: updates.energy_level,
           time_estimate: updates.time_estimate,
-        })
+        };
+        if ((updates as any).idea_category !== undefined) {
+          updateData.idea_category = (updates as any).idea_category;
+        }
+        const { error } = await supabase
+        .from('ideas')
+        .update(updateData as any)
         .eq('id', id);
 
       if (error) throw error;
