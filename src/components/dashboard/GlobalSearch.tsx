@@ -61,8 +61,8 @@ export function GlobalSearch() {
     setQuery('');
   };
 
-  const handleNoteClick = (note: { log_category?: string }) => {
-    const category = (note as any).log_category === 'business' ? 'business' : 'creative';
+  const handleNoteClick = (note: any) => {
+    const category = note.log_category === 'business' ? 'business' : 'creative';
     navigate(`/log/${category}`);
     setOpen(false);
     setQuery('');
