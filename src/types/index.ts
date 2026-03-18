@@ -69,6 +69,7 @@ export interface Idea {
   time_estimate: TimeEstimate | null;
   created_at: string;
   updated_at: string;
+  idea_category: IdeaCategory;
   // Joined data
   content_type?: ContentType | null;
   platform?: Platform | null;
