@@ -51,9 +51,7 @@ export function useIdeas(userId: string | undefined) {
     if (!userId) return null;
 
     try {
-      const { data, error } = await supabase
-        .from('ideas')
-        .insert({
+      const insertData: Record<string, unknown> = {
           user_id: userId,
           title: idea.title || 'Untitled Idea',
           description: idea.description,
@@ -68,7 +66,13 @@ export function useIdeas(userId: string | undefined) {
           next_action: idea.next_action || null,
           energy_level: idea.energy_level || null,
           time_estimate: idea.time_estimate || null,
-        })
+        };
+        if ((idea as any).idea_category) {
+          insertData.idea_category = (idea as any).idea_category;
+        }
+        const { data, error } = await supabase
+          .from('ideas')
+          .insert(insertData as any)
         .select(`
           *,
           content_type:content_types(*),
