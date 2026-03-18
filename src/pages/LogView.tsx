@@ -28,9 +28,15 @@ type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
 type ColorFilter = '__all__' | '__none__' | string;
 
-export function SystemsView() {
+interface LogViewProps {
+  logCategory: LogCategory;
+  title: string;
+  description: string;
+}
+
+export function LogView({ logCategory, title, description }: LogViewProps) {
   const { user } = useAuth();
-  const { systems, loading, createSystem, updateSystem, deleteSystem } = useSystems(user?.id);
+  const { systems, loading, createSystem, updateSystem, deleteSystem } = useSystems(user?.id, logCategory);
   const { colors: noteColors, createColor, updateColor, deleteColor } = useNoteColors(user?.id);
   const { platforms, ideas, createIdea } = useIdea();
 
