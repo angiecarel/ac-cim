@@ -1,6 +1,6 @@
 import { useState, useMemo } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { useSystems, SystemNote, SystemNoteType } from '@/hooks/useSystems';
+import { useSystems, SystemNote, SystemNoteType, LogCategory } from '@/hooks/useSystems';
 import { useNoteColors } from '@/hooks/useNoteColors';
 import { useIdea } from '@/contexts/IdeaContext';
 import { toast } from '@/hooks/use-toast';
