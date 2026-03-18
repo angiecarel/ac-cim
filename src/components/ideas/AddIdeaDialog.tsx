@@ -56,6 +56,7 @@ function AddIdeaDialogInner({ open, onOpenChange }: AddIdeaDialogProps) {
   const [nextAction, setNextAction] = useState('');
   const [energyLevel, setEnergyLevel] = useState<EnergyLevel | ''>('');
   const [timeEstimate, setTimeEstimate] = useState<TimeEstimate | ''>('');
+  const [ideaCategory, setIdeaCategory] = useState<IdeaCategory>('creative');
   const [templatePopoverOpen, setTemplatePopoverOpen] = useState(false);
 
   // Filter templates based on selected content type
