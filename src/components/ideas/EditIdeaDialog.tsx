@@ -222,13 +222,15 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
                 </Select>
               </div>
             </div>
-                <TagMultiSelect
-                  tags={tags}
-                  selectedTagIds={selectedTagIds}
-                  onTagsChange={setSelectedTagIds}
-                  onCreateTag={createTag}
-                />
-              </div>
+
+            <div className="space-y-2">
+              <Label>Tags</Label>
+              <TagMultiSelect
+                tags={tags}
+                selectedTagIds={selectedTagIds}
+                onTagsChange={setSelectedTagIds}
+                onCreateTag={createTag}
+              />
             </div>
 
             <div className="grid grid-cols-2 gap-4">
