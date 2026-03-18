@@ -13,7 +13,9 @@ export function GlobalSearch() {
   const [open, setOpen] = useState(false);
   const { ideas, setFilters } = useIdea();
   const { user } = useAuth();
-  const { systems } = useSystems(user?.id);
+  const { systems: creativeSystems } = useSystems(user?.id, 'creative');
+  const { systems: businessSystems } = useSystems(user?.id, 'business');
+  const allSystems = [...creativeSystems, ...businessSystems];
   const navigate = useNavigate();
   const containerRef = useRef<HTMLDivElement>(null);
 
