@@ -85,6 +85,7 @@ export function EditIdeaDialog({ idea, open, onOpenChange }: EditIdeaDialogProps
       setNextAction(idea.next_action || '');
       setEnergyLevel(idea.energy_level || null);
       setTimeEstimate(idea.time_estimate || null);
+      setIdeaCategory((idea as any).idea_category || 'creative');
     }
   }, [idea, open]);
 
