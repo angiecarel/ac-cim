@@ -82,6 +82,7 @@ export function JournalEntryDialog({
   const [ideaId, setIdeaId] = useState('');
   const [entryDate, setEntryDate] = useState<Date>(new Date());
   const [mood, setMood] = useState('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
 
   // Inline idea creation state
   const [showNewIdeaInput, setShowNewIdeaInput] = useState(false);
