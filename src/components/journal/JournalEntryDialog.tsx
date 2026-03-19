@@ -150,9 +150,12 @@ export function JournalEntryDialog({
       idea_id: ideaId || null,
       entry_date: format(entryDate, 'yyyy-MM-dd'),
       mood: mood || null,
+      color: selectedColor || null,
     });
     onOpenChange(false);
   };
+
+  const colorStyle = getColorStyle(selectedColor || null, noteColors);
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
