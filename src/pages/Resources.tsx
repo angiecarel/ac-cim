@@ -47,11 +47,11 @@ export function Resources() {
 
   const createMutation = useMutation({
     mutationFn: async ({ title, content }: { title: string; content: string }) => {
-      const { error } = await supabase.from('resources').insert({
+      const { error } = await supabase.from('resources' as any).insert({
         title,
         content,
         user_id: user!.id,
-      });
+      } as any);
       if (error) throw error;
     },
     onSuccess: () => {
