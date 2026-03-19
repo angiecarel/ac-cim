@@ -17,6 +17,7 @@ import {
   PenTool,
   Briefcase,
   Link2,
+  FolderOpen,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -27,10 +28,10 @@ const navItems = [
   { path: '/calendar', label: 'Calendar', icon: Calendar },
   { path: '/log/creative', label: 'Creative Log', icon: PenTool },
   { path: '/log/business', label: 'Business Log', icon: Briefcase },
+  { path: '/resources', label: 'Resources', icon: FolderOpen },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
   { path: '/archive', label: 'Archive', icon: Archive },
-  { path: '/settings', label: 'Manage', icon: Settings },
 ];
 
 export function AppSidebar() {
@@ -52,7 +53,7 @@ export function AppSidebar() {
 
   return (
     <>
-      {/* Mobile menu button */}
+      {/* Mobile menu button - positioned to not overlap logo */}
       <Button
         variant="ghost"
         size="icon"
@@ -79,20 +80,31 @@ export function AppSidebar() {
         )}
       >
         <div className="flex h-full flex-col">
-          {/* Logo */}
-          <Link 
-            to="/ideas" 
-            className="flex h-16 items-center gap-3 border-b px-6 hover:bg-sidebar-accent/50 transition-colors"
-            onClick={() => setIsOpen(false)}
-          >
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-creative">
-              <Lightbulb className="h-5 w-5 text-primary-foreground" />
-            </div>
-            <div className="flex flex-col">
-              <span className="font-bold text-lg text-gradient leading-tight">CIM</span>
-              <span className="text-xs text-muted-foreground leading-tight">Creative Idea Manager</span>
-            </div>
-          </Link>
+          {/* Logo + close button row */}
+          <div className="flex h-16 items-center border-b">
+            {/* Close button for mobile - inside sidebar, before logo */}
+            <Button
+              variant="ghost"
+              size="icon"
+              className="ml-2 md:hidden h-8 w-8 shrink-0"
+              onClick={() => setIsOpen(false)}
+            >
+              <X className="h-4 w-4" />
+            </Button>
+            <Link 
+              to="/ideas" 
+              className="flex flex-1 items-center gap-3 px-4 h-full hover:bg-sidebar-accent/50 transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-gradient-creative shrink-0">
+                <Lightbulb className="h-5 w-5 text-primary-foreground" />
+              </div>
+              <div className="flex flex-col">
+                <span className="font-bold text-lg text-gradient leading-tight">CIM</span>
+                <span className="text-xs text-muted-foreground leading-tight">Creative Idea Manager</span>
+              </div>
+            </Link>
+          </div>
 
           {/* Navigation */}
           <nav className="flex-1 space-y-1 p-4">
@@ -127,12 +139,25 @@ export function AppSidebar() {
           {/* User section */}
           <div className="border-t p-4">
             <div className="mb-3 flex items-center gap-3 px-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-medium">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-medium shrink-0">
                 {profile?.display_name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 truncate">
                 <p className="text-sm font-medium truncate">{profile?.display_name || 'User'}</p>
               </div>
+              <Link
+                to="/settings"
+                onClick={() => setIsOpen(false)}
+                className={cn(
+                  'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
+                  location.pathname === '/settings'
+                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                    : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                )}
+                title="Manage Settings"
+              >
+                <Settings className="h-4 w-4" />
+              </Link>
             </div>
             
             <div className="flex gap-2">
