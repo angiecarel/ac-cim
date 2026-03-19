@@ -238,7 +238,37 @@ export function JournalEntryDialog({
             </div>
           )}
 
-          {/* Title */}
+          {/* Color Picker */}
+          <div>
+            <Label className="mb-1.5 block">Color</Label>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                className={cn(
+                  'w-7 h-7 rounded-full border-2 transition-all',
+                  !selectedColor ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                )}
+                style={{ backgroundColor: '#f3f4f6' }}
+                onClick={() => setSelectedColor('')}
+                title="No color"
+              />
+              {displayColors.map((color) => (
+                <button
+                  key={color.id}
+                  type="button"
+                  className={cn(
+                    'w-7 h-7 rounded-full border-2 transition-all',
+                    selectedColor === color.hex_color ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                  )}
+                  style={{ backgroundColor: color.hex_color }}
+                  onClick={() => setSelectedColor(selectedColor === color.hex_color ? '' : color.hex_color)}
+                  title={color.name}
+                />
+              ))}
+            </div>
+          </div>
+
+
           <div>
             <Label htmlFor="title">Title</Label>
             <Input
