@@ -31,7 +31,6 @@ const navItems = [
   { path: '/resources', label: 'Resources', icon: FolderOpen },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
-  { path: '/archive', label: 'Archive', icon: Archive },
 ];
 
 export function AppSidebar() {
