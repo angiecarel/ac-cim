@@ -2,6 +2,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { cn } from '@/lib/utils';
 import { useAuth } from '@/contexts/AuthContext';
 import { useIdea } from '@/contexts/IdeaContext';
+import { Tooltip, TooltipContent, TooltipTrigger } from '@/components/ui/tooltip';
 import {
   LayoutDashboard,
   Lightbulb,
@@ -31,7 +32,6 @@ const navItems = [
   { path: '/resources', label: 'Resources', icon: FolderOpen },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
-  { path: '/archive', label: 'Archive', icon: Archive },
 ];
 
 export function AppSidebar() {
@@ -147,19 +147,40 @@ export function AppSidebar() {
               <div className="flex-1 truncate">
                 <p className="text-sm font-medium truncate">{profile?.display_name || 'User'}</p>
               </div>
-              <Link
-                to="/settings"
-                onClick={() => setIsOpen(false)}
-                className={cn(
-                  'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
-                  location.pathname === '/settings'
-                    ? 'bg-sidebar-accent text-sidebar-accent-foreground'
-                    : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
-                )}
-                title="Manage Settings"
-              >
-                <Settings className="h-4 w-4" />
-              </Link>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/archive"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
+                      location.pathname === '/archive'
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                        : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                    )}
+                  >
+                    <Archive className="h-4 w-4" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="top">Archive</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Link
+                    to="/settings"
+                    onClick={() => setIsOpen(false)}
+                    className={cn(
+                      'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
+                      location.pathname === '/settings'
+                        ? 'bg-sidebar-accent text-sidebar-accent-foreground'
+                        : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
+                    )}
+                  >
+                    <Settings className="h-4 w-4" />
+                  </Link>
+                </TooltipTrigger>
+                <TooltipContent side="top">Manage Settings</TooltipContent>
+              </Tooltip>
             </div>
             
             <div className="flex gap-2">
