@@ -65,7 +65,7 @@ export function Resources() {
 
   const updateMutation = useMutation({
     mutationFn: async ({ id, title, content }: { id: string; title: string; content: string }) => {
-      const { error } = await supabase.from('resources').update({ title, content, updated_at: new Date().toISOString() }).eq('id', id);
+      const { error } = await supabase.from('resources' as any).update({ title, content, updated_at: new Date().toISOString() } as any).eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
