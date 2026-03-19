@@ -1,6 +1,7 @@
 import { useEditor, EditorContent, Editor } from '@tiptap/react';
 import StarterKit from '@tiptap/starter-kit';
 import Placeholder from '@tiptap/extension-placeholder';
+import Link from '@tiptap/extension-link';
 import { Button } from '@/components/ui/button';
 import { 
   Bold, 
@@ -12,10 +13,12 @@ import {
   Quote, 
   Undo, 
   Redo,
-  Minus
+  Minus,
+  Link as LinkIcon,
+  Unlink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 
 interface ToolbarButtonProps {
   onClick: () => void;
@@ -50,6 +53,18 @@ interface EditorToolbarProps {
 }
 
 function EditorToolbar({ editor, minimal }: EditorToolbarProps) {
+  const setLink = useCallback(() => {
+    if (!editor) return;
+    const previousUrl = editor.getAttributes('link').href;
+    const url = window.prompt('Enter URL', previousUrl || 'https://');
+    if (url === null) return;
+    if (url === '') {
+      editor.chain().focus().extendMarkRange('link').unsetLink().run();
+      return;
+    }
+    editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
+  }, [editor]);
+
   if (!editor) return null;
 
   return (
@@ -68,6 +83,23 @@ function EditorToolbar({ editor, minimal }: EditorToolbarProps) {
       >
         <Italic className="h-4 w-4" />
       </ToolbarButton>
+      
+      <div className="w-px h-6 bg-border mx-1" />
+      <ToolbarButton
+        onClick={setLink}
+        isActive={editor.isActive('link')}
+        title="Add Link"
+      >
+        <LinkIcon className="h-4 w-4" />
+      </ToolbarButton>
+      {editor.isActive('link') && (
+        <ToolbarButton
+          onClick={() => editor.chain().focus().unsetLink().run()}
+          title="Remove Link"
+        >
+          <Unlink className="h-4 w-4" />
+        </ToolbarButton>
+      )}
       
       {!minimal && (
         <>
@@ -166,6 +198,14 @@ export function RichTextEditor({
       StarterKit.configure({
         heading: {
           levels: [1, 2, 3],
+        },
+      }),
+      Link.configure({
+        openOnClick: true,
+        HTMLAttributes: {
+          class: 'text-primary underline cursor-pointer',
+          target: '_blank',
+          rel: 'noopener noreferrer',
         },
       }),
       Placeholder.configure({
