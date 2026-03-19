@@ -53,9 +53,8 @@ interface EditorToolbarProps {
 }
 
 function EditorToolbar({ editor, minimal }: EditorToolbarProps) {
-  if (!editor) return null;
-
   const setLink = useCallback(() => {
+    if (!editor) return;
     const previousUrl = editor.getAttributes('link').href;
     const url = window.prompt('Enter URL', previousUrl || 'https://');
     if (url === null) return;
