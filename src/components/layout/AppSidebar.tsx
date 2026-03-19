@@ -145,7 +145,7 @@ export function AppSidebar() {
                 {profile?.display_name?.[0]?.toUpperCase() || 'U'}
               </div>
               <div className="flex-1 truncate">
-                <p className="text-sm font-medium truncate">{profile?.display_name || 'User'}</p>
+                <p className="text-xs text-muted-foreground truncate">{profile?.display_name || 'User'}</p>
               </div>
               <Tooltip>
                 <TooltipTrigger asChild>
