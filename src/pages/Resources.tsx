@@ -79,7 +79,7 @@ export function Resources() {
 
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from('resources').delete().eq('id', id);
+      const { error } = await supabase.from('resources' as any).delete().eq('id', id);
       if (error) throw error;
     },
     onSuccess: () => {
