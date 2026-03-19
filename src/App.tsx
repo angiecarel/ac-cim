@@ -15,6 +15,7 @@ import { CalendarView } from "@/pages/CalendarView";
 import { CreativeLog } from "@/pages/CreativeLog";
 import { BusinessLog } from "@/pages/BusinessLog";
 import { QuickLinksPage } from "@/pages/QuickLinksPage";
+import { Resources } from "@/pages/Resources";
 import { PastIdeas } from "@/pages/PastIdeas";
 import { ArchiveView } from "@/pages/ArchiveView";
 import { ManageSettings } from "@/pages/ManageSettings";
