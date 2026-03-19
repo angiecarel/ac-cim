@@ -2,9 +2,17 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/u
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Link2, Pin } from 'lucide-react';
+import { Link2, Pin, Smile, Frown, Meh, Heart, Sparkles } from 'lucide-react';
 import { format } from 'date-fns';
 import { getColorStyle } from './QuickNoteDialog';
+
+const MOOD_DISPLAY: Record<string, { icon: typeof Smile; label: string }> = {
+  great: { icon: Sparkles, label: 'Great' },
+  good: { icon: Smile, label: 'Good' },
+  okay: { icon: Meh, label: 'Okay' },
+  low: { icon: Frown, label: 'Low' },
+  grateful: { icon: Heart, label: 'Grateful' },
+};
 
 interface Platform {
   id: string;
@@ -36,6 +44,7 @@ export function ViewQuickNoteDialog({
   if (!note) return null;
 
   const colorStyle = getColorStyle(note.color, noteColors);
+  const MoodInfo = note.mood ? MOOD_DISPLAY[note.mood] : null;
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -54,7 +63,18 @@ export function ViewQuickNoteDialog({
             </DialogTitle>
           </div>
           <div className="flex flex-wrap items-center gap-3 text-sm text-muted-foreground pt-1">
-            <span>{format(new Date(note.updated_at), 'MMMM d, yyyy')}</span>
+            <span>
+              {note.entry_date
+                ? format(new Date(note.entry_date), 'EEEE, MMMM d, yyyy')
+                : format(new Date(note.updated_at), 'MMMM d, yyyy')
+              }
+            </span>
+            {MoodInfo && (
+              <span className="flex items-center gap-1">
+                <MoodInfo.icon className="h-4 w-4" />
+                {MoodInfo.label}
+              </span>
+            )}
             {platform && (
               <span className="inline-flex items-center gap-1 text-xs bg-background/50 px-2 py-1 rounded-full">
                 {platform.name}

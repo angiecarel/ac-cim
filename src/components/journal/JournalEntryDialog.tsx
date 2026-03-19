@@ -8,9 +8,21 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RichTextEditor, getWordCount } from './RichTextEditor';
 import { SystemNote, SystemNoteType } from '@/hooks/useSystems';
+import { NoteColor } from '@/hooks/useNoteColors';
+import { getColorStyle } from './QuickNoteDialog';
 import { format } from 'date-fns';
-import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles, Plus, Check, X } from 'lucide-react';
+import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles, Plus, Check, X, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const DEFAULT_COLORS = [
+  { id: 'default-yellow', name: 'Yellow', hex_color: '#fef3c7' },
+  { id: 'default-green', name: 'Green', hex_color: '#dcfce7' },
+  { id: 'default-blue', name: 'Blue', hex_color: '#dbeafe' },
+  { id: 'default-purple', name: 'Purple', hex_color: '#ede9fe' },
+  { id: 'default-pink', name: 'Pink', hex_color: '#fce7f3' },
+  { id: 'default-orange', name: 'Orange', hex_color: '#ffedd5' },
+  { id: 'default-gray', name: 'Gray', hex_color: '#f3f4f6' },
+];
 
 const MOOD_OPTIONS = [
   { value: 'great', label: 'Great', icon: Sparkles, color: 'text-yellow-500' },
@@ -38,6 +50,7 @@ interface JournalEntryDialogProps {
   editingNote?: SystemNote | null;
   platforms: Platform[];
   ideas: Idea[];
+  noteColors?: NoteColor[];
   onSave: (data: {
     title: string;
     content: string;
@@ -45,6 +58,7 @@ interface JournalEntryDialogProps {
     idea_id: string | null;
     entry_date: string | null;
     mood: string | null;
+    color: string | null;
   }) => void;
   onOpenFocusMode?: () => void;
   onCreateIdea?: (title: string) => Promise<{ id: string; title: string } | null>;
@@ -57,6 +71,7 @@ export function JournalEntryDialog({
   editingNote,
   platforms,
   ideas,
+  noteColors = [],
   onSave,
   onOpenFocusMode,
   onCreateIdea,
@@ -67,6 +82,7 @@ export function JournalEntryDialog({
   const [ideaId, setIdeaId] = useState('');
   const [entryDate, setEntryDate] = useState<Date>(new Date());
   const [mood, setMood] = useState('');
+  const [selectedColor, setSelectedColor] = useState<string>('');
 
   // Inline idea creation state
   const [showNewIdeaInput, setShowNewIdeaInput] = useState(false);
@@ -78,6 +94,14 @@ export function JournalEntryDialog({
   const linkableIdeas = ideas.filter((i) => !['archived', 'recycled'].includes(i.status));
   const wordCount = getWordCount(content);
 
+  const displayColors = noteColors.length > 0 ? noteColors : DEFAULT_COLORS.map(c => ({
+    ...c,
+    user_id: '',
+    sort_order: 0,
+    created_at: '',
+    updated_at: '',
+  }));
+
   useEffect(() => {
     if (editingNote) {
       setTitle(editingNote.title);
@@ -86,6 +110,7 @@ export function JournalEntryDialog({
       setIdeaId(editingNote.idea_id || '');
       setEntryDate(editingNote.entry_date ? new Date(editingNote.entry_date) : new Date());
       setMood(editingNote.mood || '');
+      setSelectedColor(editingNote.color || '');
     } else {
       setTitle('');
       setContent('');
@@ -93,6 +118,7 @@ export function JournalEntryDialog({
       setIdeaId('');
       setEntryDate(new Date());
       setMood('');
+      setSelectedColor('');
     }
     setShowNewIdeaInput(false);
     setNewIdeaTitle('');
@@ -124,13 +150,19 @@ export function JournalEntryDialog({
       idea_id: ideaId || null,
       entry_date: format(entryDate, 'yyyy-MM-dd'),
       mood: mood || null,
+      color: selectedColor || null,
     });
     onOpenChange(false);
   };
 
+  const colorStyle = getColorStyle(selectedColor || null, noteColors);
+
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', isJournal && 'max-w-3xl')}>
+      <DialogContent
+        className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', isJournal && 'max-w-3xl')}
+        style={selectedColor ? { backgroundColor: colorStyle.bg, borderColor: colorStyle.border } : undefined}
+      >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
@@ -206,7 +238,37 @@ export function JournalEntryDialog({
             </div>
           )}
 
-          {/* Title */}
+          {/* Color Picker */}
+          <div>
+            <Label className="mb-1.5 block">Color</Label>
+            <div className="flex flex-wrap gap-1.5">
+              <button
+                type="button"
+                className={cn(
+                  'w-7 h-7 rounded-full border-2 transition-all',
+                  !selectedColor ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                )}
+                style={{ backgroundColor: '#f3f4f6' }}
+                onClick={() => setSelectedColor('')}
+                title="No color"
+              />
+              {displayColors.map((color) => (
+                <button
+                  key={color.id}
+                  type="button"
+                  className={cn(
+                    'w-7 h-7 rounded-full border-2 transition-all',
+                    selectedColor === color.hex_color ? 'border-primary ring-2 ring-primary/30' : 'border-border'
+                  )}
+                  style={{ backgroundColor: color.hex_color }}
+                  onClick={() => setSelectedColor(selectedColor === color.hex_color ? '' : color.hex_color)}
+                  title={color.name}
+                />
+              ))}
+            </div>
+          </div>
+
+
           <div>
             <Label htmlFor="title">Title</Label>
             <Input

@@ -7,23 +7,16 @@ import { toast } from '@/hooks/use-toast';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Plus, StickyNote, BookOpen, LayoutGrid, List, ArrowUpDown, Palette, Search, X, Download, Sparkles } from 'lucide-react';
+import { Plus, Search, X, Download, ArrowUpDown, Palette } from 'lucide-react';
 import { downloadCsv, formatSystemForCsv } from '@/lib/exportCsv';
 import { JournalEntryDialog } from '@/components/journal/JournalEntryDialog';
 import { FocusModeDialog } from '@/components/journal/FocusModeDialog';
-import { JournalNoteCard } from '@/components/journal/JournalNoteCard';
-import { QuickNoteDialog } from '@/components/journal/QuickNoteDialog';
 import { QuickNoteCard } from '@/components/journal/QuickNoteCard';
 import { LogFAB } from '@/components/journal/LogFAB';
 import { QuickCaptureDialog } from '@/components/journal/QuickCaptureDialog';
 import { ViewQuickNoteDialog } from '@/components/journal/ViewQuickNoteDialog';
-import { ViewJournalEntryDialog } from '@/components/journal/ViewJournalEntryDialog';
-import { AnimatedCard } from '@/components/layout/AnimatedCard';
 
-type ViewMode = 'expanded' | 'compact';
 type SortOption = 'date_desc' | 'date_asc' | 'alpha_asc' | 'alpha_desc' | 'color';
 type ColorFilter = '__all__' | '__none__' | string;
 
@@ -41,58 +34,49 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
 
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [editingNote, setEditingNote] = useState<SystemNote | null>(null);
-  const [noteType, setNoteType] = useState<SystemNoteType>('quick_thought');
   const [focusModeOpen, setFocusModeOpen] = useState(false);
   const [focusModeTitle, setFocusModeTitle] = useState('');
   const [focusModeContent, setFocusModeContent] = useState('');
-  const [quickNoteViewMode, setQuickNoteViewMode] = useState<ViewMode>('expanded');
-  const [journalViewMode, setJournalViewMode] = useState<ViewMode>('expanded');
-  const [quickNoteSortBy, setQuickNoteSortBy] = useState<SortOption>('date_desc');
+  const [sortBy, setSortBy] = useState<SortOption>('date_desc');
   const [colorFilter, setColorFilter] = useState<ColorFilter>('__all__');
   const [searchQuery, setSearchQuery] = useState('');
   const [quickCaptureOpen, setQuickCaptureOpen] = useState(false);
   const [viewingNote, setViewingNote] = useState<SystemNote | null>(null);
-
-  // Unified: all quick_thought entries (formerly thoughts + quick notes)
-  const notes = systems.filter((s) => s.note_type === 'quick_thought');
-  const journalEntries = systems.filter((s) => s.note_type === 'journal_entry');
-
-  // State for inline note input
   const [newThought, setNewThought] = useState('');
 
-  // Filter notes by color and search
-  const filteredNotes = useMemo(() => {
-    let filtered = notes;
-    
+  // Filter by color and search
+  const filteredEntries = useMemo(() => {
+    let filtered = systems;
+
     if (colorFilter === '__none__') {
       filtered = filtered.filter(n => !n.color);
     } else if (colorFilter !== '__all__') {
       filtered = filtered.filter(n => n.color === colorFilter);
     }
-    
+
     if (searchQuery.trim()) {
       const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(query) || 
+      filtered = filtered.filter(n =>
+        n.title.toLowerCase().includes(query) ||
         (n.content && n.content.toLowerCase().includes(query))
       );
     }
-    
-    return filtered;
-  }, [notes, colorFilter, searchQuery]);
 
-  // Sort notes (pinned always first)
-  const sortedNotes = useMemo(() => {
-    const sorted = [...filteredNotes];
-    
-    switch (quickNoteSortBy) {
+    return filtered;
+  }, [systems, colorFilter, searchQuery]);
+
+  // Sort (pinned always first)
+  const sortedEntries = useMemo(() => {
+    const sorted = [...filteredEntries];
+
+    switch (sortBy) {
       case 'date_desc':
-        sorted.sort((a, b) => 
+        sorted.sort((a, b) =>
           new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime()
         );
         break;
       case 'date_asc':
-        sorted.sort((a, b) => 
+        sorted.sort((a, b) =>
           new Date(a.entry_date || a.created_at).getTime() - new Date(b.entry_date || b.created_at).getTime()
         );
         break;
@@ -106,32 +90,13 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         sorted.sort((a, b) => (a.color || '').localeCompare(b.color || ''));
         break;
     }
-    
+
     return sorted.sort((a, b) => {
       if (a.is_pinned && !b.is_pinned) return -1;
       if (!a.is_pinned && b.is_pinned) return 1;
       return 0;
     });
-  }, [filteredNotes, quickNoteSortBy]);
-
-  // Filter and sort journal entries
-  const filteredJournalEntries = useMemo(() => {
-    let filtered = journalEntries;
-    
-    if (searchQuery.trim()) {
-      const query = searchQuery.toLowerCase();
-      filtered = filtered.filter(n => 
-        n.title.toLowerCase().includes(query) || 
-        (n.content && n.content.toLowerCase().includes(query))
-      );
-    }
-    
-    return filtered.sort((a, b) => {
-      if (a.is_pinned && !b.is_pinned) return -1;
-      if (!a.is_pinned && b.is_pinned) return 1;
-      return new Date(b.entry_date || b.created_at).getTime() - new Date(a.entry_date || a.created_at).getTime();
-    });
-  }, [journalEntries, searchQuery]);
+  }, [filteredEntries, sortBy]);
 
   const getLinkedPlatform = (platformId: string | null) => {
     if (!platformId) return null;
@@ -143,14 +108,15 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
     return ideas.find((i) => i.id === ideaId) || null;
   };
 
-  // Journal entry save handler
-  const handleJournalSave = async (data: {
+  // Unified save handler
+  const handleSave = async (data: {
     title: string;
     content: string;
     platform_id: string | null;
     idea_id: string | null;
     entry_date: string | null;
     mood: string | null;
+    color: string | null;
   }) => {
     if (editingNote) {
       await updateSystem(editingNote.id, {
@@ -160,6 +126,7 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         idea_id: data.idea_id,
         entry_date: data.entry_date,
         mood: data.mood,
+        color: data.color,
       });
     } else {
       await createSystem({
@@ -170,35 +137,6 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         idea_id: data.idea_id,
         entry_date: data.entry_date,
         mood: data.mood,
-      });
-    }
-    setEditingNote(null);
-    setIsAddOpen(false);
-  };
-
-  // Quick note save handler
-  const handleQuickNoteSave = async (data: {
-    title: string;
-    content: string;
-    platform_id: string | null;
-    idea_id: string | null;
-    color: string | null;
-  }) => {
-    if (editingNote) {
-      await updateSystem(editingNote.id, {
-        title: data.title,
-        content: data.content || null,
-        platform_id: data.platform_id,
-        idea_id: data.idea_id,
-        color: data.color,
-      });
-    } else {
-      await createSystem({
-        title: data.title,
-        content: data.content || null,
-        note_type: 'quick_thought',
-        platform_id: data.platform_id,
-        idea_id: data.idea_id,
         color: data.color,
       });
     }
@@ -206,39 +144,36 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
     setIsAddOpen(false);
   };
 
-  // Toggle pin handler
   const handleTogglePin = async (id: string, isPinned: boolean) => {
     await updateSystem(id, { is_pinned: isPinned });
   };
 
-  // Quick capture save handler
   const handleQuickCaptureSave = async (data: { title: string; content: string; type: SystemNoteType }) => {
     await createSystem({
       title: data.title,
       content: data.content || null,
-      note_type: data.type,
+      note_type: 'journal_entry',
       platform_id: null,
       idea_id: null,
-      entry_date: data.type === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
+      entry_date: new Date().toISOString().split('T')[0],
       mood: null,
       color: null,
     });
   };
 
-  // Inline note add handler
   const handleAddThought = async () => {
     if (!newThought.trim()) return;
     await createSystem({
       title: newThought.trim(),
       content: null,
-      note_type: 'quick_thought',
+      note_type: 'journal_entry',
       platform_id: null,
       idea_id: null,
+      entry_date: new Date().toISOString().split('T')[0],
     });
     setNewThought('');
   };
 
-  // Promote to Idea — creates an idea then deletes the note
   const handlePromoteToIdea = async (note: SystemNote) => {
     const idea = await createIdea({
       title: note.title,
@@ -254,24 +189,8 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
     }
   };
 
-  // Move between note types
-  const handleMoveTo = async (id: string, targetType: 'quick_thought' | 'journal_entry') => {
-    await updateSystem(id, { 
-      note_type: targetType,
-      entry_date: targetType === 'journal_entry' ? new Date().toISOString().split('T')[0] : null,
-    });
-    toast({ title: targetType === 'quick_thought' ? 'Moved to Notes' : 'Moved to Journal Entries' });
-  };
-
-  const openAdd = (type: SystemNoteType) => {
-    setEditingNote(null);
-    setNoteType(type);
-    setIsAddOpen(true);
-  };
-
   const openEdit = (note: SystemNote) => {
     setEditingNote(note);
-    setNoteType(note.note_type);
     setIsAddOpen(true);
   };
 
@@ -311,7 +230,7 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
           <h1 className="text-3xl font-bold text-gradient">{title}</h1>
           <p className="text-muted-foreground mt-1">{description}</p>
         </div>
-        
+
         <div className="flex items-center gap-2 w-full sm:w-auto">
           <Button
             variant="outline"
@@ -330,7 +249,7 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
           <div className="relative flex-1 sm:w-64">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
-              placeholder="Search notes..."
+              placeholder="Search entries..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="pl-9 pr-9"
@@ -349,287 +268,131 @@ export function LogView({ logCategory, title, description }: LogViewProps) {
         </div>
       </div>
 
-      {/* Tabs — Notes + Journal Entries */}
-      <Tabs defaultValue="notes" className="space-y-6">
-        <TabsList>
-          <TabsTrigger value="notes" className="gap-2">
-            <StickyNote className="h-4 w-4" />
-            Notes
-          </TabsTrigger>
-          <TabsTrigger value="journal" className="gap-2">
-            <BookOpen className="h-4 w-4" />
-            Journal Entries
-          </TabsTrigger>
-        </TabsList>
+      {/* Inline quick capture */}
+      <div className="flex gap-2">
+        <Input
+          placeholder="What's on your mind?"
+          value={newThought}
+          onChange={(e) => setNewThought(e.target.value)}
+          onKeyDown={(e) => { if (e.key === 'Enter') handleAddThought(); }}
+          className="flex-1"
+        />
+        <Button onClick={handleAddThought} disabled={!newThought.trim()} className="gap-2">
+          <Plus className="h-4 w-4" />
+          Add
+        </Button>
+      </div>
 
-        {/* Notes Tab (unified thoughts + quick notes) */}
-        <TabsContent value="notes" className="space-y-4">
-          {/* Inline quick capture */}
-          <div className="flex gap-2">
-            <Input
-              placeholder="What's on your mind?"
-              value={newThought}
-              onChange={(e) => setNewThought(e.target.value)}
-              onKeyDown={(e) => { if (e.key === 'Enter') handleAddThought(); }}
-              className="flex-1"
+      {/* Toolbar */}
+      <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <Select value={sortBy} onValueChange={(v) => setSortBy(v as SortOption)}>
+            <SelectTrigger className="w-[140px]">
+              <ArrowUpDown className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="date_desc">Newest First</SelectItem>
+              <SelectItem value="date_asc">Oldest First</SelectItem>
+              <SelectItem value="alpha_asc">A → Z</SelectItem>
+              <SelectItem value="alpha_desc">Z → A</SelectItem>
+              <SelectItem value="color">By Color</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={colorFilter} onValueChange={(v) => setColorFilter(v as ColorFilter)}>
+            <SelectTrigger className="w-[160px]">
+              <Palette className="h-4 w-4 mr-2" />
+              <SelectValue placeholder="Filter by color" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="__all__">All Colors</SelectItem>
+              <SelectItem value="__none__">No Color</SelectItem>
+              {noteColors.map((color) => (
+                <SelectItem key={color.id} value={color.id}>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className="w-3 h-3 rounded-full border border-border"
+                      style={{ backgroundColor: color.hex_color }}
+                    />
+                    {color.name}
+                  </div>
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
+            Focus Mode
+          </Button>
+          <Button onClick={() => { setEditingNote(null); setIsAddOpen(true); }} className="gap-2">
+            <Plus className="h-4 w-4" />
+            New Entry
+          </Button>
+        </div>
+      </div>
+
+      {/* Entries List (compact only) */}
+      {systems.length === 0 ? (
+        <Card className="p-8 text-center">
+          <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground">No entries yet. Jot down a quick thought or create a journal entry!</p>
+        </Card>
+      ) : sortedEntries.length === 0 ? (
+        <Card className="p-8 text-center">
+          <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
+          <p className="text-muted-foreground">No entries match your search.</p>
+        </Card>
+      ) : (
+        <div className="space-y-1">
+          {sortedEntries.map((note) => (
+            <QuickNoteCard
+              key={note.id}
+              note={note}
+              compact
+              platform={getLinkedPlatform(note.platform_id)}
+              idea={getLinkedIdea(note.idea_id)}
+              noteColors={noteColors}
+              onEdit={openEdit}
+              onDelete={deleteSystem}
+              onTogglePin={handleTogglePin}
+              onPromoteToIdea={handlePromoteToIdea}
+              onView={setViewingNote}
             />
-            <Button onClick={handleAddThought} disabled={!newThought.trim()} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add
-            </Button>
-          </div>
-
-          <div className="flex flex-wrap items-center justify-between gap-4">
-            <div className="flex items-center gap-2">
-              <ToggleGroup
-                type="single"
-                value={quickNoteViewMode}
-                onValueChange={(v) => v && setQuickNoteViewMode(v as ViewMode)}
-                className="border rounded-md"
-              >
-                <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
-                  <LayoutGrid className="h-4 w-4" />
-                  <span className="hidden sm:inline text-sm">Cards</span>
-                </ToggleGroupItem>
-                <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
-                  <List className="h-4 w-4" />
-                  <span className="hidden sm:inline text-sm">List</span>
-                </ToggleGroupItem>
-              </ToggleGroup>
-              
-              <Select value={quickNoteSortBy} onValueChange={(v) => setQuickNoteSortBy(v as SortOption)}>
-                <SelectTrigger className="w-[140px]">
-                  <ArrowUpDown className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Sort by" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="date_desc">Newest First</SelectItem>
-                  <SelectItem value="date_asc">Oldest First</SelectItem>
-                  <SelectItem value="alpha_asc">A → Z</SelectItem>
-                  <SelectItem value="alpha_desc">Z → A</SelectItem>
-                  <SelectItem value="color">By Color</SelectItem>
-                </SelectContent>
-              </Select>
-
-              <Select value={colorFilter} onValueChange={(v) => setColorFilter(v as ColorFilter)}>
-                <SelectTrigger className="w-[160px]">
-                  <Palette className="h-4 w-4 mr-2" />
-                  <SelectValue placeholder="Filter by color" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="__all__">All Colors</SelectItem>
-                  <SelectItem value="__none__">No Color</SelectItem>
-                  {noteColors.map((color) => (
-                    <SelectItem key={color.id} value={color.id}>
-                      <div className="flex items-center gap-2">
-                        <span
-                          className="w-3 h-3 rounded-full border border-border"
-                          style={{ backgroundColor: color.hex_color }}
-                        />
-                        {color.name}
-                      </div>
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <Button onClick={() => openAdd('quick_thought')} className="gap-2">
-              <Plus className="h-4 w-4" />
-              Add Note
-            </Button>
-          </div>
-
-          {notes.length === 0 ? (
-            <Card className="p-8 text-center">
-              <StickyNote className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No notes yet. Jot down a quick thought or capture an idea!</p>
-            </Card>
-          ) : sortedNotes.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No notes match your search.</p>
-            </Card>
-          ) : quickNoteViewMode === 'compact' ? (
-            <div className="space-y-1">
-              {sortedNotes.map((note) => (
-                <QuickNoteCard
-                  key={note.id}
-                  note={note}
-                  compact
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  noteColors={noteColors}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                  onPromoteToIdea={handlePromoteToIdea}
-                  onMoveTo={(id) => handleMoveTo(id, 'journal_entry')}
-                  onView={setViewingNote}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {sortedNotes.map((note, index) => (
-                <AnimatedCard key={note.id} index={index}>
-                  <QuickNoteCard
-                    note={note}
-                    platform={getLinkedPlatform(note.platform_id)}
-                    idea={getLinkedIdea(note.idea_id)}
-                    noteColors={noteColors}
-                    onEdit={openEdit}
-                    onDelete={deleteSystem}
-                    onTogglePin={handleTogglePin}
-                    onPromoteToIdea={handlePromoteToIdea}
-                    onMoveTo={(id) => handleMoveTo(id, 'journal_entry')}
-                    onView={setViewingNote}
-                  />
-                </AnimatedCard>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-
-        {/* Journal Entries Tab */}
-        <TabsContent value="journal" className="space-y-4">
-          <div className="flex items-center justify-between gap-4">
-            <ToggleGroup
-              type="single"
-              value={journalViewMode}
-              onValueChange={(v) => v && setJournalViewMode(v as ViewMode)}
-              className="border rounded-md"
-            >
-              <ToggleGroupItem value="expanded" aria-label="Expanded view" className="gap-1.5 px-3">
-                <LayoutGrid className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Expanded</span>
-              </ToggleGroupItem>
-              <ToggleGroupItem value="compact" aria-label="Compact view" className="gap-1.5 px-3">
-                <List className="h-4 w-4" />
-                <span className="hidden sm:inline text-sm">Titles</span>
-              </ToggleGroupItem>
-            </ToggleGroup>
-            <div className="flex gap-2">
-              <Button variant="outline" onClick={handleOpenFocusMode} className="gap-2">
-                Focus Mode
-              </Button>
-              <Button onClick={() => openAdd('journal_entry')} className="gap-2">
-                <Plus className="h-4 w-4" />
-                New Entry
-              </Button>
-            </div>
-          </div>
-
-          {journalEntries.length === 0 ? (
-            <Card className="p-8 text-center">
-              <BookOpen className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No journal entries yet. Start documenting your journey!</p>
-            </Card>
-          ) : filteredJournalEntries.length === 0 ? (
-            <Card className="p-8 text-center">
-              <Search className="h-12 w-12 mx-auto text-muted-foreground mb-4" />
-              <p className="text-muted-foreground">No entries match your search.</p>
-            </Card>
-          ) : journalViewMode === 'compact' ? (
-            <Card className="divide-y divide-border overflow-hidden">
-              {filteredJournalEntries.map((note) => (
-                <JournalNoteCard
-                  key={note.id}
-                  note={note}
-                  compact
-                  platform={getLinkedPlatform(note.platform_id)}
-                  idea={getLinkedIdea(note.idea_id)}
-                  onEdit={openEdit}
-                  onDelete={deleteSystem}
-                  onTogglePin={handleTogglePin}
-                  onPromoteToIdea={handlePromoteToIdea}
-                  onMoveTo={(id) => handleMoveTo(id, 'quick_thought')}
-                  onView={setViewingNote}
-                />
-              ))}
-            </Card>
-          ) : (
-            <div className="space-y-4">
-              {filteredJournalEntries.map((note, index) => (
-                <AnimatedCard key={note.id} index={index}>
-                  <JournalNoteCard
-                    note={note}
-                    platform={getLinkedPlatform(note.platform_id)}
-                    idea={getLinkedIdea(note.idea_id)}
-                    onEdit={openEdit}
-                    onDelete={deleteSystem}
-                    onTogglePin={handleTogglePin}
-                    onPromoteToIdea={handlePromoteToIdea}
-                    onMoveTo={(id) => handleMoveTo(id, 'quick_thought')}
-                    onView={setViewingNote}
-                  />
-                </AnimatedCard>
-              ))}
-            </div>
-          )}
-        </TabsContent>
-      </Tabs>
-
-      {/* Journal Entry Dialog */}
-      {noteType === 'journal_entry' && (
-        <JournalEntryDialog
-          open={isAddOpen}
-          onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) setEditingNote(null);
-          }}
-          noteType={noteType}
-          editingNote={editingNote}
-          platforms={platforms}
-          ideas={ideas}
-          onSave={handleJournalSave}
-          onOpenFocusMode={handleOpenFocusMode}
-          onCreateIdea={async (title) => {
-            const idea = await createIdea({ title, status: 'developing', priority: 'none' });
-            return idea ? { id: idea.id, title: idea.title } : null;
-          }}
-        />
+          ))}
+        </div>
       )}
 
-      {/* Quick Note Dialog */}
-      {noteType === 'quick_thought' && (
-        <QuickNoteDialog
-          open={isAddOpen}
-          onOpenChange={(open) => {
-            setIsAddOpen(open);
-            if (!open) setEditingNote(null);
-          }}
-          editingNote={editingNote}
-          platforms={platforms}
-          ideas={ideas}
-          noteColors={noteColors}
-          onSave={handleQuickNoteSave}
-          onCreateColor={createColor}
-          onUpdateColor={updateColor}
-          onDeleteColor={deleteColor}
-          onCreateIdea={async (title) => {
-            const idea = await createIdea({ title, status: 'developing', priority: 'none' });
-            return idea ? { id: idea.id, title: idea.title } : null;
-          }}
-        />
-      )}
+      {/* Journal Entry Dialog (unified) */}
+      <JournalEntryDialog
+        open={isAddOpen}
+        onOpenChange={(open) => {
+          setIsAddOpen(open);
+          if (!open) setEditingNote(null);
+        }}
+        noteType="journal_entry"
+        editingNote={editingNote}
+        platforms={platforms}
+        ideas={ideas}
+        noteColors={noteColors}
+        onSave={handleSave}
+        onOpenFocusMode={handleOpenFocusMode}
+        onCreateIdea={async (title) => {
+          const idea = await createIdea({ title, status: 'developing', priority: 'none' });
+          return idea ? { id: idea.id, title: idea.title } : null;
+        }}
+      />
 
-      {/* View Quick Note Dialog */}
+      {/* View Note Dialog */}
       <ViewQuickNoteDialog
         note={viewingNote}
-        open={!!viewingNote && viewingNote.note_type !== 'journal_entry'}
+        open={!!viewingNote}
         onOpenChange={(open) => { if (!open) setViewingNote(null); }}
         platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
         idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
         noteColors={noteColors}
-      />
-
-      <ViewJournalEntryDialog
-        note={viewingNote && viewingNote.note_type === 'journal_entry' ? viewingNote : null}
-        open={!!viewingNote && viewingNote.note_type === 'journal_entry'}
-        onOpenChange={(open) => { if (!open) setViewingNote(null); }}
-        platform={viewingNote ? getLinkedPlatform(viewingNote.platform_id) : null}
-        idea={viewingNote ? getLinkedIdea(viewingNote.idea_id) : null}
       />
 
       <FocusModeDialog
