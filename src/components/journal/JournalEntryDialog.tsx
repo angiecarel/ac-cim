@@ -159,7 +159,10 @@ export function JournalEntryDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', isJournal && 'max-w-3xl')}>
+      <DialogContent
+        className={cn('max-w-2xl max-h-[90vh] overflow-y-auto', isJournal && 'max-w-3xl')}
+        style={selectedColor ? { backgroundColor: colorStyle.bg, borderColor: colorStyle.border } : undefined}
+      >
         <DialogHeader>
           <div className="flex items-center justify-between">
             <DialogTitle className="flex items-center gap-2">
