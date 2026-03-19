@@ -71,6 +71,7 @@ export function JournalEntryDialog({
   editingNote,
   platforms,
   ideas,
+  noteColors = [],
   onSave,
   onOpenFocusMode,
   onCreateIdea,
