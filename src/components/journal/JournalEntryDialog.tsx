@@ -50,6 +50,7 @@ interface JournalEntryDialogProps {
   editingNote?: SystemNote | null;
   platforms: Platform[];
   ideas: Idea[];
+  noteColors?: NoteColor[];
   onSave: (data: {
     title: string;
     content: string;
@@ -57,6 +58,7 @@ interface JournalEntryDialogProps {
     idea_id: string | null;
     entry_date: string | null;
     mood: string | null;
+    color: string | null;
   }) => void;
   onOpenFocusMode?: () => void;
   onCreateIdea?: (title: string) => Promise<{ id: string; title: string } | null>;
