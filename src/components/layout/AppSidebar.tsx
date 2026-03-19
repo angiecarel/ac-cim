@@ -36,7 +36,7 @@ const navItems = [
 
 export function AppSidebar() {
   const location = useLocation();
-  const { signOut, profile } = useAuth();
+  const { signOut, profile, user } = useAuth();
   const { stats } = useIdea();
   const [isDark, setIsDark] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
@@ -139,21 +139,25 @@ export function AppSidebar() {
           </nav>
 
           {/* User section */}
-          <div className="border-t p-4">
-            <div className="mb-3 flex items-center gap-3 px-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-sm font-medium shrink-0">
+          <div className="border-t p-4 space-y-3">
+            <div className="flex items-center gap-2.5 px-1">
+              <div className="flex h-9 w-9 items-center justify-center rounded-full bg-muted text-xs font-semibold shrink-0">
                 {profile?.display_name?.[0]?.toUpperCase() || 'U'}
               </div>
-              <div className="flex-1 truncate">
-                <p className="text-xs text-muted-foreground truncate">{profile?.display_name || 'User'}</p>
+              <div className="flex flex-col min-w-0">
+                <span className="text-xs font-semibold truncate">{profile?.display_name || 'User'}</span>
+                <span className="text-[10px] text-muted-foreground truncate">{user?.email || ''}</span>
               </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-1">
               <Tooltip>
                 <TooltipTrigger asChild>
                   <Link
                     to="/archive"
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
+                      'flex h-9 items-center justify-center rounded-md transition-colors',
                       location.pathname === '/archive'
                         ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                         : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
@@ -170,7 +174,7 @@ export function AppSidebar() {
                     to="/settings"
                     onClick={() => setIsOpen(false)}
                     className={cn(
-                      'flex h-8 w-8 items-center justify-center rounded-md transition-colors shrink-0',
+                      'flex h-9 items-center justify-center rounded-md transition-colors',
                       location.pathname === '/settings'
                         ? 'bg-sidebar-accent text-sidebar-accent-foreground'
                         : 'text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground'
@@ -179,29 +183,30 @@ export function AppSidebar() {
                     <Settings className="h-4 w-4" />
                   </Link>
                 </TooltipTrigger>
-                <TooltipContent side="top">Manage Settings</TooltipContent>
+                <TooltipContent side="top">Settings</TooltipContent>
               </Tooltip>
-            </div>
-            
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 justify-start"
-                onClick={toggleDarkMode}
-              >
-                {isDark ? <Sun className="h-4 w-4 mr-2" /> : <Moon className="h-4 w-4 mr-2" />}
-                {isDark ? 'Light' : 'Dark'}
-              </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                className="flex-1 justify-start text-destructive hover:text-destructive hover:bg-destructive/10"
-                onClick={signOut}
-              >
-                <LogOut className="h-4 w-4 mr-2" />
-                Sign Out
-              </Button>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={toggleDarkMode}
+                    className="flex h-9 items-center justify-center rounded-md text-muted-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-foreground transition-colors"
+                  >
+                    {isDark ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">{isDark ? 'Light mode' : 'Dark mode'}</TooltipContent>
+              </Tooltip>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <button
+                    onClick={signOut}
+                    className="flex h-9 items-center justify-center rounded-md text-destructive hover:bg-destructive/10 transition-colors"
+                  >
+                    <LogOut className="h-4 w-4" />
+                  </button>
+                </TooltipTrigger>
+                <TooltipContent side="top">Sign out</TooltipContent>
+              </Tooltip>
             </div>
           </div>
         </div>
