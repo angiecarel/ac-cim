@@ -49,6 +49,7 @@ function AppContent() {
           <Route path="/log/creative" element={<PageTransition><CreativeLog /></PageTransition>} />
           <Route path="/log/business" element={<PageTransition><BusinessLog /></PageTransition>} />
           <Route path="/quicklinks" element={<PageTransition><QuickLinksPage /></PageTransition>} />
+          <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
           <Route path="/history" element={<PageTransition><PastIdeas /></PageTransition>} />
           <Route path="/archive" element={<PageTransition><ArchiveView /></PageTransition>} />
           <Route path="/settings" element={<PageTransition><ManageSettings /></PageTransition>} />

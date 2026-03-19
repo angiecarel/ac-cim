@@ -65,6 +65,8 @@ function EditorToolbar({ editor, minimal }: EditorToolbarProps) {
     editor.chain().focus().extendMarkRange('link').setLink({ href: url }).run();
   }, [editor]);
 
+  if (!editor) return null;
+
   return (
     <div className="flex flex-wrap items-center gap-0.5 border-b border-border p-1 bg-muted/30">
       <ToolbarButton
