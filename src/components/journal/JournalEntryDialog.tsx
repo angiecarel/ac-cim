@@ -94,6 +94,14 @@ export function JournalEntryDialog({
   const linkableIdeas = ideas.filter((i) => !['archived', 'recycled'].includes(i.status));
   const wordCount = getWordCount(content);
 
+  const displayColors = noteColors.length > 0 ? noteColors : DEFAULT_COLORS.map(c => ({
+    ...c,
+    user_id: '',
+    sort_order: 0,
+    created_at: '',
+    updated_at: '',
+  }));
+
   useEffect(() => {
     if (editingNote) {
       setTitle(editingNote.title);
@@ -102,6 +110,7 @@ export function JournalEntryDialog({
       setIdeaId(editingNote.idea_id || '');
       setEntryDate(editingNote.entry_date ? new Date(editingNote.entry_date) : new Date());
       setMood(editingNote.mood || '');
+      setSelectedColor(editingNote.color || '');
     } else {
       setTitle('');
       setContent('');
@@ -109,6 +118,7 @@ export function JournalEntryDialog({
       setIdeaId('');
       setEntryDate(new Date());
       setMood('');
+      setSelectedColor('');
     }
     setShowNewIdeaInput(false);
     setNewIdeaTitle('');
