@@ -35,12 +35,12 @@ export function Resources() {
     queryKey: ['resources', user?.id],
     queryFn: async () => {
       const { data, error } = await supabase
-        .from('resources')
+        .from('resources' as any)
         .select('*')
         .eq('user_id', user!.id)
         .order('updated_at', { ascending: false });
       if (error) throw error;
-      return data as Resource[];
+      return (data || []) as Resource[];
     },
     enabled: !!user,
   });
