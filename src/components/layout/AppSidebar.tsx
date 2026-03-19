@@ -36,7 +36,7 @@ const navItems = [
 
 export function AppSidebar() {
   const location = useLocation();
-  const { signOut, profile } = useAuth();
+  const { signOut, profile, user } = useAuth();
   const { stats } = useIdea();
   const [isDark, setIsDark] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
