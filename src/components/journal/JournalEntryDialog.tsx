@@ -8,9 +8,21 @@ import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { RichTextEditor, getWordCount } from './RichTextEditor';
 import { SystemNote, SystemNoteType } from '@/hooks/useSystems';
+import { NoteColor } from '@/hooks/useNoteColors';
+import { getColorStyle } from './QuickNoteDialog';
 import { format } from 'date-fns';
-import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles, Plus, Check, X } from 'lucide-react';
+import { CalendarIcon, Maximize2, BookOpen, StickyNote, Smile, Frown, Meh, Heart, Sparkles, Plus, Check, X, Palette } from 'lucide-react';
 import { cn } from '@/lib/utils';
+
+const DEFAULT_COLORS = [
+  { id: 'default-yellow', name: 'Yellow', hex_color: '#fef3c7' },
+  { id: 'default-green', name: 'Green', hex_color: '#dcfce7' },
+  { id: 'default-blue', name: 'Blue', hex_color: '#dbeafe' },
+  { id: 'default-purple', name: 'Purple', hex_color: '#ede9fe' },
+  { id: 'default-pink', name: 'Pink', hex_color: '#fce7f3' },
+  { id: 'default-orange', name: 'Orange', hex_color: '#ffedd5' },
+  { id: 'default-gray', name: 'Gray', hex_color: '#f3f4f6' },
+];
 
 const MOOD_OPTIONS = [
   { value: 'great', label: 'Great', icon: Sparkles, color: 'text-yellow-500' },
