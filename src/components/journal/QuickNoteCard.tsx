@@ -2,7 +2,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Edit, Trash2, Link2, Pin, PinOff, Sparkles, BookOpen } from 'lucide-react';
+import { Edit, Trash2, Link2, Pin, PinOff, Sparkles, BookOpen, Smile, Meh, Frown, Heart } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
