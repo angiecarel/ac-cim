@@ -8,6 +8,14 @@ import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
+const MOOD_ICONS: Record<string, { icon: typeof Smile; label: string }> = {
+  great: { icon: Sparkles, label: 'Great' },
+  good: { icon: Smile, label: 'Good' },
+  okay: { icon: Meh, label: 'Okay' },
+  low: { icon: Frown, label: 'Low' },
+  grateful: { icon: Heart, label: 'Grateful' },
+};
+
 interface Platform {
   id: string;
   name: string;
