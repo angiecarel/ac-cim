@@ -2,11 +2,19 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { SystemNote } from '@/hooks/useSystems';
 import { NoteColor } from '@/hooks/useNoteColors';
-import { Edit, Trash2, Link2, Pin, PinOff, Sparkles, BookOpen } from 'lucide-react';
+import { Edit, Trash2, Link2, Pin, PinOff, Sparkles, BookOpen, Smile, Meh, Frown, Heart } from 'lucide-react';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
 import { getColorStyle } from './QuickNoteDialog';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+
+const MOOD_ICONS: Record<string, { icon: typeof Smile; label: string }> = {
+  great: { icon: Sparkles, label: 'Great' },
+  good: { icon: Smile, label: 'Good' },
+  okay: { icon: Meh, label: 'Okay' },
+  low: { icon: Frown, label: 'Low' },
+  grateful: { icon: Heart, label: 'Grateful' },
+};
 
 interface Platform {
   id: string;
@@ -64,10 +72,19 @@ export function QuickNoteCard({
         {note.is_pinned && (
           <Pin className="h-3 w-3 text-primary flex-shrink-0" />
         )}
-        <div
-          className="w-2 h-2 rounded-full flex-shrink-0"
-          style={{ backgroundColor: colorStyle.border }}
-        />
+        {note.mood && MOOD_ICONS[note.mood] && (() => {
+          const MoodIcon = MOOD_ICONS[note.mood!].icon;
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MoodIcon className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent side="top"><p>{MOOD_ICONS[note.mood!].label}</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })()}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
