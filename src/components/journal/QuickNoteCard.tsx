@@ -72,10 +72,19 @@ export function QuickNoteCard({
         {note.is_pinned && (
           <Pin className="h-3 w-3 text-primary flex-shrink-0" />
         )}
-        <div
-          className="w-2 h-2 rounded-full flex-shrink-0"
-          style={{ backgroundColor: colorStyle.border }}
-        />
+        {note.mood && MOOD_ICONS[note.mood] && (() => {
+          const MoodIcon = MOOD_ICONS[note.mood!].icon;
+          return (
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <MoodIcon className="h-3 w-3 text-muted-foreground flex-shrink-0" />
+                </TooltipTrigger>
+                <TooltipContent side="top"><p>{MOOD_ICONS[note.mood!].label}</p></TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
+          );
+        })()}
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger asChild>
