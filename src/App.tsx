@@ -19,6 +19,8 @@ import { Resources } from "@/pages/Resources";
 import { PastIdeas } from "@/pages/PastIdeas";
 import { ArchiveView } from "@/pages/ArchiveView";
 import { ManageSettings } from "@/pages/ManageSettings";
+import { Workflows } from "@/pages/Workflows";
+import { WorkflowEditor } from "@/pages/WorkflowEditor";
 import NotFound from "./pages/NotFound";
 import { Loader2 } from "lucide-react";
 
@@ -50,6 +52,8 @@ function AppContent() {
           <Route path="/log/business" element={<PageTransition><BusinessLog /></PageTransition>} />
           <Route path="/quicklinks" element={<PageTransition><QuickLinksPage /></PageTransition>} />
           <Route path="/resources" element={<PageTransition><Resources /></PageTransition>} />
+          <Route path="/workflows" element={<PageTransition><Workflows /></PageTransition>} />
+          <Route path="/workflows/:id" element={<WorkflowEditor />} />
           <Route path="/history" element={<PageTransition><PastIdeas /></PageTransition>} />
           <Route path="/archive" element={<PageTransition><ArchiveView /></PageTransition>} />
           <Route path="/settings" element={<PageTransition><ManageSettings /></PageTransition>} />

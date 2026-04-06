@@ -19,6 +19,7 @@ import {
   Briefcase,
   Link2,
   FolderOpen,
+  Workflow,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useState, useEffect } from 'react';
@@ -30,6 +31,7 @@ const navItems = [
   { path: '/log/creative', label: 'Creative Log', icon: PenTool },
   { path: '/log/business', label: 'Business Log', icon: Briefcase },
   { path: '/resources', label: 'Resources', icon: FolderOpen },
+  { path: '/workflows', label: 'Workflows', icon: Workflow },
   { path: '/quicklinks', label: 'Quick Links', icon: Link2 },
   { path: '/history', label: 'Past Ideas', icon: History },
 ];
