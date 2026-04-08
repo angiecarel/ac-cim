@@ -49,8 +49,10 @@ function ShapeNodeComponent({ id, data, selected }: NodeProps) {
 
   return (
     <div className="relative group">
-      <Handle type="target" position={Position.Top} className="!w-2 !h-2 !bg-primary" />
-      <Handle type="target" position={Position.Left} className="!w-2 !h-2 !bg-primary" />
+      <Handle type="target" position={Position.Top} id="top-target" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="source" position={Position.Top} id="top-source" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="target" position={Position.Left} id="left-target" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="source" position={Position.Left} id="left-source" className="!w-2 !h-2 !bg-primary" />
 
       <div
         className={`${shapeStyles[nodeData.shape]} ${sizeStyles[nodeData.shape]} flex items-center justify-center border-2 px-3 py-2 cursor-pointer transition-shadow ${selected ? 'shadow-lg ring-2 ring-primary' : 'shadow-sm'}`}
@@ -77,8 +79,10 @@ function ShapeNodeComponent({ id, data, selected }: NodeProps) {
         </div>
       </div>
 
-      <Handle type="source" position={Position.Bottom} className="!w-2 !h-2 !bg-primary" />
-      <Handle type="source" position={Position.Right} className="!w-2 !h-2 !bg-primary" />
+      <Handle type="target" position={Position.Bottom} id="bottom-target" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="source" position={Position.Bottom} id="bottom-source" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="target" position={Position.Right} id="right-target" className="!w-2 !h-2 !bg-primary" />
+      <Handle type="source" position={Position.Right} id="right-source" className="!w-2 !h-2 !bg-primary" />
 
       {showColors && (
         <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 z-50 flex gap-1 bg-popover border rounded-lg p-1.5 shadow-lg">
