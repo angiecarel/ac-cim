@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { IdeaFile } from '@/types';
 import { useIdeaFiles } from '@/hooks/useIdeaFiles';
@@ -25,11 +25,23 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
   const { user } = useAuth();
   const { getIdeaFiles, uploadFile, deleteFile, getFileUrl, uploading } = useIdeaFiles(user?.id);
   const [files, setFiles] = useState<IdeaFile[]>([]);
+  const [fileUrls, setFileUrls] = useState<Record<string, string>>({});
   const [isDragging, setIsDragging] = useState(false);
 
+  const refreshUrls = useCallback(async (fileList: IdeaFile[]) => {
+    const urls: Record<string, string> = {};
+    for (const f of fileList) {
+      urls[f.id] = await getFileUrl(f.file_path);
+    }
+    setFileUrls(urls);
+  }, [getFileUrl]);
+
   useEffect(() => {
-    getIdeaFiles(ideaId).then(setFiles);
-  }, [ideaId, getIdeaFiles]);
+    getIdeaFiles(ideaId).then((fetched) => {
+      setFiles(fetched);
+      refreshUrls(fetched);
+    });
+  }, [ideaId, getIdeaFiles, refreshUrls]);
 
   const processFiles = async (fileList: FileList | File[]) => {
     for (const file of Array.from(fileList)) {
