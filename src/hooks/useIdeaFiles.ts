@@ -72,9 +72,15 @@ export function useIdeaFiles(userId: string | undefined) {
     }
   }, []);
 
-  const getFileUrl = useCallback((filePath: string) => {
-    const { data } = supabase.storage.from('idea-files').getPublicUrl(filePath);
-    return data.publicUrl;
+  const getFileUrl = useCallback(async (filePath: string): Promise<string> => {
+    const { data, error } = await supabase.storage
+      .from('idea-files')
+      .createSignedUrl(filePath, 3600); // 1 hour expiry
+    if (error || !data?.signedUrl) {
+      console.error('Error creating signed URL:', error);
+      return '';
+    }
+    return data.signedUrl;
   }, []);
 
   return { getIdeaFiles, uploadFile, deleteFile, getFileUrl, uploading };
