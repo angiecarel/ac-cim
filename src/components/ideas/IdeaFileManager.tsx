@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { IdeaFile } from '@/types';
 import { useIdeaFiles } from '@/hooks/useIdeaFiles';
@@ -25,16 +25,32 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
   const { user } = useAuth();
   const { getIdeaFiles, uploadFile, deleteFile, getFileUrl, uploading } = useIdeaFiles(user?.id);
   const [files, setFiles] = useState<IdeaFile[]>([]);
+  const [fileUrls, setFileUrls] = useState<Record<string, string>>({});
   const [isDragging, setIsDragging] = useState(false);
 
+  const refreshUrls = useCallback(async (fileList: IdeaFile[]) => {
+    const urls: Record<string, string> = {};
+    for (const f of fileList) {
+      urls[f.id] = await getFileUrl(f.file_path);
+    }
+    setFileUrls(urls);
+  }, [getFileUrl]);
+
   useEffect(() => {
-    getIdeaFiles(ideaId).then(setFiles);
-  }, [ideaId, getIdeaFiles]);
+    getIdeaFiles(ideaId).then((fetched) => {
+      setFiles(fetched);
+      refreshUrls(fetched);
+    });
+  }, [ideaId, getIdeaFiles, refreshUrls]);
 
   const processFiles = async (fileList: FileList | File[]) => {
     for (const file of Array.from(fileList)) {
       const uploaded = await uploadFile(ideaId, file);
-      if (uploaded) setFiles(prev => [uploaded, ...prev]);
+      if (uploaded) {
+        const url = await getFileUrl(uploaded.file_path);
+        setFiles(prev => [uploaded, ...prev]);
+        setFileUrls(prev => ({ ...prev, [uploaded.id]: url }));
+      }
     }
   };
 
@@ -106,7 +122,7 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
               <div key={file.id} className="flex items-center gap-2 text-sm px-2 py-1.5 rounded-md bg-muted/50 group">
                 <Icon className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                 <a
-                  href={getFileUrl(file.file_path)}
+                  href={fileUrls[file.id] || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 truncate text-primary hover:underline"
