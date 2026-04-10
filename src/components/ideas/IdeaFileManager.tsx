@@ -118,7 +118,7 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
               <div key={file.id} className="flex items-center gap-2 text-sm px-2 py-1.5 rounded-md bg-muted/50 group">
                 <Icon className="h-3.5 w-3.5 text-muted-foreground flex-shrink-0" />
                 <a
-                  href={getFileUrl(file.file_path)}
+                  href={fileUrls[file.id] || '#'}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex-1 truncate text-primary hover:underline"
