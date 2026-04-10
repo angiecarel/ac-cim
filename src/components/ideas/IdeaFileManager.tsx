@@ -46,7 +46,11 @@ export function IdeaFileManager({ ideaId, readOnly = false }: IdeaFileManagerPro
   const processFiles = async (fileList: FileList | File[]) => {
     for (const file of Array.from(fileList)) {
       const uploaded = await uploadFile(ideaId, file);
-      if (uploaded) setFiles(prev => [uploaded, ...prev]);
+      if (uploaded) {
+        const url = await getFileUrl(uploaded.file_path);
+        setFiles(prev => [uploaded, ...prev]);
+        setFileUrls(prev => ({ ...prev, [uploaded.id]: url }));
+      }
     }
   };
 
